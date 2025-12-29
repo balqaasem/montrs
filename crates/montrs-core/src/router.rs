@@ -56,6 +56,12 @@ pub struct Router<C: AppConfig> {
     actions: HashMap<String, Box<dyn Action<C>>>,
 }
 
+impl<C: AppConfig> Default for Router<C> {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl<C: AppConfig> Router<C> {
     /// Initializes a new, empty router.
     pub fn new() -> Self {

@@ -21,6 +21,12 @@ pub struct ReactiveRuntime {
     _dependencies: RwLock<std::collections::HashMap<DefaultKey, HashSet<DefaultKey>>>,
 }
 
+impl Default for ReactiveRuntime {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl ReactiveRuntime {
     /// Initializes a new reactive runtime.
     pub fn new() -> Self {

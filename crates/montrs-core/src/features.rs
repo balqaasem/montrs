@@ -36,6 +36,12 @@ pub struct FeatureManager {
     segments: HashMap<String, Segment>,
 }
 
+impl Default for FeatureManager {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl FeatureManager {
     /// Creates a new, empty FeatureManager.
     pub fn new() -> Self {

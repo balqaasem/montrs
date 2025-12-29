@@ -13,6 +13,12 @@ pub struct TestEnv {
     vars: Arc<RwLock<HashMap<String, String>>>,
 }
 
+impl Default for TestEnv {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl TestEnv {
     /// Creates a new, empty TestEnv.
     pub fn new() -> Self {

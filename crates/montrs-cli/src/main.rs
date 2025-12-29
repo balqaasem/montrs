@@ -75,16 +75,14 @@ async fn provision_project(name: &str, _template: &str) -> anyhow::Result<()> {
 
     // 2. Write the root workspace Cargo.toml.
     pb.set_message("Writing workspace config...");
-    let cargo_toml = format!(
-        r#"[workspace]
+    let cargo_toml = r#"[workspace]
 resolver = "2"
 members = ["app", "crates/*"]
 
 [workspace.package]
 version = "0.1.0"
 edition = "2024"
-"#
-    );
+"#;
     fs::write(base_path.join("Cargo.toml"), cargo_toml)?;
     pb.inc(1);
 
