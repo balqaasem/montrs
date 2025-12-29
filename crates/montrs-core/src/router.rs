@@ -2,23 +2,30 @@
 //! This module defines Loaders for data fetching and Actions for data mutation,
 //! ensuring clear boundaries between reads and writes.
 
-use std::collections::HashMap;
+use crate::AppConfig;
 use async_trait::async_trait;
 use serde::{Deserialize, Serialize};
-use crate::AppConfig;
+use std::collections::HashMap;
 
 /// Trait for data loading components. Loaders are responsible for fetching data
 /// for a specific route. They are read-only and idempotent.
 #[async_trait]
 pub trait Loader<C: AppConfig>: Send + Sync + 'static {
-    async fn call(&self, ctx: LoaderCtx<C>) -> Result<LoaderResponse, crate::signals::Signal<String>>;
+    async fn call(
+        &self,
+        ctx: LoaderCtx<C>,
+    ) -> Result<LoaderResponse, crate::signals::Signal<String>>;
 }
 
 /// Trait for data mutation components. Actions are responsible for handling
 /// state-changing operations (form submissions, API mutations).
 #[async_trait]
 pub trait Action<C: AppConfig>: Send + Sync + 'static {
-    async fn call(&self, input: serde_json::Value, ctx: ActionCtx<C>) -> Result<ActionResponse, crate::signals::Signal<String>>;
+    async fn call(
+        &self,
+        input: serde_json::Value,
+        ctx: ActionCtx<C>,
+    ) -> Result<ActionResponse, crate::signals::Signal<String>>;
 }
 
 /// Context passed to a Loader, providing access to the application configuration.
@@ -47,6 +54,12 @@ pub struct ActionResponse {
 pub struct Router<C: AppConfig> {
     loaders: HashMap<String, Box<dyn Loader<C>>>,
     actions: HashMap<String, Box<dyn Action<C>>>,
+}
+
+impl<C: AppConfig> Default for Router<C> {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl<C: AppConfig> Router<C> {

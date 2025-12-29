@@ -2,7 +2,7 @@
 //! This module allows for runtime feature toggling and segment-based
 //! targeting to support A/B testing and phased rollouts.
 
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
 /// Configuration for an individual feature flag.
@@ -34,6 +34,12 @@ pub enum Rule {
 pub struct FeatureManager {
     flags: HashMap<String, FeatureFlag>,
     segments: HashMap<String, Segment>,
+}
+
+impl Default for FeatureManager {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl FeatureManager {

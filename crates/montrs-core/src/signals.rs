@@ -2,11 +2,11 @@
 //! This module implements a thread-safe reactive runtime that tracks subscribers
 //! and notifies them when signal values change.
 
-use std::sync::Arc;
-use parking_lot::RwLock;
-use std::collections::HashSet;
-use slotmap::{DefaultKey, SlotMap};
 use once_cell::sync::Lazy;
+use parking_lot::RwLock;
+use slotmap::{DefaultKey, SlotMap};
+use std::collections::HashSet;
+use std::sync::Arc;
 
 /// A unique identifier for a reactive effect or subscriber.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -18,7 +18,13 @@ pub struct ReactiveRuntime {
     /// Mapping of keys to closure behaviors that run when a dependency changes.
     subscribers: RwLock<SlotMap<DefaultKey, Arc<dyn Fn() + Send + Sync>>>,
     /// Tracks which subscribers depend on which other keys (for future graph optimization).
-    dependencies: RwLock<std::collections::HashMap<DefaultKey, HashSet<DefaultKey>>>,
+    _dependencies: RwLock<std::collections::HashMap<DefaultKey, HashSet<DefaultKey>>>,
+}
+
+impl Default for ReactiveRuntime {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl ReactiveRuntime {
@@ -26,7 +32,7 @@ impl ReactiveRuntime {
     pub fn new() -> Self {
         Self {
             subscribers: RwLock::new(SlotMap::new()),
-            dependencies: RwLock::new(std::collections::HashMap::new()),
+            _dependencies: RwLock::new(std::collections::HashMap::new()),
         }
     }
 }
@@ -54,8 +60,10 @@ impl<T: Send + Sync + 'static> Signal<T> {
 
     /// Returns a clone of the current value.
     /// In future versions, this will automatically register the current reactive scope as a dependency.
-    pub fn get(&self) -> T 
-    where T: Clone {
+    pub fn get(&self) -> T
+    where
+        T: Clone,
+    {
         self.value.read().clone()
     }
 

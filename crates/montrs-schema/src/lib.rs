@@ -5,7 +5,7 @@
 extern crate proc_macro;
 use proc_macro::TokenStream;
 use quote::quote;
-use syn::{parse_macro_input, DeriveInput, Data, Fields, LitInt};
+use syn::{Data, DeriveInput, Fields, LitInt, parse_macro_input};
 
 /// Procedural macro to derive validation logic for a struct.
 /// Supported attributes:
@@ -21,15 +21,18 @@ pub fn derive_schema(input: TokenStream) -> TokenStream {
     let mut all_field_validations = Vec::new();
 
     // Parse the struct data and iterate over named fields.
-    if let Data::Struct(data) = input.data {
-        if let Fields::Named(fields) = data.fields {
-            for f in fields.named {
-                let field_name = f.ident.clone();
-                // Iterate over attributes on each field.
-                for attr in f.attrs {
-                    if attr.path().is_ident("schema") {
-                        // Use syn's nested meta parsing for schema attributes.
-                        let _ = attr.parse_nested_meta(|meta| {
+    if let Data::Struct(syn::DataStruct {
+        fields: Fields::Named(fields),
+        ..
+    }) = input.data
+    {
+        for f in fields.named {
+            let field_name = f.ident.clone();
+            // Iterate over attributes on each field.
+            for attr in f.attrs {
+                if attr.path().is_ident("schema") {
+                    // Use syn's nested meta parsing for schema attributes.
+                    let _ = attr.parse_nested_meta(|meta| {
                             if meta.path.is_ident("min_len") {
                                 // Extract integer value for min_len.
                                 let value = meta.value()?;
@@ -70,7 +73,6 @@ pub fn derive_schema(input: TokenStream) -> TokenStream {
                                     }
                             Ok(())
                         });
-                    }
                 }
             }
         }
