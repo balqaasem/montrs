@@ -343,7 +343,7 @@ my-app/
 │  │  └─ client/           \# WASM client code (RustUI)  
 │  ├─ static/  
 │  └─ Cargo.toml  
-├─ shared-modules/          \# app-specific modules (optional workspace crates)  
+├─ shared-modules/          \# shared modules (optional workspace crates)  
 ├─ docs/  
 │  ├─ getting-started.md  
 │  ├─ api.md  
