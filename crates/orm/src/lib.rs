@@ -70,6 +70,7 @@ pub trait DbBackend: Send + Sync + 'static {
 
 /// SQLite-specific database backend implementation.
 /// Uses synchronous rusqlite under the hood with internal locking.
+#[derive(Clone)]
 pub struct SqliteBackend {
     conn: Arc<Mutex<Connection>>,
 }
@@ -124,6 +125,7 @@ impl DbBackend for SqliteBackend {
 
 /// PostgreSQL-specific database backend implementation.
 /// Uses deadpool-postgres for async connection pooling.
+#[derive(Clone)]
 pub struct PostgresBackend {
     pool: Pool,
 }

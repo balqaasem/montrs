@@ -52,6 +52,7 @@ pub trait EnvConfigExt: EnvConfig {
 impl<T: EnvConfig + ?Sized> EnvConfigExt for T {}
 
 /// Default implementation of EnvConfig that reads from the system's environment.
+#[derive(Clone)]
 pub struct TypedEnv {
     // Standard implementation using std::env
 }

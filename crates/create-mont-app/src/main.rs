@@ -77,7 +77,7 @@ async fn provision_project(name: &str, _template: &str) -> anyhow::Result<()> {
     pb.set_message("Writing workspace config...");
     let cargo_toml = r#"[workspace]
 resolver = "2"
-members = ["app", "crates/*"]
+members = ["app"]
 
 [workspace.package]
 version = "0.1.0"
@@ -86,8 +86,8 @@ edition = "2024"
     fs::write(base_path.join("Cargo.toml"), cargo_toml)?;
     pb.inc(1);
 
-    // 3. Generate the application core skeleton.
-    pb.set_message("Generating application core...");
+    // 3. Generate the application core skeleton (Leptos-ready).
+    pb.set_message("Generating Leptos application...");
     let app_cargo = r#"[package]
 name = "app"
 version = "0.1.0"
@@ -95,26 +95,80 @@ edition = "2024"
 
 [dependencies]
 montrs-core = { git = "https://github.com/afsall-labs/mont-rs.git" }
+leptos = { version = "0.8", features = ["hydrate", "ssr"] }
 "#;
     fs::write(base_path.join("app/Cargo.toml"), app_cargo)?;
-    fs::write(
-        base_path.join("app/src/main.rs"),
-        "fn main() { println!(\"Hello, MontRS!\"); }",
-    )?;
+
+    let app_main = r#"use leptos::prelude::*;
+use montrs_core::{AppSpec, Target, AppConfig, EnvConfig, EnvError, FromEnv};
+
+#[derive(Clone)]
+struct MyAppConfig;
+impl AppConfig for MyAppConfig {
+    type Error = Box<dyn std::error::Error + Send + Sync>;
+    type Env = MyEnv;
+}
+
+#[derive(Clone)]
+struct MyEnv;
+impl EnvConfig for MyEnv {
+    fn get<T: FromEnv>(&self, _key: &str) -> Result<T, EnvError> {
+        Err(EnvError::MissingKey(_key.to_string()))
+    }
+}
+
+#[component]
+fn App() -> impl IntoView {
+    let (count, set_count) = signal(0);
+
+    view! {
+        <main class="flex flex-col items-center justify-center min-h-screen bg-slate-900 text-white">
+            <h1 class="text-4xl font-bold mb-4">"Built with MontRS & Leptos"</h1>
+            <button
+                class="px-6 py-2 bg-blue-600 rounded-lg hover:bg-blue-500 transition-colors"
+                on:click=move |_| set_count.update(|n| *n += 1)
+            >
+                "Count: " {count}
+            </button>
+        </main>
+    }
+}
+
+fn main() {
+    let spec = AppSpec::new(MyAppConfig, MyEnv)
+        .with_target(Target::Wasm);
+    
+    spec.mount(|| view! { <App /> });
+}
+"#;
+    fs::write(base_path.join("app/src/main.rs"), app_main)?;
+
+    let index_html = r#"<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MontRS App</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body></body>
+</html>
+"#;
+    fs::write(base_path.join("index.html"), index_html)?;
     pb.inc(1);
 
     // 4. Add developer ergonomics (Makefiles, Trunk, etc.).
     pb.set_message("Adding developer ergonomics...");
     let makefile = r#"[tasks.dev]
-command = "cargo"
-args = ["run", "-p", "app"]
+command = "trunk"
+args = ["serve"]
 
 [tasks.test]
 command = "cargo"
 args = ["test", "--workspace"]
 
 [tasks.build]
-command = "cargo"
+command = "trunk"
 args = ["build", "--release"]
 "#;
     fs::write(base_path.join("Makefile.toml"), makefile)?;

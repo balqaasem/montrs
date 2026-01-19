@@ -6,16 +6,15 @@ pub mod env;
 pub mod features;
 pub mod limiter;
 pub mod router;
-pub mod signals;
 
 pub use env::{EnvConfig, EnvConfigExt, EnvError, FromEnv, TypedEnv};
 pub use features::{FeatureFlag, FeatureManager, Rule, Segment, UserContext};
+pub use leptos::prelude::*;
 pub use limiter::{GovernorLimiter, Limiter};
 pub use router::{Action, ActionCtx, Loader, LoaderCtx, Router};
-pub use signals::Signal;
 
 use async_trait::async_trait;
-use std::error::Error;
+use std::error::Error as StdError;
 
 /// Represents the execution target for the application.
 /// Allows for conditional logic based on where the code is running.
@@ -29,17 +28,17 @@ pub enum Target {
 }
 
 /// The core trait for modular application components (Modules).
-/// Modules are the unit of composition in MontRS, similar to pallets in Substrate.
+/// Modules are the unit of composition in MontRS, designed to run on top of Leptos.
 #[async_trait]
 pub trait Module<C: AppConfig>: Send + Sync + 'static {
     /// Unique identifier for the module.
     fn name(&self) -> &'static str;
 
     /// Initialization hook called during application bootstrap.
-    /// Provides access to the global configuration and environment.
-    async fn init(&self, ctx: &mut ModuleContext<C>) -> Result<(), Box<dyn Error + Send + Sync>>;
+    /// In MontRS, modules use this to provide Leptos contexts and initialize resources.
+    async fn init(&self, ctx: &mut ModuleContext<C>) -> Result<(), Box<dyn StdError + Send + Sync>>;
 
-    /// Hook to register routes (loaders/actions) with the application router.
+    /// Hook to register server-side or client-side routes.
     fn register_routes(&self, _router: &mut Router<C>) {}
 }
 
@@ -51,12 +50,12 @@ pub struct ModuleContext<'a, C: AppConfig> {
 
 /// Trait defining the global application requirements.
 /// Every MontRS app must provide a custom config and error type.
-pub trait AppConfig: Sized + Send + Sync + 'static {
-    type Error: Error + Send + Sync;
-    type Env: EnvConfig;
+pub trait AppConfig: Sized + Send + Sync + Clone + 'static {
+    type Error: StdError + Send + Sync;
+    type Env: EnvConfig + Clone;
 }
 
-/// The AppSpec is a deterministic blueprint of the entire application.
+/// The AppSpec is a deterministic blueprint of the entire Leptos application.
 /// It contains the configuration, modules, environment, and routing table.
 pub struct AppSpec<C: AppConfig> {
     pub config: C,
@@ -88,5 +87,31 @@ impl<C: AppConfig> AppSpec<C> {
     pub fn with_target(mut self, target: Target) -> Self {
         self.target = target;
         self
+    }
+
+    /// Primary entry point to boot the Leptos application based on the AppSpec.
+    pub fn mount<F, IV>(self, main_view: F)
+    where
+        F: FnOnce() -> IV + 'static,
+        IV: IntoView + 'static,
+    {
+        let config = self.config;
+        let env = self.env;
+        let modules = self.modules;
+
+        leptos::mount::mount_to_body(move || {
+            // Provide global application context.
+            provide_context(config.clone());
+            provide_context(env.clone());
+
+            // Initialize modules and provide them as contexts if needed.
+            // Note: In a real implementation, we might need a more sophisticated
+            // async initialization flow for modules.
+            for module in modules {
+                println!("Initializing module: {}", module.name());
+            }
+
+            main_view()
+        });
     }
 }

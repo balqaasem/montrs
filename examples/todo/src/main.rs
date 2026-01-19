@@ -2,29 +2,29 @@
 //! This application integrates signals, schema validation, and the ORM layer
 //! to build a simple but functional Todo management system.
 
-use async_trait::async_trait;
-use montrs_core::{AppConfig, AppSpec, Module, ModuleContext, Router, Signal, Target, TypedEnv};
+use leptos::prelude::*;
+use montrs_core::{
+    AppConfig, AppSpec, Module, ModuleContext, Router, Target,
+};
 use montrs_orm::{DbBackend, FromRow, SqliteBackend};
 use montrs_schema::Schema;
 use serde::{Deserialize, Serialize};
 
 // 1. Define the Schema for creating a Todo.
-// The #[derive(Schema)] macro generates the validate() method.
-#[derive(Debug, Serialize, Deserialize, Schema)]
+#[derive(Debug, Clone, Serialize, Deserialize, Schema)]
 pub struct CreateTodo {
     #[schema(min_len = 3)]
     pub title: String,
 }
 
 // Data model representing a Todo item in the database.
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Todo {
     pub id: i32,
     pub title: String,
     pub completed: bool,
 }
 
-// Implement FromRow to allow the ORM to map database results to the Todo struct.
 impl FromRow for Todo {
     fn from_row_sqlite(row: &rusqlite::Row) -> rusqlite::Result<Self> {
         Ok(Self {
@@ -35,7 +35,6 @@ impl FromRow for Todo {
     }
 
     fn from_row_postgres(_row: &tokio_postgres::Row) -> Result<Self, montrs_orm::DbError> {
-        // Skeleton for now, Postgres integration is planned for v0.2
         Err(montrs_orm::DbError::Query(
             "Postgres not fully implemented in example".to_string(),
         ))
@@ -52,21 +51,29 @@ pub enum MyError {
 }
 
 // 2. Define the Application Configuration.
-// This holds shared resources like the database connection.
+#[derive(Clone)]
 pub struct MyConfig {
     pub db: SqliteBackend,
 }
 
 impl AppConfig for MyConfig {
     type Error = MyError;
-    type Env = TypedEnv;
+    type Env = MyEnv;
+}
+
+#[derive(Clone)]
+pub struct MyEnv;
+
+impl montrs_core::EnvConfig for MyEnv {
+    fn get_var(&self, key: &str) -> Result<String, montrs_core::EnvError> {
+        Err(montrs_core::EnvError::MissingKey(key.to_string()))
+    }
 }
 
 // 3. Define a Module for Todo logic.
-// Modules are the primary unit of modularity in MontRS.
 pub struct TodoModule;
 
-#[async_trait]
+#[async_trait::async_trait]
 impl Module<MyConfig> for TodoModule {
     fn name(&self) -> &'static str {
         "todo"
@@ -81,74 +88,69 @@ impl Module<MyConfig> for TodoModule {
     }
 
     fn register_routes(&self, _router: &mut Router<MyConfig>) {
-        // Here you would register loaders for fetching todos and actions for adding/removing them.
         println!("Routes registered for TodoModule");
+    }
+}
+
+#[component]
+fn TodoApp() -> impl IntoView {
+    let (count, set_count) = signal(0);
+    // Access the provided application config context.
+    let _config = use_context::<MyConfig>();
+
+    view! {
+        <div class="p-8 max-w-md mx-auto bg-white rounded-xl shadow-md overflow-hidden md:max-w-2xl mt-10">
+            <h1 class="text-2xl font-bold text-gray-900 mb-4">"MontRS Todo (Leptos 0.8)"</h1>
+            <p class="text-gray-500 mb-4">"This example uses Leptos's high-performance fine-grained reactivity."</p>
+            {move || {
+                if _config.is_some() {
+                    view! { <p class="text-green-600 mb-4">"AppConfig context is available!"</p> }.into_any()
+                } else {
+                    view! { <p class="text-red-600 mb-4">"AppConfig context missing."</p> }.into_any()
+                }
+            }}
+            <button
+                class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-500 transition-colors"
+                on:click=move |_| set_count.update(|n| *n += 1)
+            >
+                "Clicked " {count} " times"
+            </button>
+        </div>
     }
 }
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
-    // Initialize the SQLite database in memory for this example.
-    let db = SqliteBackend::new(":memory:")?;
-    db.execute(
-        "CREATE TABLE IF NOT EXISTS todos (id INTEGER PRIMARY KEY, title TEXT, completed BOOLEAN)",
-        &[],
-    )
-    .await?;
-
-    let config = MyConfig { db };
-    let env = TypedEnv {};
-
     // 4. Bootstrap the Application Specification (AppSpec).
-    // This is the blueprint of our application.
+    let db = SqliteBackend::new(":memory:")?;
+    let config = MyConfig { db };
+    let env = MyEnv;
+
     let spec = AppSpec::new(config, env)
-        .with_target(Target::Server)
+        .with_target(Target::Wasm)
         .with_module(Box::new(TodoModule));
 
-    // Initialize modules (Simplified manual bootstrap for the example).
-    for _module in &spec.modules {
-        let _ctx = ModuleContext {
-            config: &spec.config,
-            env: &spec.env,
-        };
-        // _module.init(&mut ctx).await?;
-    }
+    println!("Bootstrapping MontRS application...");
 
-    // 5. Demonstrate Reactivity via Signals.
-    // Changing a signal's value would normally trigger dependent effects.
-    let counter = Signal::new(0);
-    println!("Initial counter: {}", counter.get());
-
-    counter.set(10);
-    println!("Updated counter: {}", counter.get());
-
-    // 6. Demonstrate Schema Validation.
-    // The generated validate() method checks our min_len constraint.
+    // 5. Demonstrate Schema Validation (Meta-framework feature).
     let valid_todo = CreateTodo {
-        title: "Buy milk".to_string(),
+        title: "Build with Leptos".to_string(),
     };
-    let invalid_todo = CreateTodo {
-        title: "a".to_string(),
-    };
+    println!("Validation check: {:?}", valid_todo.validate());
 
-    println!("Valid todo check: {:?}", valid_todo.validate());
-    println!("Invalid todo check: {:?}", invalid_todo.validate());
-
-    // 7. Demonstrate ORM operations.
-    // We can execute SQL and query typed results directly from our config's database backend.
+    // 6. Demonstrate ORM operations (Meta-framework feature).
     spec.config
         .db
         .execute(
-            "INSERT INTO todos (title, completed) VALUES (?, ?)",
-            &[&"Learn MontRS", &false],
+            "CREATE TABLE IF NOT EXISTS todos (id INTEGER PRIMARY KEY, title TEXT, completed BOOLEAN)",
+            &[],
         )
         .await?;
-    let todos: Vec<Todo> = spec
-        .config
-        .db
-        .query("SELECT id, title, completed FROM todos", &[])
-        .await?;
-    println!("Todos in DB: {:?}", todos);
+
+    // 7. Mount the Leptos application.
+    // In a WASM environment, this would start the reactivity loop.
+    println!("Mounting Leptos application...");
+    spec.mount(|| view! { <TodoApp /> });
 
     Ok(())
 }

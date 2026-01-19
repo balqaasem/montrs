@@ -14,7 +14,7 @@ pub trait Loader<C: AppConfig>: Send + Sync + 'static {
     async fn call(
         &self,
         ctx: LoaderCtx<C>,
-    ) -> Result<LoaderResponse, crate::signals::Signal<String>>;
+    ) -> Result<LoaderResponse, Box<dyn std::error::Error + Send + Sync>>;
 }
 
 /// Trait for data mutation components. Actions are responsible for handling
@@ -25,7 +25,7 @@ pub trait Action<C: AppConfig>: Send + Sync + 'static {
         &self,
         input: serde_json::Value,
         ctx: ActionCtx<C>,
-    ) -> Result<ActionResponse, crate::signals::Signal<String>>;
+    ) -> Result<ActionResponse, Box<dyn std::error::Error + Send + Sync>>;
 }
 
 /// Context passed to a Loader, providing access to the application configuration.

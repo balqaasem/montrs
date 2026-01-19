@@ -6,9 +6,9 @@
 
 # **1\. Executive summary**
 
-MontRS is a Rust-native, trait-driven, deterministic web framework that blends the engineering strengths of Leptos (fine-grained reactivity), Remix (web-native routing/HTTP mental model), Dioxus (ergonomic multi-target components), Yew (architecture discipline), Substrate/Setheum (trait-first modularity, deterministic initialization, test harness), and Drizzle (minimal-abstraction SQL ergonomics). MontRS is built for teams that value compile-time correctness, explicit boundaries, deterministic initialization across targets, test-first design, and minimal runtime overhead.
+MontRS is a Rust-native, trait-driven, deterministic meta-framework built on top of **Leptos**. It leverages Leptos's high-performance fine-grained reactivity and component model as its core engine, while adding engineering disciplines from Remix (web-native routing/HTTP mental model), Dioxus (ergonomic multi-target components), Yew (architecture discipline), Substrate/Setheum (trait-first modularity, deterministic initialization, test harness), and Drizzle (minimal-abstraction SQL ergonomics). MontRS is designed for teams that want the power of Leptos with added structure for compile-time correctness, explicit modular boundaries, and deterministic initialization across server, WASM, and edge targets.
 
-This PRD defines the technical architecture, core runtime API surfaces, module system, schema model, ORM expectations, testing & mocking, the `create-mont-app` CLI scaffolding tool (including default template), repository and app folder conventions, documentation layout, CI/CD & Cloudflare deployment guidance, and versioning and release practices to produce a production-ready MontRS v0.1.0.
+This PRD defines the technical architecture of the MontRS meta-framework, its integration with the Leptos runtime, the module system, schema model, ORM expectations, testing & mocking, the `create-mont-app` CLI scaffolding tool (including default Leptos template), repository and app folder conventions, documentation layout, CI/CD & Cloudflare deployment guidance, and versioning and release practices to produce a production-ready MontRS v0.1.0 as a first-class Leptos meta-framework.
 
 # **2\. Guiding philosophy & design constraints**
 
@@ -26,39 +26,34 @@ Constraints: MontRS should not require specific third-party services. Where thir
 
 # **3\. High-level architecture**
 
-MontRS splits responsibilities across these layers:
+MontRS splits responsibilities across these layers, sitting on top of the Leptos runtime:
 
-* **Core runtime:** signal scheduler, router resolver, loader/action dispatcher, AppSpec loader.  
-* **Reactive primitives:** `Signal<T>` with explicit `mutate(...)` API.  
-* **Router & routes:** file-based nested routing, typed path/query params, loader/action attributes.  
-* **Modules:** trait-driven feature modules with explicit dependency declarations and init hooks.  
-* **AppSpec:** typed, target-aware initializer that composes modules, env, initial state, features, and segments.  
-* **ORM layer:** trait-based `DbBackend` supporting `Postgres`, `Sqlite`, and generic `Sql`.  
-* **Environment:** typed `EnvConfig` trait and secure secret handling, mockable in TestRuntime.  
-* **Rate limiting & feature flags:** trait-driven interfaces with deterministic evaluation.  
-* **Test runtime:** `TestRuntime` that boots AppSpec deterministically and provides in-memory resources for tests.  
-* **Tooling & scaffold:** `create-mont-app` crate provides project scaffolding and integrates `cargo-make`, `trunk`, `tailwindcss`, `RustUI`, and `axum` in the template.
+* **Core runtime:** Leptos-backed signal scheduler and component lifecycle, MontRS router resolver, loader/action dispatcher, AppSpec loader.  
+* **Reactive primitives:** Direct use of Leptos signals (`ReadSignal`, `WriteSignal`, `Memo`, `Effect`).  
+* **Router & routes:** Leptos-integrated file-based nested routing, typed path/query params, loader/action attributes.  
+* **Modules:** Trait-driven feature modules that provide Leptos contexts and resources, with explicit dependency declarations and init hooks.  
+* **AppSpec:** Typed, target-aware initializer that composes modules, env, initial state, features, and segments on top of the Leptos app context.  
+* **ORM layer:** Trait-based `DbBackend` supporting `Postgres`, `Sqlite`, and generic `Sql`.  
+* **Environment:** Typed `EnvConfig` trait and secure secret handling, mockable in TestRuntime.  
+* **Rate limiting & feature flags:** Trait-driven interfaces with deterministic evaluation.  
+* **Test runtime:** `TestRuntime` that boots AppSpec (and the internal Leptos reactive scope) deterministically.  
+* **Tooling & scaffold:** `create-mont-app` crate provides project scaffolding for Leptos-based MontRS apps, integrating `trunk`, `tailwindcss`, and `axum`.
 
 # **4\. Core runtime APIs (conceptual)**
 
 Below are the canonical trait and type signatures that should be implemented in v0.1. These are intentionally minimal and typed.
 
-## **4.1 Signals (reactivity)**
+MontRS uses Leptos's native reactivity system. It does not reinvent signals but provides ergonomic wrappers or direct access to:
 
-pub struct Signal\<T\> { /\* private \*/ }
-
-impl\<T\> Signal\<T\> {  
-    pub fn new(val: T) \-\> Self;  
-    pub fn get(\&self) \-\> \&T;  
-    pub fn set(\&self, val: T);  
-    // Explicit in-place mutation \-- not a raw \&mut, but a controlled mutate that notifies dependents  
-    pub fn mutate\<F: FnOnce(\&mut T)\>(\&self, f: F);  
-}
+*   `create_signal(value)`: Returns a `ReadSignal` and `WriteSignal`.
+*   `create_memo(f)`: For derived state.
+*   `create_effect(f)`: For side effects.
+*   `provide_context` / `use_context`: For dependency injection across modules.
 
 Properties:
 
-* `mutate` enforces capability boundaries; mutation always triggers dependency notification.  
-* Signals are usable server-side during SSR and in WASM.
+*   Full compatibility with the Leptos ecosystem.
+*   Signals are usable server-side during SSR and hydrated in WASM.
 
 ## **4.2 Loader & Action primitives (file-based routing)**
 
@@ -613,7 +608,7 @@ To go from PRD → v0.1 implementable artifact, deliver:
 
 # **26\. Conclusion**
 
-MontRS unifies best-in-class design patterns in a Rust-native framework: Leptos-style reactivity, Remix-style routing mental model, Dioxus ergonomics, Yew discipline, Substrate modularity & testability, and Drizzle minimal ORM abstraction. The `create-mont-app` CLI and template will accelerate adoption and produce opinionated, production-capable projects using `cargo-make`, `trunk`, `tailwindcss`, `RustUI`, and `axum`. The deterministic AppSpec plus TestRuntime ensures reproducible tests and safe deployments to Cloudflare Workers / Pages and other targets.
+MontRS establishes itself as a premier **Leptos meta-framework**, providing an opinionated and structured layer on top of Leptos's world-class reactivity. It unifies the engineering strengths of Remix (routing), Dioxus (multi-target), Yew (discipline), Substrate (modularity), and Drizzle (minimal ORM) into a cohesive Rust-native ecosystem. The `create-mont-app` CLI and template accelerate adoption by producing production-capable Leptos projects pre-configured with `trunk`, `tailwindcss`, and `axum`. The deterministic AppSpec plus TestRuntime ensures reproducible tests and safe deployments to Cloudflare Workers / Pages and beyond.
 
-This PRD defines an actionable route to MontRS v0.1: small set of core crates, clear trait interfaces, a deterministic spec, minimal-DSL schema derives, a Drizzle-like ORM, and an approachable developer experience with strong test invariants. Follow the roadmap and implementation deliverables, and MontRS will be positioned to provide a Rust-first web framework that scales from prototypes to production systems while preserving correctness, performance, and developer ergonomics.
+This PRD defines the actionable transition to MontRS v0.1: a first-class Leptos meta-framework with clear trait interfaces, a deterministic spec, minimal-DSL schema derives, a Drizzle-like ORM, and an approachable developer experience that leverages the best of the Rust web ecosystem.
 
