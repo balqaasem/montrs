@@ -31,3 +31,4 @@ reqwest = { version = "0.12", features = ["json", "blocking"] }
 cargo-generate = "0.23"
 config = "0.14"
 tempfile = "3.10"
+toml = "0.9.11"

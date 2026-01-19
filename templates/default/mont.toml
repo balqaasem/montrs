@@ -1,0 +1,36 @@
+[project]
+name = "my-app"
+
+[build]
+target = "index.html"
+dist = "dist"
+site_root = "target/site"
+site_pkg_name = "pkg"
+
+[serve]
+port = 8080
+addr = "127.0.0.1"
+
+[tasks]
+# Simple shell command
+hello = "echo 'Hello from MontRS!'"
+
+# Build & Development
+lint = { command = "cargo clippy --workspace -- -D warnings", category = "Quality" }
+fmt = { command = "cargo fmt --all", category = "Quality" }
+
+# Testing
+test-unit = { command = "cargo test --lib", category = "Testing", description = "Run unit tests" }
+test-all = { 
+    command = "cargo test --workspace", 
+    category = "Testing", 
+    description = "Run all tests", 
+    dependencies = ["lint", "fmt"] 
+}
+
+# Production
+pre-release = { 
+    command = "echo 'Preparing release...'", 
+    category = "Release", 
+    dependencies = ["test-all"] 
+}

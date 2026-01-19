@@ -20,6 +20,13 @@ pub enum Commands {
         #[arg(short, long, default_value = "default")]
         template: String,
     },
+    /// Run a custom task defined in mont.toml.
+    Run {
+        /// Name of the task to run.
+        task: String,
+    },
+    /// List available tasks.
+    Tasks,
 }
 
 pub async fn run(command: Commands) -> anyhow::Result<()> {
@@ -27,5 +34,7 @@ pub async fn run(command: Commands) -> anyhow::Result<()> {
         Commands::Build => command::build::run().await,
         Commands::Serve => command::serve::run().await,
         Commands::New { name, template } => command::new::run(name, template).await,
+        Commands::Run { task } => command::run::run(task).await,
+        Commands::Tasks => command::run::list().await,
     }
 }

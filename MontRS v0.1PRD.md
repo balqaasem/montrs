@@ -37,7 +37,7 @@ MontRS splits responsibilities across these layers, sitting on top of the Leptos
 * **Environment:** Typed `EnvConfig` trait and secure secret handling, mockable in TestRuntime.  
 * **Rate limiting & feature flags:** Trait-driven interfaces with deterministic evaluation.  
 * **Test runtime:** `TestRuntime` that boots AppSpec (and the internal Leptos reactive scope) deterministically.  
-* **Tooling & scaffold:** `create-mont-app` crate provides project scaffolding for Leptos-based MontRS apps, integrating `trunk`, `tailwindcss`, and `axum`.
+* **Tooling & scaffold:** `create-mont-app` crate provides project scaffolding for Leptos-based MontRS apps, integrating the MontRS build system, `tailwindcss`, and `axum`.
 
 # **4\. Core runtime APIs (conceptual)**
 
@@ -251,7 +251,7 @@ fn comment\_create(input: CreateComment, ctx: ActionCtx) \-\> Result\<(), Action
   * `montrs-cli` (create-mont-app code)  
   * `app/` crate (user application)  
 * Populate the AppSpec, example modules, README, docs, CI files, and scripts.  
-* Integrate `cargo-make` for common tasks, `trunk` for WASM builds, `tailwindcss` for CSS tooling, `RustUI` for UI abstraction, and `axum` for backend routing in the template app.  
+* Integrate `cargo-mont` for common tasks, WASM builds, `tailwindcss` for CSS tooling, `RustUI` for UI abstraction, and `axum` for backend routing in the template app.  
 * Create a `docs/` directory with starter API docs and contribution guide.
 
 ## **10.2 Command usage (example)**
@@ -267,11 +267,11 @@ cargo make init
 Default template choices:
 
 * Build tool: `cargo-make`  
-* WASM build: `trunk`  
+* WASM build: `cargo-mont`  
 * Styling: `tailwindcss`  
 * UI layer: `RustUI` (opinionated set of components)  
 * Backend routing: `axum`  
-* Task runner config and npm setup are created for tailwind/trunk usage.
+* Task runner config and npm setup are created for tailwind usage.
 
 ## **10.3 Template artifacts**
 
@@ -285,7 +285,7 @@ Template will include:
 * `docs/` (see docs section)  
 * `Makefile.toml` for `cargo-make` tasks  
 * `tailwind.config.js`, `package.json` for minimal tailwind dev build  
-* `trunk.toml` and static assets for WASM  
+* Build configuration and static assets for WASM  
 * CI files (.github/workflows) for build/test/deploy
 
 # **11\. Project & repo layout (recommended)**
@@ -393,7 +393,7 @@ MontRS v0.1 should avoid locking into heavy dependencies. Recommend optionally p
 
 * `tokio` — async runtime (optional for server variant)  
 * `axum` — HTTP routing & server (used in template)  
-* `trunk` — WASM bundling (template)  
+* `cargo-mont` — WASM bundling and orchestration (template)  
 * `tailwindcss` — CSS (via npm in template)  
 * `sqlx` or `postgres`/`rusqlite` — DB drivers (pluggable implementations)  
 * `serde` — (de)serialization  
@@ -419,7 +419,7 @@ Note: Keep runtime optional; each capability is behind traits so implementations
   * `cargo clippy -- -D warnings`  
   * `cargo test --workspace`  
   * `cargo build --workspace --release`  
-  * WASM: `trunk build` (for examples)  
+  * WASM: `cargo mont build` (for examples)  
   * Lint docs & markdown  
   * Run integration smoke tests under TestRuntime
 
@@ -447,7 +447,7 @@ Note: Keep runtime optional; each capability is behind traits so implementations
 
 **Cloudflare Workers (Edge)**:
 
-* Build WASM using `trunk` or `wasm-pack`, bundle serverless handler with `wrangler` or Cloudflare's Workers for Rust support.  
+* Build WASM using `cargo-mont`, bundle serverless handler with `wrangler` or Cloudflare's Workers for Rust support.  
 * Use `AppSpec` target `Edge` to change features (e.g., smaller ORM, different caching).  
 * Provide a `wrangler.toml` in the template, and a `Makefile` target `cargo make deploy:cloudflare` that:  
   * Builds the WASM/worker bundle  
@@ -455,9 +455,9 @@ Note: Keep runtime optional; each capability is behind traits so implementations
 
 **Cloudflare Pages (static \+ functions)**:
 
-* `trunk` builds static assets; Pages can serve them.  
+* `cargo-mont` builds static assets; Pages can serve them.  
 * For SSR or API, deploy functions as Workers and static frontend to Pages.  
-* CI should run `trunk build` then push static assets to Pages via API or GitHub integration; publish worker via `wrangler` in same pipeline.
+* CI should run `cargo mont build` then push static assets to Pages via API or GitHub integration; publish worker via `wrangler` in same pipeline.
 
 **Serverful deployments (optional)**:
 
@@ -504,7 +504,7 @@ tests/
 
 **M4 — cargo-mont CLI**
 
-* CLI scaffold, workspace template, `app/` example, tailwind/trunk integration.
+* CLI scaffold, workspace template, `app/` example, tailwind integration.
 
 **M5 — Feature flags & rate limiter**
 
@@ -606,7 +606,7 @@ To go from PRD → v0.1 implementable artifact, deliver:
 
 # **26\. Conclusion**
 
-MontRS establishes itself as a premier **Leptos meta-framework**, providing an opinionated and structured layer on top of Leptos's world-class reactivity. It unifies the engineering strengths of Remix (routing), Dioxus (multi-target), Yew (discipline), Substrate (modularity), and Drizzle (minimal ORM) into a cohesive Rust-native ecosystem. The `create-mont-app` CLI and template accelerate adoption by producing production-capable Leptos projects pre-configured with `trunk`, `tailwindcss`, and `axum`. The deterministic AppSpec plus TestRuntime ensures reproducible tests and safe deployments to Cloudflare Workers / Pages and beyond.
+MontRS establishes itself as a premier **Leptos meta-framework**, providing an opinionated and structured layer on top of Leptos's world-class reactivity. It unifies the engineering strengths of Remix (routing), Dioxus (multi-target), Yew (discipline), Substrate (modularity), and Drizzle (minimal ORM) into a cohesive Rust-native ecosystem. The `cargo-mont` CLI and template accelerate adoption by producing production-capable Leptos projects pre-configured with `tailwindcss` and `axum`. The deterministic AppSpec plus TestRuntime ensures reproducible tests and safe deployments to Cloudflare Workers / Pages and beyond.
 
 This PRD defines the actionable transition to MontRS v0.1: a first-class Leptos meta-framework with clear trait interfaces, a deterministic spec, minimal-DSL schema derives, a Drizzle-like ORM, and an approachable developer experience that leverages the best of the Rust web ecosystem.
 

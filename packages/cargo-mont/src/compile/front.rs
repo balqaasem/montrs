@@ -1,4 +1,4 @@
 pub async fn compile() -> anyhow::Result<()> {
-    // TODO: Call trunk build
+    // TODO: Implement frontend compilation
     Ok(())
 }
