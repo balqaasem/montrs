@@ -2,12 +2,11 @@
 resolver = "2"
 
 members = [
-    "crates/montrs-core",
-    "crates/montrs-schema",
-    "crates/montrs-orm",
-    "crates/montrs-test",
-    "crates/montrs-cli",
-    "examples/*",
+    "packages/core",
+    "packages/schema",
+    "packages/orm",
+    "packages/test",
+    "packages/cargo-mont",
 ]
 
 [workspace.package]
@@ -26,3 +25,4 @@ async-trait = "0.1"
 anyhow = "1.0"
 tracing = "0.1"
 futures = "0.3"
+leptos = { version = "0.8", features = ["hydrate", "ssr"] }

@@ -1,0 +1,8 @@
+[package]
+name = "app"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+montrs-core = { git = "https://github.com/afsall-labs/mont-rs.git" }
+leptos = { version = "0.8", features = ["hydrate", "ssr"] }

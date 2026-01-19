@@ -1,0 +1,34 @@
+[package]
+name = "cargo-mont"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+
+[[bin]]
+name = "cargo-mont"
+path = "src/main.rs"
+
+[dependencies]
+clap = { version = "4.5", features = ["derive"] }
+tokio = { version = "1.40", features = ["full"] }
+anyhow.workspace = true
+serde = { workspace = true, features = ["derive"] }
+serde_json.workspace = true
+tracing.workspace = true
+tracing-subscriber = "0.3"
+console = "0.15"
+indicatif = "0.17"
+camino = "1.1"
+cargo_metadata = "0.18"
+notify = "6.1"
+notify-debouncer-full = "0.3"
+which = "6.0"
+shlex = "1.3"
+fs_extra = "1.3"
+reqwest = { version = "0.12", features = ["json", "blocking"] }
+cargo-generate = "0.23"
+config = "0.14"
+tempfile = "3.10"
+toml = "0.9.11"
