@@ -7,7 +7,6 @@ members = [
     "packages/orm",
     "packages/test",
     "packages/cargo-mont",
-    "examples/*",
 ]
 
 [workspace.package]

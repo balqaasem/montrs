@@ -326,8 +326,7 @@ montrs/
 my-app/  
 ├─ Cargo.toml (workspace)  
 ├─ Makefile.toml (cargo-make tasks: dev, build, test, lint, fmt)  
-├─ trunk.toml  
-├─ package.json (tailwind only)  
+├─ trunk.toml   
 ├─ app/                     \# main application crate (server \+ wasm entry)  
 │  ├─ src/  
 │  │  ├─ main.rs  
@@ -577,7 +576,7 @@ To go from PRD → v0.1 implementable artifact, deliver:
 3. `packages/orm` crate with DbBackend trait and sqlite + in-memory backends.  
 4. `packages/test` crate with TestRuntime and TestEnv.  
 5. `packages/cargo-mont` crate implementing the CLI tool.  
-6. Workspace templates and `examples/` demonstrating server+wasm usage.  
+6. Workspace templates in `templates/` demonstrating server+wasm usage.  
 7. `docs/` content for all public APIs and developer guides.  
 8. CI configs and `scripts/release.sh` to perform semantic versioned releases.
 
