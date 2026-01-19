@@ -2,11 +2,11 @@
 resolver = "2"
 
 members = [
-    "crates/core",
-    "crates/schema",
-    "crates/orm",
-    "crates/test",
-    "crates/cargo-mont",
+    "packages/core",
+    "packages/schema",
+    "packages/orm",
+    "packages/test",
+    "packages/cargo-mont",
     "examples/*",
 ]
 

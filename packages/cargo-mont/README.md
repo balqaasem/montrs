@@ -17,7 +17,7 @@ The official build and orchestration tool for the MontRS framework.
 ## Installation
 
 ```bash
-cargo install --path crates/cargo-mont
+cargo install --path packages/cargo-mont
 ```
 
 ## Usage

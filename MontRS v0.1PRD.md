@@ -504,7 +504,7 @@ tests/
 
 * Implement `TestRuntime`, TestEnv, in-memory DB, and module tests for example modules.
 
-**M4 — create-mont-app template**
+**M4 — cargo-mont CLI**
 
 * CLI scaffold, workspace template, `app/` example, tailwind/trunk integration.
 
@@ -572,11 +572,11 @@ fn create\_user(input: CreateUser, ctx: ActionCtx) \-\> Result\<JsonResponse, Ac
 
 To go from PRD → v0.1 implementable artifact, deliver:
 
-1. `montrs-core` crate implementing runtime primitives and signals.  
-2. `montrs-schema` derive crate with basic validators.  
-3. `montrs-orm` crate with DbBackend trait and sqlite \+ in-memory backends.  
-4. `montrs-test` crate with TestRuntime and TestEnv.  
-5. `montrs-cli` crate implementing `create-mont-app`.  
+1. `packages/core` implementing runtime primitives and signals.  
+2. `packages/schema` derive crate with basic validators.  
+3. `packages/orm` crate with DbBackend trait and sqlite + in-memory backends.  
+4. `packages/test` crate with TestRuntime and TestEnv.  
+5. `packages/cargo-mont` crate implementing the CLI tool.  
 6. Workspace templates and `examples/` demonstrating server+wasm usage.  
 7. `docs/` content for all public APIs and developer guides.  
 8. CI configs and `scripts/release.sh` to perform semantic versioned releases.

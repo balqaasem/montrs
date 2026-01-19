@@ -8,7 +8,8 @@
 ## 🚀 Philosophy
 
 - **Compile-time correctness:** Type-driven design; traits and typed configs everywhere.
-- **Deterministic execution:** AppSpec is the single source of truth for initialization.
+- **Modular Core**: Check out `packages/core` for the runtime.
+- **ORM Layer**: See `packages/orm` for database integration.
 - **Explicit boundaries:** Loaders for reads, Actions for writes.
 - **Minimal abstraction:** SQL-first ORM; no hidden magic.
 

@@ -26,8 +26,8 @@ cargo run -p app
 
 ## Documentation
 
-- [Architecture](architecture.md)
-- [Getting Started](getting-started.md)
-- [Modules](modules.md)
-- [ORM & Database](orm.md)
-- [Testing](testing.md)
+- [Core Architecture](packages/core/README.md)
+- [Schema & Validation](packages/schema/README.md)
+- [ORM Layer](packages/orm/README.md)
+- [Testing Tools](packages/test/README.md)
+- [cargo-mont CLI](packages/cargo-mont/README.md)

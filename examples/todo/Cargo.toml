@@ -4,10 +4,10 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
-montrs-core = { path = "../../crates/core" }
-montrs-schema = { path = "../../crates/schema" }
-montrs-orm = { path = "../../crates/orm" }
-montrs-test = { path = "../../crates/test" }
+montrs-core = { path = "../../packages/core" }
+montrs-schema = { path = "../../packages/schema" }
+montrs-orm = { path = "../../packages/orm" }
+montrs-test = { path = "../../packages/test" }
 serde = { workspace = true }
 serde_json = { workspace = true }
 tokio = { workspace = true }
