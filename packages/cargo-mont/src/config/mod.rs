@@ -128,10 +128,10 @@ impl MontConfig {
             Self::default()
         };
 
-        if let Some(root) = metadata.root_package() {
-            if config.project.name == "app" {
-                config.project.name = root.name.clone();
-            }
+        if let Some(root) = metadata.root_package()
+            && config.project.name == "app"
+        {
+            config.project.name = root.name.clone();
         }
 
         Ok(config)
