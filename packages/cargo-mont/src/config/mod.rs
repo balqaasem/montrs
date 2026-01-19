@@ -1,7 +1,7 @@
+use anyhow::{Context, Result};
+use cargo_metadata::MetadataCommand;
 use serde::Deserialize;
 use std::collections::HashMap;
-use cargo_metadata::MetadataCommand;
-use anyhow::{Context, Result};
 
 #[derive(Debug, Deserialize, Clone, Default)]
 pub struct MontConfig {
@@ -29,7 +29,9 @@ impl Default for ProjectConfig {
     }
 }
 
-fn default_app_name() -> String { "app".to_string() }
+fn default_app_name() -> String {
+    "app".to_string()
+}
 
 #[derive(Debug, Deserialize, Clone)]
 pub struct BuildConfig {
@@ -57,11 +59,21 @@ impl Default for BuildConfig {
     }
 }
 
-fn default_target() -> String { "index.html".to_string() }
-fn default_dist() -> String { "dist".to_string() }
-fn default_site_root() -> String { "target/site".to_string() }
-fn default_site_pkg_name() -> String { "pkg".to_string() }
-fn default_assets_dir() -> Option<String> { None }
+fn default_target() -> String {
+    "index.html".to_string()
+}
+fn default_dist() -> String {
+    "dist".to_string()
+}
+fn default_site_root() -> String {
+    "target/site".to_string()
+}
+fn default_site_pkg_name() -> String {
+    "pkg".to_string()
+}
+fn default_assets_dir() -> Option<String> {
+    None
+}
 
 #[derive(Debug, Deserialize, Clone)]
 pub struct ServeConfig {
@@ -80,8 +92,12 @@ impl Default for ServeConfig {
     }
 }
 
-fn default_port() -> u16 { 8080 }
-fn default_addr() -> String { "127.0.0.1".to_string() }
+fn default_port() -> u16 {
+    8080
+}
+fn default_addr() -> String {
+    "127.0.0.1".to_string()
+}
 
 #[derive(Debug, Deserialize, Clone)]
 #[serde(untagged)]
@@ -105,7 +121,7 @@ impl MontConfig {
         let metadata = MetadataCommand::new()
             .exec()
             .map_err(|e| anyhow::anyhow!("Failed to load cargo metadata: {}", e))?;
-        
+
         let mut config = if let Ok(content) = std::fs::read_to_string("mont.toml") {
             toml::from_str(&content).context("Failed to parse mont.toml")?
         } else {

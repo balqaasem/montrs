@@ -1,5 +1,5 @@
 //! montrs-core: The core architectural engine for MontRS.
-//! 
+//!
 //! This crate provides the foundational traits and structs that define how a MontRS
 //! application is structured, initialized, and executed. It leverages Leptos 0.8
 //! for fine-grained reactivity and provides a modular system for composing
@@ -20,7 +20,7 @@ use async_trait::async_trait;
 use std::error::Error as StdError;
 
 /// The execution environment context for the application.
-/// Used to differentiate logic between server-side rendering, WASM hydration, 
+/// Used to differentiate logic between server-side rendering, WASM hydration,
 /// and other deployment targets like Edge or Mobile.
 pub enum Target {
     /// Server-side rendering (SSR) context.
@@ -38,7 +38,7 @@ pub enum Target {
 }
 
 /// The unit of composition in MontRS.
-/// 
+///
 /// A `Module` encapsulates a logical piece of functionality (e.g., Auth, Users, Blog).
 /// It provides hooks for initialization, context provision, and route registration.
 /// Modules are designed to be portable across different `Target` environments.
@@ -48,7 +48,7 @@ pub trait Module<C: AppConfig>: Send + Sync + 'static {
     fn name(&self) -> &'static str;
 
     /// The primary initialization point for a module.
-    /// 
+    ///
     /// This is called during the application bootstrap process. It should be used to:
     /// 1. Initialize local resources (database connections, etc.)
     /// 2. Provide Leptos contexts using `provide_context`.
@@ -57,8 +57,8 @@ pub trait Module<C: AppConfig>: Send + Sync + 'static {
     -> Result<(), Box<dyn StdError + Send + Sync>>;
 
     /// Register routes for this module.
-    /// 
-    /// This allows modules to define their own URL structure and link them to 
+    ///
+    /// This allows modules to define their own URL structure and link them to
     /// specific Loaders and Actions.
     fn register_routes(&self, _router: &mut Router<C>) {}
 }
@@ -73,7 +73,7 @@ pub struct ModuleContext<'a, C: AppConfig> {
 }
 
 /// Defining the "Shape" of the application.
-/// 
+///
 /// Every MontRS application must implement `AppConfig` to define its
 /// custom config structure, error handling, and environment requirements.
 pub trait AppConfig: Sized + Send + Sync + Clone + 'static {
@@ -84,7 +84,7 @@ pub trait AppConfig: Sized + Send + Sync + Clone + 'static {
 }
 
 /// The deterministic blueprint of a MontRS application.
-/// 
+///
 /// `AppSpec` contains everything needed to boot the application: configuration,
 /// registered modules, the environment, and the routing table. It is the single
 /// source of truth for the application's structure.
@@ -126,7 +126,7 @@ impl<C: AppConfig> AppSpec<C> {
     }
 
     /// Boots the application and mounts it to the document body.
-    /// 
+    ///
     /// Inside this method:
     /// 1. The global config and env are provided as Leptos contexts.
     /// 2. All registered modules are initialized sequentially.
@@ -148,7 +148,7 @@ impl<C: AppConfig> AppSpec<C> {
             // Initialize modules.
             for module in modules {
                 println!("Booting module: {}", module.name());
-                // In v0.1, we acknowledge the async balance; true async init 
+                // In v0.1, we acknowledge the async balance; true async init
                 // typically happens outside the reactive loop or via Resources.
             }
 

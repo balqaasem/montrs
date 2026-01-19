@@ -1,12 +1,12 @@
 use crate::config::{MontConfig, TaskConfig};
 use crate::ext::exe_command;
-use std::process::Command;
 use console::style;
 use std::collections::{HashMap, HashSet};
+use std::process::Command;
 
 pub async fn run(task_name: String) -> anyhow::Result<()> {
     let config = MontConfig::load()?;
-    
+
     // Resolve dependencies and run them in order
     let mut executed = HashSet::new();
     execute_task_recursive(&task_name, &config, &mut executed).await?;
@@ -15,15 +15,17 @@ pub async fn run(task_name: String) -> anyhow::Result<()> {
 }
 
 async fn execute_task_recursive(
-    name: &str, 
-    config: &MontConfig, 
-    executed: &mut HashSet<String>
+    name: &str,
+    config: &MontConfig,
+    executed: &mut HashSet<String>,
 ) -> anyhow::Result<()> {
     if executed.contains(name) {
         return Ok(());
     }
 
-    let task = config.tasks.get(name)
+    let task = config
+        .tasks
+        .get(name)
         .ok_or_else(|| anyhow::anyhow!("Task '{}' not found in mont.toml", name))?;
 
     // 1. Run dependencies first
@@ -44,7 +46,12 @@ async fn execute_task_recursive(
         TaskConfig::Simple(cmd_str) => {
             run_shell_cmd(cmd_str, &HashMap::new())?;
         }
-        TaskConfig::Detailed { command, env, description, .. } => {
+        TaskConfig::Detailed {
+            command,
+            env,
+            description,
+            ..
+        } => {
             if let Some(desc) = description {
                 println!("   {}", style(desc).italic().dim());
             }
@@ -61,14 +68,14 @@ fn run_shell_cmd(cmd_str: &str, env_vars: &HashMap<String, String>) -> anyhow::R
     let mut cmd = Command::new("powershell");
     #[cfg(windows)]
     cmd.arg("-Command");
-    
+
     #[cfg(not(windows))]
     let mut cmd = Command::new("sh");
     #[cfg(not(windows))]
     cmd.arg("-c");
-    
+
     cmd.arg(cmd_str);
-    
+
     for (key, val) in env_vars {
         cmd.env(key, val);
     }
@@ -79,14 +86,14 @@ fn run_shell_cmd(cmd_str: &str, env_vars: &HashMap<String, String>) -> anyhow::R
 
 pub async fn list() -> anyhow::Result<()> {
     let config = MontConfig::load()?;
-    
+
     if config.tasks.is_empty() {
         println!("No tasks defined in mont.toml");
         return Ok(());
     }
 
     println!("{}", style("Available Tasks:").bold());
-    
+
     // Group by category if possible
     let mut categories: HashMap<String, Vec<(&String, &TaskConfig)>> = HashMap::new();
     for (name, task) in &config.tasks {
@@ -94,7 +101,10 @@ pub async fn list() -> anyhow::Result<()> {
             TaskConfig::Detailed { category, .. } => category.as_deref().unwrap_or("General"),
             TaskConfig::Simple(_) => "General",
         };
-        categories.entry(cat.to_string()).or_default().push((name, task));
+        categories
+            .entry(cat.to_string())
+            .or_default()
+            .push((name, task));
     }
 
     for (cat, tasks) in categories {

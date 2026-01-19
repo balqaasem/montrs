@@ -10,10 +10,15 @@ pub async fn run() -> anyhow::Result<()> {
 
     // 2. Build Frontend
     let mut front_cmd = Command::new("trunk");
-    front_cmd.arg("build").arg("--release")
-        .arg("--config").arg("mont.toml")
-        .arg("--target").arg(&config.build.target)
-        .arg("--dist").arg(&config.build.dist);
+    front_cmd
+        .arg("build")
+        .arg("--release")
+        .arg("--config")
+        .arg("mont.toml")
+        .arg("--target")
+        .arg(&config.build.target)
+        .arg("--dist")
+        .arg(&config.build.dist);
 
     if let Some(assets) = &config.build.assets_dir {
         front_cmd.arg("--assets-dir").arg(assets);
