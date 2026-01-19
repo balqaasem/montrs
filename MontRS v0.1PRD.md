@@ -321,12 +321,11 @@ montrs/
 ├─ Cargo.toml                \# workspace  
 └─ README.md
 
-## **11.2 Template app layout (create-mont-app generated)**
+## **11.2 Template app layout (cargo-mont generated)**
 
 my-app/  
 ├─ Cargo.toml (workspace)  
-├─ Makefile.toml (cargo-make tasks: dev, build, test, lint, fmt)  
-├─ trunk.toml   
+├─ mont.toml (cargo-mont configuration)
 ├─ app/                     \# main application crate (server \+ wasm entry)  
 │  ├─ src/  
 │  │  ├─ main.rs  
@@ -362,7 +361,7 @@ The `docs/` directory must be comprehensive. The framework repo and generated ap
 docs/  
 ├─ index.md                 \# overview and quickstart  
 ├─ architecture.md          \# deep design rationale  
-├─ getting-started.md       \# create-mont-app usage \+ example  
+├─ getting-started.md       \# cargo-mont usage + example  
 ├─ modules.md               \# how to author modules  
 ├─ appspec.md               \# targeting, segments, features  
 ├─ router.md                \# file-based routes, loaders/actions  
