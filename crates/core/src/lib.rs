@@ -36,7 +36,8 @@ pub trait Module<C: AppConfig>: Send + Sync + 'static {
 
     /// Initialization hook called during application bootstrap.
     /// In MontRS, modules use this to provide Leptos contexts and initialize resources.
-    async fn init(&self, ctx: &mut ModuleContext<C>) -> Result<(), Box<dyn StdError + Send + Sync>>;
+    async fn init(&self, ctx: &mut ModuleContext<C>)
+    -> Result<(), Box<dyn StdError + Send + Sync>>;
 
     /// Hook to register server-side or client-side routes.
     fn register_routes(&self, _router: &mut Router<C>) {}

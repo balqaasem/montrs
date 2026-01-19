@@ -3,9 +3,7 @@
 //! to build a simple but functional Todo management system.
 
 use leptos::prelude::*;
-use montrs_core::{
-    AppConfig, AppSpec, Module, ModuleContext, Router, Target,
-};
+use montrs_core::{AppConfig, AppSpec, Module, ModuleContext, Router, Target};
 use montrs_orm::{DbBackend, FromRow, SqliteBackend};
 use montrs_schema::Schema;
 use serde::{Deserialize, Serialize};

@@ -1,27 +1,38 @@
-# montrs-cli
+# cargo-mont
 
-The official command-line scaffolding tool for the MontRS framework.
+The official build and orchestration tool for the MontRS framework.
 
 ## Overview
 
-`create-mont-app` is a CLI tool designed to jumpstart MontRS development by scaffolding a full workspace-first project structure with sensible defaults and developer tool integrations.
+`cargo-mont` is a specialized cargo subcommand designed to manage the lifecycle of MontRS applications. It provides high-level commands for scaffolding, building, and serving projects, integrating deeply with `trunk` and `cargo`.
 
 ## Key Features
 
-- **Workspace Integration**: Automatically sets up a Cargo workspace for modular development.
-- **Developer Ergonomics**: Includes pre-configured `Makefile.toml` for `cargo-make` and `trunk.toml` for web development.
-- **Scaffolding**: Generates application skeletons, documentation folders, and git ignore files.
+- **Cargo Subcommand**: Seamlessly integrates into the Rust ecosystem as `cargo mont`.
+- **Sophisticated Scaffolding**: Create new projects from local templates via `cargo mont new`.
+- **Integrated Build System**: Orchestrates both frontend (`trunk`) and server-side (`cargo`) builds with a single command: `cargo mont build`.
+- **Developer Experience**: Parallelized development server with hot-reloading via `cargo mont serve`.
+- **Local Template Management**: Templates are managed within the monorepo for maximum stability and speed.
 
 ## Installation
 
 ```bash
-cargo install --path crates/montrs-cli
+cargo install --path crates/cargo-mont
 ```
 
 ## Usage
 
+### Create a New Project
 ```bash
-create-mont-app new my-awesome-project
-cd my-awesome-project
-cargo run -p app
+cargo mont new my-app
+```
+
+### Build for Production
+```bash
+cargo mont build
+```
+
+### Start Development Server
+```bash
+cargo mont serve
 ```
