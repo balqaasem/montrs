@@ -6,7 +6,7 @@ members = [
     "crates/schema",
     "crates/orm",
     "crates/test",
-    "crates/create-mont-app",
+    "crates/cargo-mont",
     "examples/*",
 ]
 
