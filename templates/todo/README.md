@@ -26,3 +26,24 @@ cargo run -p todo-example
 - **`CreateTodo`**: Demonstrates field-level validation attributes.
 - **`Todo`**: Shows how to implement `FromRow` for different database backends.
 - **`TodoModule`**: Illustrates the unit of composition in a MontRS app.
+
+## Tailwind Support
+
+This template includes [`tailwind-fuse`](https://github.com/gaucho-labs/tailwind-fuse) for advanced styling capabilities:
+
+- **Type-Safe Variants**: Use `#[derive(TwClass)]` and `#[derive(TwVariant)]` to build robust UI components.
+- **Smart Merging**: `tw_merge!` handles class conflicts automatically (e.g., `p-4` overrides `px-2`).
+- **Rust-First Config**: Optional `tailwind.toml` support for defining themes and merge options without JavaScript.
+
+### Configuration Options
+
+1. **Tailwind v4 (Recommended)**: Use pure CSS for configuration. No JS files required.
+2. **tailwind.toml**: Create a `tailwind.toml` for a pure-Rust configuration experience. `cargo-mont` generates the JS config automatically.
+
+```toml
+content = ["src/**/*.rs", "*.html"]
+
+[merge]
+prefix = "tw-"
+separator = ":"
+```
