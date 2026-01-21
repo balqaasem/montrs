@@ -1,5 +1,4 @@
 pub mod command;
-pub mod compile;
 pub mod config;
 pub mod ext;
 
@@ -62,6 +61,14 @@ pub struct MontCli {
     /// Output logs from dependencies (multiple --log accepted).
     #[arg(long)]
     pub log: Vec<cargo_leptos::config::Log>,
+
+    /// Use tailwind.toml to generate tailwind.config.js (Pure Rust config).
+    #[arg(long)]
+    pub tailwind_toml: bool,
+
+    /// Use Tailwind v4 CSS-only configuration (No JS/TOML needed).
+    #[arg(long, conflicts_with = "tailwind_toml")]
+    pub tailwind_v4: bool,
 }
 
 #[derive(Subcommand, Debug)]
@@ -114,6 +121,12 @@ pub async fn run(cli: MontCli) -> anyhow::Result<()> {
     config.project.frontend_only = cli.frontend_only;
     config.project.server_only = cli.server_only;
     config.project.features = cli.features.clone();
+
+    if cli.tailwind_toml {
+        config.project.tailwind_style = Some(config::TailwindStyle::Toml);
+    } else if cli.tailwind_v4 {
+        config.project.tailwind_style = Some(config::TailwindStyle::V4);
+    }
 
     match cli.command {
         Commands::Build => command::build::run().await,

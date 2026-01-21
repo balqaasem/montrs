@@ -4,6 +4,8 @@ use cargo_metadata::MetadataCommand;
 use serde::Deserialize;
 use std::{collections::HashMap, net::SocketAddr, sync::Arc};
 
+pub mod tailwind;
+
 #[derive(Debug, Deserialize, Clone, Default)]
 pub struct MontConfig {
     #[serde(default)]
@@ -42,6 +44,16 @@ pub struct ProjectConfig {
     pub server_only: bool,
     #[serde(skip)]
     pub features: Vec<String>,
+    #[serde(skip)]
+    pub tailwind_style: Option<TailwindStyle>,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+pub enum TailwindStyle {
+    #[default]
+    Auto,
+    Toml,
+    V4,
 }
 
 impl Default for ProjectConfig {
