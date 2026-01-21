@@ -17,3 +17,4 @@ rusqlite = { version = "0.31", features = ["bundled"] }
 thiserror = { workspace = true }
 tokio-postgres = "0.7"
 leptos = { workspace = true }
+tailwind-fuse = { version = "0.3.2", features = ["variant"] }

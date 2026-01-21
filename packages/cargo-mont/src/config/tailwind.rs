@@ -8,6 +8,13 @@ pub struct TailwindToml {
     pub content: Option<Vec<String>>,
     pub theme: Option<serde_json::Value>,
     pub plugins: Option<Vec<String>>,
+    pub merge: Option<MergeConfig>,
+}
+
+#[derive(Debug, Deserialize, Clone)]
+pub struct MergeConfig {
+    pub prefix: Option<String>,
+    pub separator: Option<String>,
 }
 
 impl TailwindToml {
