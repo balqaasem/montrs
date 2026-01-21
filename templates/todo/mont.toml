@@ -1,0 +1,24 @@
+[project]
+name = "todo-example"
+
+[build]
+target = "index.html"
+dist = "dist"
+site_root = "target/site"
+site_pkg_name = "pkg"
+# tailwind-input-file = "style/tailwind.css"
+# tailwind-config-file = "tailwind.config.js"
+# style-file = "style/main.scss"
+# assets-dir = "assets"
+# browserquery = "defaults"
+e2e-cmd = "cargo run --package e2e"
+e2e-dir = "."
+
+[serve]
+port = 8081
+addr = "127.0.0.1"
+
+[tasks]
+fmt = { command = "cargo fmt --all", category = "Quality" }
+lint = { command = "cargo clippy -- -D warnings", category = "Quality" }
+test = { command = "cargo test", category = "Testing" }

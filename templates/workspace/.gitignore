@@ -1,6 +1,6 @@
 /target
 /dist
-**/*.rs.bk
 Cargo.lock
-.env
+*.log
+.DS_Store
 tailwind.config.js
