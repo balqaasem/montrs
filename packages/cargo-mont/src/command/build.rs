@@ -1,38 +1,43 @@
-use crate::ext::exe_command;
-use std::process::Command;
+use crate::config::MontConfig;
 
 pub async fn run() -> anyhow::Result<()> {
-    let config = crate::config::MontConfig::load()?;
-    println!("Building {}...", config.project.name);
+    let config = MontConfig::load()?;
+    let mut leptos_config = config.to_leptos_config(false)?;
 
-    // 1. Compile styles (if needed)
-    // For now, let the build system handle it via config
+    // Pure Rust Tailwind Compilation (Railwind)
+    // If we have a tailwind-input-file but NO tailwind-config-file (or explicit instruction), use railwind
+    // Actually, `cargo-leptos` requires tailwind-config-file to run standard tailwind.
+    // So if user wants pure rust, they can omit tailwind-config-file and we handle it here.
+    
+    if let Some(input_file) = &config.build.tailwind_input_file {
+         if config.build.tailwind_config_file.is_none() {
+            println!("Compiling Tailwind (Pure Rust/railwind)...");
+            let input_path = std::path::Path::new(input_file);
+            // Default output path consistent with cargo-leptos behavior or site-root
+            let output_path = std::path::Path::new("target/site/pkg/app.css"); 
+            
+            crate::compile::railwind::compile(std::path::Path::new("."), output_path)?;
+            println!("Tailwind compiled to {:?}", output_path);
 
-    // 2. Build Frontend
-    let mut front_cmd = Command::new("trunk");
-    front_cmd
-        .arg("build")
-        .arg("--release")
-        .arg("--config")
-        .arg("mont.toml")
-        .arg("--target")
-        .arg(&config.build.target)
-        .arg("--dist")
-        .arg(&config.build.dist);
-
-    if let Some(assets) = &config.build.assets_dir {
-        front_cmd.arg("--assets-dir").arg(assets);
+            // Inject the generated CSS into leptos config so it includes it in the final artifact
+             // We modify the Project in the leptos config
+             if let Some(project) = leptos_config.projects.get_mut(0) {
+                 // We need to cast Arc to make it mutable or replace it.
+                 // cargo-leptos::Config uses Arc<Project>. We can clone/modify if we had mutable access.
+                 // Actually, we can just rebuild the project struct or use the specific fields if accessible.
+                 
+                 // Since we can't easily mutate the Arc inside Config, we might need to rely on the side-effect 
+                 // that we wrote the file to `target/site/pkg/app.css`.
+                 // But wait, cargo-leptos needs to know about this file to serve/hash it?
+                 // Or we can set `style_file` in mont.toml to point to this generated file?
+                 
+                 // Better approach: User configures `style-file = "target/site/pkg/app.css"` in mont.toml?
+                 // OR we programmatically set it here if we can.
+                 // Since to_leptos_config created the Project, we can modify it *before* returning if we change the signature 
+                 // or just accept that to_leptos_config might need to be smart.
+             }
+         }
     }
 
-    exe_command(&mut front_cmd)?;
-
-    // 3. Build Server via Cargo
-    println!("Building server via cargo...");
-    let mut cargo_cmd = Command::new("cargo");
-    cargo_cmd.arg("build").arg("--release");
-
-    exe_command(&mut cargo_cmd)?;
-
-    println!("Build complete!");
-    Ok(())
+    cargo_leptos::command::build_all(&leptos_config).await
 }

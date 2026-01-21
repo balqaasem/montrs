@@ -6,6 +6,11 @@ target = "index.html"
 dist = "dist"
 site_root = "target/site"
 site_pkg_name = "pkg"
+# tailwind-input-file = "style/tailwind.css"
+# tailwind-config-file = "tailwind.config.js"
+# style-file = "style/main.scss"
+# assets-dir = "assets"
+# browserquery = "defaults"
 
 [serve]
 port = 8080
