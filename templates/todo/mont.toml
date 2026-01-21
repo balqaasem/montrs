@@ -11,6 +11,8 @@ site_pkg_name = "pkg"
 # style-file = "style/main.scss"
 # assets-dir = "assets"
 # browserquery = "defaults"
+e2e-cmd = "cargo run --package e2e"
+e2e-dir = "."
 
 [serve]
 port = 8081
