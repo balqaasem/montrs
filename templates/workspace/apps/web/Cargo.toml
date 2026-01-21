@@ -4,6 +4,7 @@ version.workspace = true
 edition.workspace = true
 
 [dependencies]
+montrs-core = { workspace = true }
 leptos = { workspace = true }
 tailwind-fuse = { workspace = true }
 ui = { path = "../../packages/ui" }

@@ -4,6 +4,6 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
-montrs-core = { git = "https://github.com/afsall-labs/mont-rs.git" }
+montrs-core = { path = "../../../packages/core" }
 leptos = { version = "0.8", features = ["hydrate", "ssr"] }
 tailwind-fuse = { version = "0.3.2", features = ["variant"] }

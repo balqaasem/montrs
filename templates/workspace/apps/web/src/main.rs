@@ -1,6 +1,21 @@
 use leptos::prelude::*;
-use tailwind_fuse::*;
+use montrs_core::{AppSpec, Target, AppConfig, EnvConfig, EnvError, FromEnv};
 use ui::Button;
+
+#[derive(Clone)]
+struct MyAppConfig;
+impl AppConfig for MyAppConfig {
+    type Error = Box<dyn std::error::Error + Send + Sync>;
+    type Env = MyEnv;
+}
+
+#[derive(Clone)]
+struct MyEnv;
+impl EnvConfig for MyEnv {
+    fn get<T: FromEnv>(&self, _key: &str) -> Result<T, EnvError> {
+        Err(EnvError::MissingKey(_key.to_string()))
+    }
+}
 
 #[component]
 fn App() -> impl IntoView {
@@ -20,5 +35,8 @@ fn App() -> impl IntoView {
 }
 
 fn main() {
-    leptos::mount::mount_to_body(App);
+    let spec = AppSpec::new(MyAppConfig, MyEnv)
+        .with_target(Target::Wasm);
+    
+    spec.mount(|| view! { <App /> });
 }
