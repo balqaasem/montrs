@@ -15,6 +15,14 @@
     - [Test](packages/test/README.md): Deterministic testing suite.
 - **Production CLI**: [cargo-mont](packages/cargo-mont/README.md) for orchestration.
 
+## 📋 Prerequisites
+
+Before installing MontRS, ensure you have the following installed:
+
+- **Rust**: Latest stable version (install via [rustup](https://rustup.rs/)).
+- **Perl (Windows only)**: Required for building `openssl-sys` (vendored).
+    - Install via winget: `winget install StrawberryPerl.StrawberryPerl`
+
 ## 📦 Getting Started
 
 ### Install the CLI
