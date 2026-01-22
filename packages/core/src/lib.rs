@@ -9,12 +9,14 @@ pub mod env;
 pub mod features;
 pub mod limiter;
 pub mod router;
+pub mod validation;
 
 pub use env::{EnvConfig, EnvConfigExt, EnvError, FromEnv, TypedEnv};
 pub use features::{FeatureFlag, FeatureManager, Rule, Segment, UserContext};
 pub use leptos::prelude::*;
 pub use limiter::{GovernorLimiter, Limiter};
 pub use router::{Action, ActionCtx, Loader, LoaderCtx, Router};
+pub use validation::{Validate, ValidationError};
 
 use async_trait::async_trait;
 use std::error::Error as StdError;

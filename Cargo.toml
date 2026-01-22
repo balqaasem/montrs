@@ -26,3 +26,4 @@ anyhow = "1.0"
 tracing = "0.1"
 futures = "0.3"
 leptos = { version = "0.8", features = ["hydrate", "ssr"] }
+regex = "1.10"

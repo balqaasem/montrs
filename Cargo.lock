@@ -3609,6 +3609,7 @@ dependencies = [
  "governor",
  "leptos",
  "nonzero_ext",
+ "regex",
  "serde",
  "serde_json",
  "thiserror 1.0.69",
@@ -3634,8 +3635,10 @@ dependencies = [
 name = "montrs-schema"
 version = "0.1.0"
 dependencies = [
+ "montrs-core",
  "proc-macro2",
  "quote",
+ "regex",
  "serde",
  "syn 2.0.114",
  "thiserror 1.0.69",

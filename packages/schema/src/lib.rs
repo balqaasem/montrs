@@ -19,6 +19,7 @@ pub fn derive_schema(input: TokenStream) -> TokenStream {
     let name = input.ident;
 
     let mut all_field_validations = Vec::new();
+    let mut regex_statics = Vec::new();
 
     // Parse the struct data and iterate over named fields.
     if let Data::Struct(syn::DataStruct {
@@ -27,63 +28,98 @@ pub fn derive_schema(input: TokenStream) -> TokenStream {
     }) = input.data
     {
         for f in fields.named {
-            let field_name = f.ident.clone();
+            let field_name = f.ident.expect("Named fields must have idents");
+            let field_name_str = field_name.to_string();
+
             // Iterate over attributes on each field.
             for attr in f.attrs {
                 if attr.path().is_ident("schema") {
-                    // Use syn's nested meta parsing for schema attributes.
                     let _ = attr.parse_nested_meta(|meta| {
-                            if meta.path.is_ident("min_len") {
-                                // Extract integer value for min_len.
-                                let value = meta.value()?;
-                                let lit: LitInt = value.parse()?;
-                                let min = lit.base10_parse::<usize>()?;
-                                all_field_validations.push(quote! {
-                                    if self.#field_name.len() < #min {
-                                        return Err(format!("{} is too short (min {})", stringify!(#field_name), #min));
-                                    }
-                                });
-                            } else if meta.path.is_ident("email") {
-                                // Basic email presence check.
-                                all_field_validations.push(quote! {
-                                    if !self.#field_name.contains('@') {
-                                        return Err(format!("{} must be a valid email", stringify!(#field_name)));
-                                    }
-                                });
-                            } else if meta.path.is_ident("regex") {
-                                        // Regex pattern extraction.
-                                        let value = meta.value()?;
-                                        let lit: syn::LitStr = value.parse()?;
-                                        let regex_str = lit.value();
-                                        all_field_validations.push(quote! {
-                                            if !#regex_str.is_empty() && !self.#field_name.is_empty() {
-                                                // TODO: Integration with regex crate for v0.2
-                                            }
-                                        });
-                                    } else if meta.path.is_ident("custom") {
-                                        // Custom function name extraction.
-                                        let value = meta.value()?;
-                                        let lit: syn::LitStr = value.parse()?;
-                                        let custom_fn = syn::Ident::new(&lit.value(), lit.span());
-                                        all_field_validations.push(quote! {
-                                            if let Err(e) = self.#custom_fn() {
-                                                return Err(format!("{}: {}", stringify!(#field_name), e));
-                                            }
-                                        });
-                                    }
-                            Ok(())
-                        });
+                        if meta.path.is_ident("min_len") {
+                            let value = meta.value()?;
+                            let lit: LitInt = value.parse()?;
+                            let min = lit.base10_parse::<usize>()?;
+                            all_field_validations.push(quote! {
+                                if self.#field_name.len() < #min {
+                                    errors.push(::montrs_core::ValidationError::MinLength {
+                                        field: #field_name_str,
+                                        min: #min,
+                                        actual: self.#field_name.len(),
+                                    });
+                                }
+                            });
+                        } else if meta.path.is_ident("email") {
+                            all_field_validations.push(quote! {
+                                if !self.#field_name.contains('@') {
+                                    errors.push(::montrs_core::ValidationError::InvalidEmail {
+                                        field: #field_name_str,
+                                    });
+                                }
+                            });
+                        } else if meta.path.is_ident("regex") {
+                            let value = meta.value()?;
+                            let lit: syn::LitStr = value.parse()?;
+                            let regex_str = lit.value();
+
+                            // Compile-time validation of the regex pattern.
+                            if let Err(e) = regex::Regex::new(&regex_str) {
+                                return Err(meta.error(format!("Invalid regex pattern: {}", e)));
+                            }
+
+                            // Generate a unique identifier for the static regex.
+                            let static_ident = syn::Ident::new(
+                                &format!("__REGEX_{}_{}", name, field_name).to_uppercase(),
+                                proc_macro2::Span::call_site(),
+                            );
+
+                            regex_statics.push(quote! {
+                                static #static_ident: ::std::sync::OnceLock<::regex::Regex> = ::std::sync::OnceLock::new();
+                            });
+
+                            all_field_validations.push(quote! {
+                                let re = #static_ident.get_or_init(|| ::regex::Regex::new(#regex_str).unwrap());
+                                if !re.is_match(&self.#field_name) {
+                                    errors.push(::montrs_core::ValidationError::RegexMismatch {
+                                        field: #field_name_str,
+                                        pattern: #regex_str,
+                                    });
+                                }
+                            });
+                        } else if meta.path.is_ident("custom") {
+                            let value = meta.value()?;
+                            let lit: syn::LitStr = value.parse()?;
+                            let custom_fn = syn::Ident::new(&lit.value(), lit.span());
+                            all_field_validations.push(quote! {
+                                if let Err(e) = self.#custom_fn() {
+                                    errors.push(::montrs_core::ValidationError::Custom {
+                                        field: #field_name_str,
+                                        message: e,
+                                    });
+                                }
+                            });
+                        }
+                        Ok(())
+                    });
                 }
             }
         }
     }
 
-    // Generate the implementation of the validate() method.
+    // Generate the implementation of the Validate trait.
     let expanded = quote! {
-        impl #name {
-            pub fn validate(&self) -> Result<(), String> {
+        #(#regex_statics)*
+
+        impl ::montrs_core::Validate for #name {
+            fn validate(&self) -> Result<(), Vec<::montrs_core::ValidationError>> {
+                let mut errors = Vec::new();
+
                 #(#all_field_validations)*
-                Ok(())
+
+                if errors.is_empty() {
+                    Ok(())
+                } else {
+                    Err(errors)
+                }
             }
         }
     };
