@@ -4,13 +4,23 @@ use std::fmt;
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum ValidationError {
     /// Field length is less than the required minimum.
-    MinLength { field: &'static str, min: usize, actual: usize },
+    MinLength {
+        field: &'static str,
+        min: usize,
+        actual: usize,
+    },
     /// Field does not contain a valid email format.
     InvalidEmail { field: &'static str },
     /// Field does not match the required regular expression.
-    RegexMismatch { field: &'static str, pattern: &'static str },
+    RegexMismatch {
+        field: &'static str,
+        pattern: &'static str,
+    },
     /// A custom validation rule failed.
-    Custom { field: &'static str, message: String },
+    Custom {
+        field: &'static str,
+        message: String,
+    },
 }
 
 impl fmt::Display for ValidationError {

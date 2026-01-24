@@ -1,5 +1,5 @@
-use montrs_schema::Schema;
 use montrs_core::{Validate, ValidationError};
+use montrs_schema::Schema;
 
 #[derive(Schema)]
 struct User {
@@ -38,10 +38,10 @@ fn test_validation_success() {
 #[test]
 fn test_validation_failure_multiple_errors() {
     let user = User {
-        username: "al".to_string(), // too short
+        username: "al".to_string(),         // too short
         email: "invalid-email".to_string(), // no @
         birth_date: "90-01-01".to_string(), // wrong format
-        status: "forbidden".to_string(), // custom error
+        status: "forbidden".to_string(),    // custom error
     };
 
     let result = user.validate();
@@ -49,11 +49,33 @@ fn test_validation_failure_multiple_errors() {
     let errors = result.unwrap_err();
 
     assert_eq!(errors.len(), 4);
-    
-    assert!(matches!(errors[0], ValidationError::MinLength { field: "username", min: 3, actual: 2 }));
-    assert!(matches!(errors[1], ValidationError::InvalidEmail { field: "email" }));
-    assert!(matches!(errors[2], ValidationError::RegexMismatch { field: "birth_date", .. }));
-    assert!(matches!(errors[3], ValidationError::Custom { field: "status", .. }));
+
+    assert!(matches!(
+        errors[0],
+        ValidationError::MinLength {
+            field: "username",
+            min: 3,
+            actual: 2
+        }
+    ));
+    assert!(matches!(
+        errors[1],
+        ValidationError::InvalidEmail { field: "email" }
+    ));
+    assert!(matches!(
+        errors[2],
+        ValidationError::RegexMismatch {
+            field: "birth_date",
+            ..
+        }
+    ));
+    assert!(matches!(
+        errors[3],
+        ValidationError::Custom {
+            field: "status",
+            ..
+        }
+    ));
 }
 
 #[test]

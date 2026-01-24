@@ -2,7 +2,7 @@ use crate::config::MontConfig;
 
 pub async fn run() -> anyhow::Result<()> {
     let mut config = MontConfig::load()?;
-    
+
     // Handle tailwind.toml
     if let Ok(Some(js_path)) = crate::config::tailwind::ensure_tailwind_config(
         std::path::Path::new("."),
