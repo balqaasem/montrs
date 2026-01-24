@@ -17,6 +17,14 @@ The official build and orchestration tool for the MontRS framework.
 
 ## Installation
 
+### From Crates.io
+
+```bash
+cargo install cargo-mont
+```
+
+### From Source
+
 ```bash
 cargo install --path packages/cargo-mont
 ```
