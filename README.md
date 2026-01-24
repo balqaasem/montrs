@@ -20,6 +20,11 @@
 Before installing MontRS, ensure you have the following installed:
 
 - **Rust**: Latest stable version (install via [rustup](https://rustup.rs/)).
+
+- **OpenSSL**: Development headers are required for building dependencies.
+    - **Linux**: `sudo apt install libssl-dev pkg-config` (Ubuntu/Debian) or `sudo dnf install openssl-devel` (Fedora).
+    - **macOS**: `brew install openssl`.
+
 - **Perl (Windows only)**: Required for building `openssl-sys` (vendored).
     - Install via winget: `winget install StrawberryPerl.StrawberryPerl`
 
