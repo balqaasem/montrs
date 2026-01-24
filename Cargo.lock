@@ -783,6 +783,7 @@ dependencies = [
  "console 0.15.11",
  "fs_extra",
  "indicatif 0.17.11",
+ "quick-xml",
  "reqwest 0.12.28",
  "serde",
  "serde_json",
@@ -4719,6 +4720,15 @@ dependencies = [
  "wasi 0.11.1+wasi-snapshot-preview1",
  "web-sys",
  "winapi",
+]
+
+[[package]]
+name = "quick-xml"
+version = "0.39.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f2e3bf4aa9d243beeb01a7b3bc30b77cfe2c44e24ec02d751a7104a53c2c49a1"
+dependencies = [
+ "memchr",
 ]
 
 [[package]]

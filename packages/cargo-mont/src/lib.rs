@@ -80,7 +80,22 @@ pub enum Commands {
     /// Watch for changes and rebuild.
     Watch,
     /// Run cargo tests for app, client and server.
-    Test,
+    Test {
+        /// If specified, filters tests by name.
+        filter: Option<String>,
+
+        /// Report format (human, json, junit).
+        #[arg(long, default_value = "human")]
+        report: String,
+
+        /// Output file for the report (if not human).
+        #[arg(long)]
+        output: Option<String>,
+
+        /// Run tests in parallel jobs.
+        #[arg(short = 'j', long)]
+        jobs: Option<usize>,
+    },
     /// Start the server and end-2-end tests.
     EndToEnd,
     /// Create a new project from a template.
@@ -136,7 +151,12 @@ pub async fn run(cli: MontCli) -> anyhow::Result<()> {
         Commands::Build => command::build::run().await,
         Commands::Serve => command::serve::run().await,
         Commands::Watch => command::watch::run().await,
-        Commands::Test => command::test::run().await,
+        Commands::Test {
+            filter,
+            report,
+            output,
+            jobs,
+        } => command::test::run(filter, report, output, jobs).await,
         Commands::EndToEnd => command::end2end::run().await,
         Commands::New { name, template } => command::new::run(name, template).await,
         Commands::Run { task } => command::run::run(task).await,
