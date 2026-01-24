@@ -1,17 +1,16 @@
-use playwright::Playwright;
+use montrs_test::e2e::{MontDriver, assertions};
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
-    let playwright = Playwright::initialize().await?;
-    playwright.prepare()?;
-    
-    let chromium = playwright.chromium();
-    let browser = chromium.launcher().headless(true).launch().await?;
-    let context = browser.context_builder().build().await?;
-    let page = context.new_page().await?;
+    let driver = MontDriver::new().await?;
 
-    page.goto_builder("http://localhost:3000").goto().await?;
-    println!("Successfully navigated to http://localhost:3000");
+    driver.goto("/").await?;
+    println!("Successfully navigated to {}", driver.url());
+
+    // Basic assertion example for Todo app
+    // assertions::assert_element_exists(&driver.page, "input[type='text']").await?;
+
+    driver.close().await?;
 
     Ok(())
 }

@@ -3,6 +3,9 @@ name = "todo-example"
 version = "0.1.0"
 edition = "2024"
 
+[workspace]
+members = ["e2e"]
+
 [dependencies]
 montrs-core = { path = "../../packages/core" }
 montrs-schema = { path = "../../packages/schema" }

@@ -1,24 +1,23 @@
-use playwright::Playwright;
+use montrs_test::e2e::{MontDriver, assertions};
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
-    let playwright = Playwright::initialize().await?; // Initialize Playwright
-    playwright.prepare()?; // Install browsers
-    
-    let chromium = playwright.chromium();
-    let browser = chromium.launcher().headless(true).launch().await?;
-    let context = browser.context_builder().build().await?;
-    let page = context.new_page().await?;
+    // Initialize MontDriver with default config (reads from env vars)
+    let driver = MontDriver::new().await?;
 
-    // Basic test: Navigate to the app and check title/content
-    page.goto_builder("http://localhost:3000").goto().await?;
+    // Navigate to the app (automatically handles base URL)
+    driver.goto("/").await?;
     
-    // Example assertion logic (you might want a proper test runner like nextest eventually)
-    // For now, we'll just print success
-    println!("Successfully navigated to http://localhost:3000");
+    println!("Successfully navigated to {}", driver.url());
+    
+    // Example assertion
+    // assertions::assert_title_contains(&driver.page, "MontRS").await?;
     
     // Screenshot for verification
-    // page.screenshot_builder().path("screenshot.png").screenshot().await?;
+    // driver.screenshot("screenshot.png").await?;
+    
+    // Cleanup
+    driver.close().await?;
 
     Ok(())
 }

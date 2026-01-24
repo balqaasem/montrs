@@ -2,6 +2,9 @@
 //! This crate provides a mockable environment and a test runtime for
 //! verifying application logic in-process.
 
+#[cfg(feature = "e2e")]
+pub mod e2e;
+
 use montrs_core::env::EnvError;
 use montrs_core::{AppConfig, AppSpec, EnvConfig};
 use std::collections::HashMap;
