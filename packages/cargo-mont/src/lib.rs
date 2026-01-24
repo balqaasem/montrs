@@ -103,6 +103,10 @@ pub enum Commands {
         /// Shell to generate completions for.
         shell: clap_complete::Shell,
     },
+    /// Upgrade cargo-mont to the latest version.
+    Upgrade,
+    /// Show help.
+    Help,
 }
 
 pub async fn run(cli: MontCli) -> anyhow::Result<()> {
@@ -141,6 +145,12 @@ pub async fn run(cli: MontCli) -> anyhow::Result<()> {
             use clap::CommandFactory;
             let mut cmd = MontCli::command();
             clap_complete::generate(shell, &mut cmd, "cargo-mont", &mut std::io::stdout());
+            Ok(())
+        }
+        Commands::Upgrade => command::upgrade::run().await,
+        Commands::Help => {
+            use clap::CommandFactory;
+            MontCli::command().print_help()?;
             Ok(())
         }
     }
