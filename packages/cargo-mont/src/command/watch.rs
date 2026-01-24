@@ -1,6 +1,7 @@
 use crate::config::MontConfig;
 use std::sync::Arc;
 
+pub async fn run() -> anyhow::Result<()> {
     let mut config = MontConfig::load()?;
 
     // Handle tailwind.toml
