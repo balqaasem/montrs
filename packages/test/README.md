@@ -13,6 +13,9 @@ Deterministic testing utilities for the MontRS framework.
   - `run_fixture_test` helper for isolated test execution.
 - **Unit Testing**: 
   - `bench` utility for simple performance measurements.
+  - Fluent assertions (`expect`).
+  - Spies and Mocks (`Spy`, `Mock`).
+  - Table-driven tests (`table_test!`).
 - **E2E Testing** (via `e2e` feature):
   - `MontDriver` wrapper around Playwright (uses `playwright-rs` v0.8.2).
   - Automatic server configuration detection.
@@ -60,6 +63,34 @@ async fn test_example() -> anyhow::Result<()> {
         assert_eq!(ctx, "connected");
         Ok(())
     }).await
+}
+```
+
+## Unit Testing Usage
+
+### Fluent Assertions
+
+```rust
+use montrs_test::unit::expect;
+
+#[test]
+fn test_assertions() {
+    expect(1 + 1).to_equal(2);
+    expect(vec![1, 2]).to_contain(&1);
+    expect(true).to_be_true();
+}
+```
+
+### Benchmarking
+
+```rust
+use montrs_test::unit::bench;
+
+#[tokio::test]
+async fn test_perf() {
+    bench("my_op", 1000, || async {
+        // ...
+    }).await;
 }
 ```
 

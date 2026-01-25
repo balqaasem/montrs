@@ -58,6 +58,15 @@ pub async fn run(
     cmd.arg("--");
 
     // Pass custom args for montrs-bench
+    // We pass arguments that the `BenchRunner` in `montrs-bench` should parse.
+    // Since `montrs-bench` is a library, the user's benchmark binary (or test harness)
+    // is responsible for parsing these if they use `BenchRunner::from_args()` or similar.
+    // However, currently `BenchRunner` relies on `BenchConfig`.
+    // We should probably implement `clap` parsing in `montrs-bench` or read env vars.
+    // For now, we rely on environment variables as the primary configuration method
+    // because it's non-intrusive to the binary's argument parsing logic if it uses libtest.
+    
+    // We still pass them as args for visibility in `ps`, but env vars are the contract.
     harness_args.push(format!("--iterations={}", iterations));
     harness_args.push(format!("--warmup={}", warmup));
     

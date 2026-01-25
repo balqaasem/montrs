@@ -1,5 +1,5 @@
 use serde::{Deserialize, Serialize};
-use statrs::statistics::{Data, Distribution, Max, Mean, Median, Min, OrderStatistics, Variance};
+use statrs::statistics::{Data, Distribution, Max, Min, OrderStatistics, Statistics};
 use std::time::Duration;
 
 /// Statistical analysis of benchmark results.
