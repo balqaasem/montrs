@@ -8,9 +8,10 @@ Deterministic testing utilities for the MontRS framework.
 
 ## Key Features
 
-- **Unit Testing**: 
+- **Integration Testing**:
   - `Fixture` trait for setup/teardown logic.
   - `run_fixture_test` helper for isolated test execution.
+- **Unit Testing**: 
   - `bench` utility for simple performance measurements.
 - **E2E Testing** (via `e2e` feature):
   - `MontDriver` wrapper around Playwright (uses `playwright-rs` v0.8.2).
@@ -20,10 +21,21 @@ Deterministic testing utilities for the MontRS framework.
   - `TestEnv` for simulating environment variables.
   - `TestRuntime` for in-process application testing.
 
-## Unit Testing Usage
+## Environment Mocking
 
 ```rust
-use montrs_test::unit::{Fixture, run_fixture_test};
+use montrs_test::integration::TestEnv;
+use montrs_core::EnvConfig;
+
+let env = TestEnv::new();
+env.set("DATABASE_URL", "sqlite::memory:");
+assert_eq!(env.get_var("DATABASE_URL").unwrap(), "sqlite::memory:");
+```
+
+## Integration Testing Usage
+
+```rust
+use montrs_test::integration::{Fixture, run_fixture_test};
 use async_trait::async_trait;
 
 struct DatabaseFixture;

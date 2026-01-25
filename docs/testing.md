@@ -34,12 +34,12 @@ cargo mont test --report junit --output test-results.xml
 
 ### Writing Unit Tests
 
-Use `montrs_test::TestEnv` to mock environment variables and configurations without affecting your global environment.
+Use `montrs_test::integration::TestEnv` to mock environment variables and configurations without affecting your global environment.
 
 ```rust
 #[cfg(test)]
 mod tests {
-    use montrs_test::TestEnv;
+    use montrs_test::integration::TestEnv;
     use montrs_core::EnvConfig;
 
     #[test]
@@ -63,7 +63,7 @@ Integration tests verify that different parts of your application work together 
 The `Fixture` trait allows you to define reusable setup and teardown logic for your tests.
 
 ```rust
-use montrs_test::unit::{Fixture, run_fixture_test};
+use montrs_test::integration::{Fixture, run_fixture_test};
 
 struct DbFixture {
     conn_string: String,
