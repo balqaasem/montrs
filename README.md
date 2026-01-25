@@ -31,6 +31,17 @@ Before installing MontRS, ensure you have the following installed:
 ## 📦 Getting Started
 
 ### Install the CLI
+
+#### Published Version
+To install the latest published version of `cargo-mont`, use:
+
+```bash
+cargo install --locked cargo-mont
+```
+
+#### Local Path
+If you're working on the MontRS repository, you can install the CLI from the local path:
+
 ```bash
 cargo install --path packages/cargo-mont
 ```

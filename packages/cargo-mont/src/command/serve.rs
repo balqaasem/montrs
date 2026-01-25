@@ -1,4 +1,5 @@
 use crate::config::MontConfig;
+use crate::utils::run_cargo_leptos;
 
 pub async fn run() -> anyhow::Result<()> {
     let mut config = MontConfig::load()?;
@@ -13,11 +14,8 @@ pub async fn run() -> anyhow::Result<()> {
         }
     }
 
-    let leptos_config = config.to_leptos_config(false)?;
-    let project = leptos_config.current_project()?;
-
-    // Initialize the ctrl-c monitor as cargo-leptos expects it
-    let _monitor = cargo_leptos::signal::Interrupt::run_ctrl_c_monitor();
-
-    cargo_leptos::command::serve(&project).await
+    // "serve" in cargo-mont usually implies watching/running the server.
+    // We map it to "watch" as cargo-leptos doesn't have a standalone "serve" command exposed clearly via CLI
+    // other than running the binary, but "watch" is safer for dev.
+    run_cargo_leptos("watch", &[], &config).await
 }

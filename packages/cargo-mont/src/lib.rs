@@ -1,5 +1,6 @@
 pub mod command;
 pub mod config;
+pub mod utils;
 pub mod ext;
 
 use clap::{Parser, Subcommand};
@@ -60,7 +61,7 @@ pub struct MontCli {
 
     /// Output logs from dependencies (multiple --log accepted).
     #[arg(long)]
-    pub log: Vec<cargo_leptos::config::Log>,
+    pub log: Vec<String>,
 
     /// Use tailwind.toml to generate tailwind.config.js (Pure Rust config).
     #[arg(long)]
@@ -97,7 +98,8 @@ pub enum Commands {
         jobs: Option<usize>,
     },
     /// Start the server and end-2-end tests.
-    EndToEnd {
+    #[command(name = "e2e")]
+    E2e {
         /// Run browsers in headless mode.
         #[arg(long)]
         headless: bool,
@@ -132,13 +134,20 @@ pub enum Commands {
     },
     /// Upgrade cargo-mont to the latest version.
     Upgrade,
-    /// Show help.
-    Help,
 }
 
 pub async fn run(cli: MontCli) -> anyhow::Result<()> {
     // Setup logger based on verbosity
-    cargo_leptos::logger::setup(cli.verbose, &cli.log);
+    let log_level = match cli.verbose {
+        0 => tracing::Level::INFO,
+        1 => tracing::Level::DEBUG,
+        _ => tracing::Level::TRACE,
+    };
+    
+    // Initialize tracing if not already initialized
+    let _ = tracing_subscriber::fmt()
+        .with_max_level(log_level)
+        .try_init();
 
     let mut config = config::MontConfig::load()?;
     config.project.verbose = cli.verbose;
@@ -169,7 +178,7 @@ pub async fn run(cli: MontCli) -> anyhow::Result<()> {
             output,
             jobs,
         } => command::test::run(filter, report, output, jobs).await,
-        Commands::EndToEnd { headless, keep_alive, browser } => command::end2end::run(headless, keep_alive, browser).await,
+        Commands::E2e { headless, keep_alive, browser } => command::e2e::run(headless, keep_alive, browser).await,
         Commands::New { name, template } => command::new::run(name, template).await,
         Commands::Run { task } => command::run::run(task).await,
         Commands::Tasks => command::run::list().await,
@@ -180,10 +189,5 @@ pub async fn run(cli: MontCli) -> anyhow::Result<()> {
             Ok(())
         }
         Commands::Upgrade => command::upgrade::run().await,
-        Commands::Help => {
-            use clap::CommandFactory;
-            MontCli::command().print_help()?;
-            Ok(())
-        }
     }
 }

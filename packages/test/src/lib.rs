@@ -10,6 +10,9 @@
 //! - **Run E2E Tests**: Use `MontDriver` (via the `e2e` feature) to control browsers with Playwright.
 //! - **Simulate Application Runtime**: Use `TestRuntime` to execute application logic in-process.
 //!
+//! The E2E capabilities are integrated with `TestRuntime`, allowing you to easily spin up
+//! browser tests alongside your integration tests.
+//!
 //! ## Feature Flags
 //!
 //! - `e2e`: Enables End-to-End testing capabilities using `playwright-rs`.
@@ -123,5 +126,25 @@ impl<C: AppConfig> TestRuntime<C> {
         // In a real implementation, this would set up the reactive context,
         // potentially a tokio task local for the runtime, etc.
         f(&self.spec)
+    }
+}
+
+#[cfg(feature = "e2e")]
+impl<C: AppConfig> TestRuntime<C> {
+    /// Creates a new E2E driver instance.
+    ///
+    /// This provides a convenient way to access the E2E capabilities from within
+    /// a test runtime context. It automatically connects to the environment
+    /// configured for the test.
+    ///
+    /// # Example
+    ///
+    /// ```rust,ignore
+    /// let runtime = TestRuntime::new(spec);
+    /// let driver = runtime.driver().await?;
+    /// driver.goto("/").await?;
+    /// ```
+    pub async fn driver(&self) -> anyhow::Result<e2e::MontDriver> {
+        e2e::MontDriver::new().await
     }
 }

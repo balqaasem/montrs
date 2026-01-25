@@ -1,5 +1,5 @@
 pub mod build;
-pub mod end2end;
+pub mod e2e;
 pub mod new;
 pub mod run;
 pub mod serve;

@@ -13,7 +13,7 @@ path = "src/main.rs"
 [dependencies]
 clap = { version = "4.5", features = ["derive"] }
 tokio = { version = "1.40", features = ["full"] }
-cargo-leptos = "0.3.2"
+cargo-leptos = { version = "0.3.2", default-features = false, features = ["no_downloads"] }
 anyhow.workspace = true
 serde = { workspace = true, features = ["derive"] }
 serde_json.workspace = true
@@ -32,3 +32,4 @@ config = "0.14"
 tempfile = "3.10"
 toml = "0.9.11"
 quick-xml = "0.39.0"
+clap_complete = "4.5.65"

@@ -102,7 +102,7 @@ MontRS features a powerful, native E2E testing solution powered by `playwright-r
 The E2E module is built around the `MontDriver`, a wrapper around the Playwright browser automation library. It handles:
 - **Browser Lifecycle**: Automatically launching and closing browser instances (Chromium, Firefox, WebKit).
 - **Configuration**: Auto-detecting settings from `mont.toml` or environment variables (`MONT_SITE_URL`, `LEPTOS_SITE_ADDR`).
-- **Orchestration**: When run via `cargo mont end-to-end`, it manages the full lifecycle of your application server (startup, readiness check, test execution, shutdown).
+- **Orchestration**: When run via `cargo mont e2e`, it manages the full lifecycle of your application server (startup, readiness check, test execution, shutdown).
 
 ### Setup
 
@@ -117,13 +117,13 @@ anyhow = "1.0"
 
 ### Configuration
 
-You can configure E2E settings in your `mont.toml` file under the `[tasks.test]` section (though defaults usually suffice):
+You can configure E2E settings in your `mont.toml` file under the `[e2e]` section:
 
 ```toml
-[tasks.test.e2e]
+[e2e]
 headless = true
 browser = "chromium"
-timeout = 30000 # 30 seconds
+# timeout = 30000 # Not yet supported in mont.toml, use env var or default
 base_url = "http://localhost:3000"
 ```
 
@@ -250,5 +250,5 @@ jobs:
         run: cargo mont test --report junit --output unit-results.xml
         
       - name: Run E2E Tests
-        run: cargo mont end-to-end --headless
+        run: cargo mont e2e --headless
 ```

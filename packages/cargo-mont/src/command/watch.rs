@@ -1,5 +1,5 @@
 use crate::config::MontConfig;
-use std::sync::Arc;
+use crate::utils::run_cargo_leptos;
 
 pub async fn run() -> anyhow::Result<()> {
     let mut config = MontConfig::load()?;
@@ -14,8 +14,5 @@ pub async fn run() -> anyhow::Result<()> {
         }
     }
 
-    let leptos_config = config.to_leptos_config(true)?;
-
-    let project = leptos_config.current_project()?;
-    cargo_leptos::command::watch(&project).await
+    run_cargo_leptos("watch", &[], &config).await
 }

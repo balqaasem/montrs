@@ -13,8 +13,9 @@ Deterministic testing utilities for the MontRS framework.
   - `run_fixture_test` helper for isolated test execution.
   - `bench` utility for simple performance measurements.
 - **E2E Testing** (via `e2e` feature):
-  - `MontDriver` wrapper around Playwright.
+  - `MontDriver` wrapper around Playwright (uses `playwright-rs` v0.8.2).
   - Automatic server configuration detection.
+  - Runtime-agnostic design (works with or without MontRS runtime).
 - **Environment Mocking**:
   - `TestEnv` for simulating environment variables.
   - `TestRuntime` for in-process application testing.
@@ -52,7 +53,15 @@ async fn test_example() -> anyhow::Result<()> {
 
 ## E2E Testing Usage
 
-Enable the `e2e` feature and use `MontDriver`:
+Enable the `e2e` feature in `Cargo.toml`. You may also want to add `playwright` if you need direct access to its types:
+
+```bash
+cargo add montrs-test --features e2e
+# Optional: Add playwright-rs for direct type usage
+cargo add playwright-rs
+```
+
+Then use `MontDriver` in your tests:
 
 ```rust
 use montrs_test::e2e::MontDriver;
@@ -61,6 +70,12 @@ use montrs_test::e2e::MontDriver;
 async fn test_homepage() -> anyhow::Result<()> {
     let driver = MontDriver::new().await?;
     driver.goto("/").await?;
+    
+    // Use driver.page (Playwright Page) for interactions
+    let title = driver.page.title().await?;
+    assert!(title.contains("MontRS"));
+    
+    driver.close().await?;
     Ok(())
 }
 ```

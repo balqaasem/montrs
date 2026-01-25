@@ -26,6 +26,9 @@ pub struct MontConfig {
     /// Development server settings.
     #[serde(default)]
     pub serve: ServeConfig,
+    /// E2E testing configuration.
+    #[serde(default)]
+    pub e2e: E2eConfig,
     /// Custom task definitions.
     #[serde(default)]
     pub tasks: HashMap<String, TaskConfig>,
@@ -42,7 +45,7 @@ pub struct ProjectConfig {
     #[serde(skip)]
     pub verbose: u8,
     #[serde(skip)]
-    pub log: Vec<cargo_leptos::config::Log>,
+    pub log: Vec<String>,
     #[serde(skip)]
     pub release: bool,
     #[serde(skip)]
@@ -196,6 +199,20 @@ fn default_addr() -> String {
     "127.0.0.1".to_string()
 }
 
+/// E2E testing configuration.
+#[derive(Debug, Deserialize, Clone, Default)]
+pub struct E2eConfig {
+    /// Run browsers in headless mode.
+    #[serde(default)]
+    pub headless: Option<bool>,
+    /// Browser to use (chromium, firefox, webkit).
+    #[serde(default)]
+    pub browser: Option<String>,
+    /// Base URL for tests (overrides automatic detection).
+    #[serde(default)]
+    pub base_url: Option<String>,
+}
+
 /// Configuration for custom tasks.
 #[derive(Debug, Deserialize, Clone)]
 #[serde(untagged)]
@@ -246,155 +263,5 @@ impl MontConfig {
         Ok(config)
     }
 
-    /// Converts MontRS configuration to `cargo-leptos` configuration.
-    ///
-    /// This allows `cargo-mont` to reuse `cargo-leptos` functionality while
-    /// maintaining its own configuration format.
-    pub fn to_leptos_config(&self, watch: bool) -> Result<cargo_leptos::config::Config> {
-        let metadata = MetadataCommand::new()
-            .exec()
-            .map_err(|e| anyhow::anyhow!("Failed to load cargo metadata: {}", e))?;
-
-        let mut opts = cargo_leptos::config::Opts::default();
-        opts.project = Some(self.project.name.clone());
-        opts.verbose = self.project.verbose;
-        opts.log = self.project.log.clone();
-        opts.release = self.project.release;
-        opts.hot_reload = self.project.hot_reload;
-        opts.precompress = self.project.precompress;
-        opts.wasm_debug = self.project.wasm_debug;
-        opts.js_minify = self.project.js_minify;
-        opts.split = self.project.split;
-        opts.frontend_only = self.project.frontend_only;
-        opts.server_only = self.project.server_only;
-        opts.features = self.project.features.clone();
-
-        let mut proj_conf = cargo_leptos::config::ProjectConfig {
-            output_name: self.project.name.clone(),
-            site_addr: format!("{}:{}", self.serve.addr, self.serve.port)
-                .parse::<SocketAddr>()
-                .context("Invalid site address")?,
-            site_root: Utf8PathBuf::from(&self.build.site_root),
-            site_pkg_dir: Utf8PathBuf::from(&self.build.site_pkg_name),
-            style_file: self.build.style_file.as_ref().map(Utf8PathBuf::from),
-            hash_file_name: None,
-            hash_files: false,
-            tailwind_input_file: self
-                .build
-                .tailwind_input_file
-                .as_ref()
-                .map(Utf8PathBuf::from),
-            tailwind_config_file: self
-                .build
-                .tailwind_config_file
-                .as_ref()
-                .map(Utf8PathBuf::from),
-            assets_dir: self.build.assets_dir.as_ref().map(Utf8PathBuf::from),
-            js_dir: None,
-            js_minify: true,
-            watch_additional_files: None,
-            reload_port: 3001,
-            end2end_cmd: None,
-            end2end_dir: None,
-            browserquery: self.build.browserquery.clone(),
-            bin_target: String::new(),
-            bin_target_triple: None,
-            bin_target_dir: None,
-            bin_cargo_command: None,
-            bin_cargo_args: None,
-            bin_exe_name: None,
-            features: Vec::new(),
-            lib_features: Vec::new(),
-            lib_default_features: true,
-            lib_cargo_args: None,
-            bin_features: Vec::new(),
-            bin_default_features: true,
-            server_fn_prefix: None,
-            disable_server_fn_hash: false,
-            disable_erase_components: false,
-            always_erase_components: false,
-            server_fn_mod_path: false,
-            config_dir: Utf8PathBuf::from("."),
-            tmp_dir: metadata.target_directory.join("tmp"),
-            separate_front_target_dir: None,
-            lib_profile_dev: None,
-            lib_profile_release: None,
-            bin_profile_dev: None,
-            bin_profile_release: None,
-            wasm_opt_features: None,
-        };
-
-        // If cargo-leptos has these types and functions as public, we can use them:
-        // Note: ProjectDefinition is not usually public but we can try Constructing it or using a public path if available.
-        // Actually, Project has a public constructor-like logic in Project::resolve.
-
-        // Since we want to ENSURE our mont.toml data is used, we have to construct the Project fields.
-
-        let project_def = cargo_leptos::config::ProjectDefinition {
-            name: self.project.name.clone(),
-            bin_package: self.project.name.clone(),
-            lib_package: self.project.name.clone(),
-        };
-
-        let cwd = Utf8PathBuf::from(".");
-
-        let lib =
-            cargo_leptos::config::LibPackage::resolve(&opts, &metadata, &project_def, &proj_conf)
-                .map_err(|e| anyhow::anyhow!("Failed to resolve lib package: {}", e))?;
-
-        let bin = cargo_leptos::config::BinPackage::resolve(
-            &opts,
-            &metadata,
-            &project_def,
-            &proj_conf,
-            None,
-        )
-        .map_err(|e| anyhow::anyhow!("Failed to resolve bin package: {}", e))?;
-
-        let style = cargo_leptos::config::StyleConfig::new(&proj_conf)
-            .map_err(|e| anyhow::anyhow!("Failed to resolve style config: {}", e))?;
-
-        let site = Arc::new(cargo_leptos::service::site::Site::new(&proj_conf));
-
-        let hash_file =
-            cargo_leptos::config::HashFile::new(Some(&metadata.workspace_root), &bin, None);
-
-        let project = cargo_leptos::config::Project {
-            working_dir: metadata.workspace_root.clone(),
-            name: self.project.name.clone(),
-            lib,
-            bin,
-            style,
-            watch,
-            release: opts.release,
-            precompress: opts.precompress,
-            hot_reload: opts.hot_reload,
-            wasm_debug: opts.wasm_debug,
-            site,
-            end2end: cargo_leptos::config::End2EndConfig::resolve(&proj_conf),
-            assets: cargo_leptos::config::AssetsConfig::resolve(&proj_conf),
-            js_dir: Utf8PathBuf::from("src"),
-            watch_additional_files: Vec::new(),
-            hash_file,
-            hash_files: false,
-            js_minify: true,
-            split: false,
-            server_fn_prefix: None,
-            disable_server_fn_hash: false,
-            disable_erase_components: false,
-            always_erase_components: false,
-            server_fn_mod_path: false,
-            wasm_opt_features: None,
-            build_frontend_only: false,
-            build_server_only: false,
-            clear_terminal_on_rebuild: false,
-        };
-
-        Ok(cargo_leptos::config::Config {
-            working_dir: metadata.workspace_root,
-            projects: vec![Arc::new(project)],
-            cli: opts,
-            watch,
-        })
-    }
+    // to_leptos_config removed as we now use cargo-leptos CLI wrapper
 }
