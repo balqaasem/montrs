@@ -1,0 +1,74 @@
+//! Professional-grade benchmarking utilities for MontRS.
+//!
+//! This crate provides tools for measuring performance, gathering system statistics,
+//! and generating detailed reports.
+
+pub mod runner;
+pub mod stats;
+pub mod report;
+pub mod sys;
+pub mod config;
+
+pub use runner::{BenchRunner, Benchmark};
+pub use config::BenchConfig;
+pub use report::Report;
+
+use std::future::Future;
+
+/// Defines a benchmark case.
+#[async_trait::async_trait]
+pub trait BenchCase: Send + Sync {
+    /// The name of the benchmark.
+    fn name(&self) -> &str;
+
+    /// Optional setup phase (not timed).
+    async fn setup(&self) -> anyhow::Result<()> {
+        Ok(())
+    }
+
+    /// The workload to measure.
+    async fn run(&self) -> anyhow::Result<()>;
+
+    /// Optional teardown phase (not timed).
+    async fn teardown(&self) -> anyhow::Result<()> {
+        Ok(())
+    }
+}
+
+/// A wrapper for simple closure-based benchmarks.
+pub struct SimpleBench<F, Fut>
+where
+    F: Fn() -> Fut + Send + Sync,
+    Fut: Future<Output = anyhow::Result<()>> + Send,
+{
+    name: String,
+    func: F,
+}
+
+impl<F, Fut> SimpleBench<F, Fut>
+where
+    F: Fn() -> Fut + Send + Sync,
+    Fut: Future<Output = anyhow::Result<()>> + Send,
+{
+    pub fn new(name: impl Into<String>, func: F) -> Self {
+        Self {
+            name: name.into(),
+            func,
+        }
+    }
+}
+
+#[async_trait::async_trait]
+impl<F, Fut> BenchCase for SimpleBench<F, Fut>
+where
+    F: Fn() -> Fut + Send + Sync,
+    Fut: Future<Output = anyhow::Result<()>> + Send,
+{
+    fn name(&self) -> &str {
+        &self.name
+    }
+
+    async fn run(&self) -> anyhow::Result<()> {
+        (self.func)().await
+    }
+}

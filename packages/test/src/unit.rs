@@ -293,22 +293,49 @@ impl<Args: Clone + Send, Ret: Clone + Send> Mock<Args, Ret> {
 //  Benchmarking
 // =============================================================================
 
+pub use montrs_bench::{bench, Benchmark, BenchConfig};
+
+// Re-export old simple bench for backward compatibility if needed, 
+// or deprecate it. For now, we assume the user wants the new power.
+// We can wrap montrs-bench here if we want a simpler API surface.
+
 /// Runs the provided async function multiple times and prints timing statistics.
-pub async fn bench<F, Fut>(name: &str, iterations: u32, func: F)
+///
+/// This uses the `montrs-bench` engine under the hood.
+pub async fn simple_bench<F, Fut>(name: &str, iterations: u32, func: F)
 where
-    F: Fn() -> Fut,
-    Fut: std::future::Future<Output = ()>,
+    F: Fn() -> Fut + Send + Sync + 'static,
+    Fut: std::future::Future<Output = ()> + Send,
 {
-    println!("\n📊 Benchmarking: {}", name);
-    let start = Instant::now();
-    for _ in 0..iterations {
-        func().await;
-    }
-    let duration = start.elapsed();
-    let avg = duration.as_secs_f64() / iterations as f64;
+    use montrs_bench::{BenchRunner, SimpleBench};
     
-    println!("  ├─ Total time: {:.4}s", duration.as_secs_f64());
-    println!("  └─ Avg time:   {:.6}s/iter", avg);
+    let bench = SimpleBench::new(name, move || {
+        let f = func();
+        async move {
+            f.await;
+            Ok(())
+        }
+    });
+
+    let mut runner = BenchRunner::new();
+    runner.add(bench);
+    
+    // We override config to match the simple signature
+    let mut config = montrs_bench::BenchConfig::default();
+    config.iterations = iterations;
+    
+    // Create a temporary runner with this config
+    let runner = BenchRunner::with_config(config);
+    // runner.add(bench); // BenchRunner logic needs ownership or cloning?
+    // Let's just run it manually since BenchRunner consumes benchmarks
+    
+    // Re-instantiate runner because of ownership
+    let mut runner = BenchRunner::with_config(config);
+    runner.add(bench);
+    
+    if let Err(e) = runner.run().await {
+        eprintln!("Benchmark failed: {}", e);
+    }
 }
 
 // =============================================================================

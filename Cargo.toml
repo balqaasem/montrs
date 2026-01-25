@@ -2,11 +2,12 @@
 resolver = "2"
 
 members = [
-    "packages/core",
-    "packages/schema",
-    "packages/orm",
-    "packages/test",
+    "packages/bench",
     "packages/cargo-mont",
+    "packages/core",
+    "packages/orm",
+    "packages/schema",
+    "packages/test",
 ]
 
 [workspace.package]

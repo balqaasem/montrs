@@ -1,3 +1,4 @@
+pub mod bench;
 pub mod build;
 pub mod e2e;
 pub mod new;

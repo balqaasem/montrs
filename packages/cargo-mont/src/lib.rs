@@ -97,6 +97,28 @@ pub enum Commands {
         #[arg(short = 'j', long)]
         jobs: Option<usize>,
     },
+    /// Run performance benchmarks.
+    Bench {
+        /// Number of measurement iterations.
+        #[arg(long, default_value = "100")]
+        iterations: u32,
+
+        /// Number of warm-up iterations.
+        #[arg(long, default_value = "10")]
+        warmup: u32,
+
+        /// Benchmark timeout in seconds.
+        #[arg(long)]
+        timeout: Option<u64>,
+
+        /// Filter benchmarks by name.
+        #[arg(short, long)]
+        filter: Option<String>,
+
+        /// Export report to JSON file.
+        #[arg(long)]
+        json_output: Option<String>,
+    },
     /// Start the server and end-2-end tests.
     #[command(name = "e2e")]
     E2e {
@@ -178,6 +200,13 @@ pub async fn run(cli: MontCli) -> anyhow::Result<()> {
             output,
             jobs,
         } => command::test::run(filter, report, output, jobs).await,
+        Commands::Bench {
+            iterations,
+            warmup,
+            timeout,
+            filter,
+            json_output,
+        } => command::bench::run(iterations, warmup, timeout, filter, json_output).await,
         Commands::E2e { headless, keep_alive, browser } => command::e2e::run(headless, keep_alive, browser).await,
         Commands::New { name, template } => command::new::run(name, template).await,
         Commands::Run { task } => command::run::run(task).await,

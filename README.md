@@ -12,7 +12,8 @@
     - [Core](packages/core/README.md): Runtime, Module traits, and AppSpec.
     - [Schema](packages/schema/README.md): Validation and Schema macros.
     - [ORM](packages/orm/README.md): SQL-centric ORM with SQLite and Postgres support.
-    - [Test](packages/test/README.md): Deterministic testing suite.
+    - [Test](packages/test/README.md): Deterministic testing suite (Unit, Integration, E2E).
+    - [Bench](packages/bench/README.md): Professional-grade benchmarking tools.
 - **Production CLI**: [cargo-mont](packages/cargo-mont/README.md) for orchestration.
 
 ## 📋 Prerequisites
@@ -58,7 +59,8 @@ cargo mont serve
 - `packages/core`: Core meta-framework logic and Leptos integration.
 - `packages/schema`: Type-safe validation and schema definitions.
 - `packages/orm`: Flexible database backend traits and drivers.
-- `packages/test`: TestRuntime for unit and integration testing.
+- `packages/test`: TestRuntime, E2E drivers, and unit testing utilities.
+- `packages/bench`: Performance benchmarking framework.
 - `packages/cargo-mont`: The official build and serve tool.
 - `templates/`: Project blueprints (including `todo` and `default`).
 
