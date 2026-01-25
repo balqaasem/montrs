@@ -4,6 +4,12 @@
 //! E2E tests for MontRS applications. It includes configuration management,
 //! test driver orchestration, and helper assertions.
 //!
+//! # Architecture
+//!
+//! The E2E module is built around the [`MontDriver`] struct, which manages the
+//! Playwright browser instance, context, and page. It abstracts away the
+//! complexity of launching browsers and provides a clean API for common actions.
+//!
 //! # Usage
 //!
 //! Add `montrs-test` with the `e2e` feature to your `Cargo.toml`:
@@ -20,9 +26,17 @@
 //!
 //! #[tokio::test]
 //! async fn my_test() -> anyhow::Result<()> {
+//!     // Initialize the driver (launches browser)
 //!     let driver = MontDriver::new().await?;
+//!
+//!     // Navigate to the application root
 //!     driver.goto("/").await?;
-//!     // ...
+//!     
+//!     // Perform assertions
+//!     assert!(driver.url().contains("/"));
+//!
+//!     // Cleanup
+//!     driver.close().await?;
 //!     Ok(())
 //! }
 //! ```
@@ -36,11 +50,25 @@ use playwright::api::{Browser, BrowserContext, Page, BrowserType};
 pub use playwright;
 
 /// Configuration for the E2E test session.
+///
+/// This struct controls how the browser is launched and how the test driver behaves.
+/// It automatically resolves defaults from environment variables.
+///
+/// # Environment Variables
+///
+/// - `MONT_SITE_URL`: The base URL of the application under test.
+/// - `LEPTOS_SITE_ADDR`: Alternative source for the base URL (e.g. `127.0.0.1:8080`).
+/// - `MONT_E2E_HEADLESS`: Set to `false` to run in headful mode (default: `true`).
 #[derive(Debug, Clone)]
 pub struct E2EConfig {
+    /// Whether to run the browser in headless mode.
     pub headless: bool,
+    /// The base URL for the application.
     pub base_url: String,
+    /// The default timeout for operations in milliseconds.
     pub timeout: u32,
+    /// The browser engine to use (chromium, firefox, webkit).
+    pub browser: String,
 }
 
 impl Default for E2EConfig {
@@ -53,41 +81,64 @@ impl Default for E2EConfig {
             headless: env::var("MONT_E2E_HEADLESS").map(|v| v != "false").unwrap_or(true),
             base_url,
             timeout: 30000,
+            browser: env::var("MONT_E2E_BROWSER").unwrap_or_else(|_| "chromium".to_string()),
         }
     }
 }
 
 /// A trait for extending MontDriver functionality.
+///
+/// Implement this trait to create reusable plugins for your E2E tests,
+/// such as authentication helpers or custom logging.
 #[async_trait::async_trait]
 pub trait MontPlugin {
     /// Called immediately after the driver is initialized.
+    ///
+    /// Use this hook to perform setup actions like logging in or mocking network requests.
     async fn on_init(&self, driver: &MontDriver) -> anyhow::Result<()>;
 }
 
 /// The main driver for MontRS E2E tests.
+///
 /// Wraps Playwright to provide an ergonomic, framework-aware testing experience.
+/// It manages the lifecycle of the browser, context, and page.
 pub struct MontDriver {
+    /// The underlying Playwright instance.
     pub playwright: Playwright,
+    /// The active browser instance.
     pub browser: Browser,
+    /// The isolated browser context for this driver.
     pub context: BrowserContext,
+    /// The main page object for interacting with the web content.
     pub page: Page,
+    /// The active configuration.
     pub config: E2EConfig,
 }
 
 impl MontDriver {
     /// Launches a new browser instance and prepares a page for testing.
+    ///
+    /// Uses the default configuration resolved from environment variables.
     pub async fn new() -> anyhow::Result<Self> {
         Self::with_config(E2EConfig::default()).await
     }
 
     /// Launches with custom configuration.
+    ///
+    /// # Arguments
+    ///
+    /// * `config` - The configuration to use for this session.
     pub async fn with_config(config: E2EConfig) -> anyhow::Result<Self> {
         let playwright = Playwright::initialize().await?;
         playwright.prepare()?; // Install browsers if needed
 
-        // Currently defaulting to Chromium, but could be configurable
-        let chromium = playwright.chromium();
-        let launcher = chromium.launcher();
+        let browser_type = match config.browser.as_str() {
+            "firefox" => playwright.firefox(),
+            "webkit" => playwright.webkit(),
+            _ => playwright.chromium(),
+        };
+
+        let launcher = browser_type.launcher();
         
         let browser = launcher
             .headless(config.headless)
@@ -108,13 +159,23 @@ impl MontDriver {
     }
 
     /// Register and run a plugin.
+    ///
+    /// # Arguments
+    ///
+    /// * `plugin` - The plugin to execute.
     pub async fn use_plugin<P: MontPlugin>(&self, plugin: P) -> anyhow::Result<&Self> {
         plugin.on_init(self).await?;
         Ok(self)
     }
 
     /// Navigates to a path relative to the configured base URL.
-    /// If an absolute URL is provided, it is used as-is.
+    ///
+    /// If an absolute URL is provided (starting with `http://` or `https://`),
+    /// it is used as-is. Otherwise, it is appended to `config.base_url`.
+    ///
+    /// # Arguments
+    ///
+    /// * `path` - The URL path or absolute URL.
     pub async fn goto(&self, path: &str) -> anyhow::Result<()> {
         let url = if path.starts_with("http://") || path.starts_with("https://") {
             path.to_string()
@@ -141,6 +202,10 @@ impl MontDriver {
     }
 
     /// Takes a screenshot and saves it to the specified path.
+    ///
+    /// # Arguments
+    ///
+    /// * `path` - The file path to save the screenshot to.
     pub async fn screenshot(&self, path: &str) -> anyhow::Result<()> {
         self.page.screenshot_builder()
             .path(std::path::Path::new(path))
@@ -150,6 +215,8 @@ impl MontDriver {
     }
 
     /// Closes the browser and context.
+    ///
+    /// This should be called at the end of the test to ensure resources are released.
     pub async fn close(&self) -> anyhow::Result<()> {
         self.context.close().await?;
         self.browser.close().await?;
@@ -158,10 +225,17 @@ impl MontDriver {
 }
 
 /// Helper assertions for MontRS applications.
+///
+/// These functions provide common verification steps for E2E tests.
 pub mod assertions {
     use playwright::api::Page;
 
     /// Asserts that the page title contains the expected text.
+    ///
+    /// # Arguments
+    ///
+    /// * `page` - The Playwright Page object.
+    /// * `text` - The text to search for in the title.
     pub async fn assert_title_contains(page: &Page, text: &str) -> anyhow::Result<()> {
         let title = page.title().await?;
         if !title.contains(text) {
@@ -171,6 +245,11 @@ pub mod assertions {
     }
 
     /// Asserts that an element exists on the page.
+    ///
+    /// # Arguments
+    ///
+    /// * `page` - The Playwright Page object.
+    /// * `selector` - The CSS selector of the element.
     pub async fn assert_element_exists(page: &Page, selector: &str) -> anyhow::Result<()> {
         match page.query_selector(selector).await? {
             Some(_) => Ok(()),

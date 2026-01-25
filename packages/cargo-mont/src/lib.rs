@@ -97,7 +97,19 @@ pub enum Commands {
         jobs: Option<usize>,
     },
     /// Start the server and end-2-end tests.
-    EndToEnd,
+    EndToEnd {
+        /// Run browsers in headless mode.
+        #[arg(long)]
+        headless: bool,
+
+        /// Keep the server running after tests complete.
+        #[arg(long)]
+        keep_alive: bool,
+
+        /// Specify browser to use (chromium, firefox, webkit).
+        #[arg(long)]
+        browser: Option<String>,
+    },
     /// Create a new project from a template.
     New {
         /// Name of the project.
@@ -157,7 +169,7 @@ pub async fn run(cli: MontCli) -> anyhow::Result<()> {
             output,
             jobs,
         } => command::test::run(filter, report, output, jobs).await,
-        Commands::EndToEnd => command::end2end::run().await,
+        Commands::EndToEnd { headless, keep_alive, browser } => command::end2end::run(headless, keep_alive, browser).await,
         Commands::New { name, template } => command::new::run(name, template).await,
         Commands::Run { task } => command::run::run(task).await,
         Commands::Tasks => command::run::list().await,

@@ -1,9 +1,29 @@
+//! Test command implementation for MontRS.
+//!
+//! This module handles the execution of unit and integration tests. It wraps `cargo test`
+//! but adds MontRS-specific capabilities like custom reporting (JSON/JUnit) and
+//! automated environment setup.
+
 use crate::config::MontConfig;
 use std::process::Stdio;
 use tokio::io::{AsyncBufReadExt, BufReader};
 use quick_xml::events::{BytesDecl, BytesStart, Event};
 use quick_xml::Writer;
 
+/// Runs the test suite for the current project.
+///
+/// This function:
+/// 1. Loads the `MontConfig` to verify the project context.
+/// 2. Constructs arguments for `cargo test`.
+/// 3. Spawns `cargo test` as a subprocess.
+/// 4. Optionally captures JSON output to generate JUnit/JSON reports.
+///
+/// # Arguments
+///
+/// * `filter` - Optional filter string to run specific tests (passed to `cargo test`).
+/// * `report` - The format of the report to generate ("human", "json", "junit").
+/// * `output` - Optional path to write the report file.
+/// * `jobs` - Number of parallel jobs to run.
 pub async fn run(
     filter: Option<String>,
     report: String,
@@ -155,6 +175,7 @@ enum TestStatus {
     Ignored,
 }
 
+/// Generates a JUnit XML report from the test results.
 fn generate_junit_report(suites: &[TestSuite], path: &str) -> anyhow::Result<()> {
     let mut writer = Writer::new_with_indent(std::fs::File::create(path)?, b' ', 4);
     

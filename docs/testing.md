@@ -1,0 +1,254 @@
+# Testing in MontRS
+
+MontRS provides a robust and comprehensive testing ecosystem designed to ensure your application is reliable, performant, and bug-free. The testing strategy is built on three pillars:
+
+1.  **Unit Testing**: Fast, isolated tests for individual functions and components.
+2.  **Integration Testing**: Tests that verify the interaction between multiple components (e.g., database, router, services).
+3.  **End-to-End (E2E) Testing**: Full-stack tests that simulate real user interactions in a browser environment.
+
+This guide covers how to leverage the `montrs-test` package and the `cargo mont` CLI to implement these testing strategies.
+
+---
+
+## 1. Unit Testing
+
+Unit tests in MontRS follow standard Rust testing practices but are enhanced with the `montrs-test` library for better determinism and mocking.
+
+### Running Unit Tests
+
+You can run unit tests using the standard Cargo command or the MontRS CLI:
+
+```bash
+# Standard Rust way
+cargo test
+
+# MontRS CLI (offers enhanced reporting)
+cargo mont test
+```
+
+The `cargo mont test` command supports generating JSON and JUnit reports for CI/CD integration:
+
+```bash
+cargo mont test --report junit --output test-results.xml
+```
+
+### Writing Unit Tests
+
+Use `montrs_test::TestEnv` to mock environment variables and configurations without affecting your global environment.
+
+```rust
+#[cfg(test)]
+mod tests {
+    use montrs_test::TestEnv;
+    use montrs_core::EnvConfig;
+
+    #[test]
+    fn test_config_loading() {
+        let env = TestEnv::new();
+        env.set("API_KEY", "test-secret-123");
+
+        assert_eq!(env.get_var("API_KEY").unwrap(), "test-secret-123");
+    }
+}
+```
+
+---
+
+## 2. Integration Testing
+
+Integration tests verify that different parts of your application work together correctly. MontRS provides the `TestRuntime` to spin up a lightweight version of your app context.
+
+### Using Fixtures
+
+The `Fixture` trait allows you to define reusable setup and teardown logic for your tests.
+
+```rust
+use montrs_test::unit::{Fixture, run_fixture_test};
+
+struct DbFixture {
+    conn_string: String,
+}
+
+#[async_trait::async_trait]
+impl Fixture for DbFixture {
+    async fn setup() -> anyhow::Result<Self> {
+        // Spin up a test DB or use an in-memory one
+        Ok(Self { conn_string: "sqlite::memory:".to_string() })
+    }
+
+    async fn teardown(&mut self) -> anyhow::Result<()> {
+        // Cleanup logic
+        Ok(())
+    }
+}
+
+#[tokio::test]
+async fn test_database_interaction() {
+    run_fixture_test::<DbFixture, _>(|fixture| async move {
+        assert_eq!(fixture.conn_string, "sqlite::memory:");
+        Ok(())
+    }).await.unwrap();
+}
+```
+
+---
+
+## 3. End-to-End (E2E) Testing
+
+MontRS features a powerful, native E2E testing solution powered by `playwright-rs`. It is designed to be runtime-agnostic, meaning it works seamlessly within the MontRS test runner or as a standalone test suite.
+
+### Architecture
+
+The E2E module is built around the `MontDriver`, a wrapper around the Playwright browser automation library. It handles:
+- **Browser Lifecycle**: Automatically launching and closing browser instances (Chromium, Firefox, WebKit).
+- **Configuration**: Auto-detecting settings from `mont.toml` or environment variables (`MONT_SITE_URL`, `LEPTOS_SITE_ADDR`).
+- **Orchestration**: When run via `cargo mont end-to-end`, it manages the full lifecycle of your application server (startup, readiness check, test execution, shutdown).
+
+### Setup
+
+To enable E2E testing in your project, add `montrs-test` with the `e2e` feature to your `Cargo.toml` (usually in a dedicated `e2e` crate or the `[dev-dependencies]` section):
+
+```toml
+[dependencies]
+montrs-test = { version = "0.1.0", features = ["e2e"] }
+tokio = { version = "1", features = ["full"] }
+anyhow = "1.0"
+```
+
+### Configuration
+
+You can configure E2E settings in your `mont.toml` file under the `[tasks.test]` section (though defaults usually suffice):
+
+```toml
+[tasks.test.e2e]
+headless = true
+browser = "chromium"
+timeout = 30000 # 30 seconds
+base_url = "http://localhost:3000"
+```
+
+Alternatively, you can override these at runtime using environment variables:
+- `MONT_E2E_HEADLESS`: "true" or "false"
+- `MONT_E2E_BROWSER`: "chromium", "firefox", or "webkit"
+- `MONT_SITE_URL`: The base URL of the running application.
+
+### Writing E2E Tests
+
+E2E tests use the `MontDriver` to interact with your application.
+
+```rust
+use montrs_test::e2e::MontDriver;
+
+#[tokio::test]
+async fn test_home_page_loads() -> anyhow::Result<()> {
+    // 1. Initialize the driver (launches browser, connects to context)
+    let driver = MontDriver::new().await?;
+
+    // 2. Navigate to a route (automatically resolves against base_url)
+    driver.goto("/").await?;
+
+    // 3. Perform assertions
+    let title = driver.page.title().await?;
+    assert!(title.contains("Welcome to MontRS"));
+
+    // 4. Interact with elements
+    driver.page.click("text=Get Started").await?;
+    assert!(driver.url().contains("/docs"));
+
+    // 5. Cleanup
+    driver.close().await?;
+    
+    Ok(())
+}
+```
+
+### Advanced: Extending MontDriver with Plugins
+
+You can extend the functionality of `MontDriver` by implementing the `MontPlugin` trait. This is useful for shared logic like authentication, custom logging, or complex setup routines.
+
+```rust
+use montrs_test::e2e::{MontDriver, MontPlugin};
+
+struct AuthPlugin {
+    username: String,
+}
+
+#[async_trait::async_trait]
+impl MontPlugin for AuthPlugin {
+    async fn on_init(&self, driver: &MontDriver) -> anyhow::Result<()> {
+        // Automatically log in when the driver starts
+        driver.goto("/login").await?;
+        driver.page.fill("input[name=username]", &self.username).await?;
+        driver.page.click("button[type=submit]").await?;
+        Ok(())
+    }
+}
+
+#[tokio::test]
+async fn test_dashboard() -> anyhow::Result<()> {
+    let driver = MontDriver::new().await?;
+    
+    // Apply the plugin
+    driver.use_plugin(AuthPlugin { username: "admin".into() }).await?;
+    
+    // Now we are logged in
+    driver.goto("/dashboard").await?;
+    assert!(driver.url().contains("/dashboard"));
+    
+    driver.close().await?;
+    Ok(())
+}
+```
+
+### Running E2E Tests
+
+The recommended way to run E2E tests is via the MontRS CLI. This command handles building your app, starting the server, waiting for it to be ready, running the tests, and then shutting everything down.
+
+```bash
+cargo mont end-to-end
+```
+
+**Options:**
+- `--headless`: Run browsers in headless mode (default: true).
+- `--browser <name>`: Specify browser (chromium, firefox, webkit).
+- `--keep-alive`: Keep the server running after tests complete (useful for debugging).
+
+You can also run them as standard Rust tests if you manage the server yourself:
+
+```bash
+# Start your server first
+cargo run & 
+# Run tests
+MONT_SITE_URL=http://localhost:3000 cargo test --package e2e
+```
+
+---
+
+## 4. Continuous Integration (CI)
+
+MontRS testing tools are designed for CI environments.
+
+### GitHub Actions Example
+
+```yaml
+name: CI
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+        
+      - name: Install Playwright Dependencies
+        run: npx playwright install-deps
+        
+      - name: Run Unit Tests
+        run: cargo mont test --report junit --output unit-results.xml
+        
+      - name: Run E2E Tests
+        run: cargo mont end-to-end --headless
+```
