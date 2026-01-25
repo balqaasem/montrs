@@ -34,6 +34,67 @@ cargo mont test --report junit --output test-results.xml
 
 ### Writing Unit Tests
 
+MontRS provides a suite of production-grade utilities to improve Developer Experience (DevX), including fluent assertions, spies, and table-driven tests.
+
+#### Fluent Assertions
+
+Instead of standard `assert_eq!`, you can use `expect` for more readable tests.
+
+```rust
+use montrs_test::unit::expect;
+
+#[test]
+fn test_fluent_assertions() {
+    expect(1 + 1).to_equal(2);
+    expect(vec![1, 2, 3]).to_contain(&2);
+    expect(true).to_be_true();
+    
+    // Negation
+    expect(1).not().to_equal(2);
+}
+```
+
+#### Spies and Mocks
+
+Track function calls and verify interactions using `Spy` and `Mock`.
+
+```rust
+use montrs_test::unit::Spy;
+
+#[test]
+fn test_spy() {
+    let spy = Spy::new();
+    
+    // Simulate a call
+    spy.record();
+    
+    expect(spy.called()).to_be_true();
+    expect(spy.call_count()).to_equal(1);
+}
+```
+
+#### Table-Driven Tests
+
+Easily define parameterized tests using the `table_test!` macro.
+
+```rust
+use montrs_test::table_test;
+
+fn add(a: i32, b: i32) -> i32 { a + b }
+
+table_test! {
+    name: test_addition,
+    func: add,
+    cases: [
+        (1, 1) => 2,
+        (2, 2) => 4,
+        (10, -5) => 5,
+    ]
+}
+```
+
+### Environment Mocking
+
 Use `montrs_test::integration::TestEnv` to mock environment variables and configurations without affecting your global environment.
 
 ```rust
