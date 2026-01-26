@@ -1,0 +1,37 @@
+[package]
+name = "mont"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+description = "The main entry point for the Mont framework."
+
+[dependencies]
+montrs-core = { path = "../core", version = "0.1.0" }
+montrs-orm = { path = "../orm", version = "0.1.0", optional = true }
+montrs-schema = { path = "../schema", version = "0.1.0", optional = true }
+montrs-test = { path = "../test", version = "0.1.0", optional = true }
+
+[features]
+default = ["full"]
+
+# Enable the entire framework
+full = ["orm", "schema", "test"]
+
+# Basic package activation
+orm = ["dep:montrs-orm"]
+schema = ["dep:montrs-schema"]
+test = ["dep:montrs-test"]
+
+# --- Forwarded Features ---
+
+# Forwarding 'sqlite' to 'montrs-orm/sqlite'
+# Note: This also ensures the 'orm' package itself is enabled
+sqlite = ["orm", "montrs-orm/sqlite"]
+
+# Forwarding 'postgres' to 'montrs-orm/postgres'
+postgres = ["orm", "montrs-orm/postgres"]
+
+# Forwarding 'e2e' to 'montrs-test/e2e'
+e2e = ["test", "montrs-test/e2e"]

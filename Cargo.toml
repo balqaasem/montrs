@@ -5,6 +5,7 @@ members = [
     "packages/bench",
     "packages/cargo-mont",
     "packages/core",
+    "packages/mont",
     "packages/orm",
     "packages/schema",
     "packages/test",

@@ -7,11 +7,16 @@ authors.workspace = true
 repository.workspace = true
 
 [dependencies]
-rusqlite = { version = "0.31", features = ["bundled"] }
-tokio-postgres = "0.7"
-deadpool-postgres = "0.12"
+rusqlite = { version = "0.31", features = ["bundled"], optional = true }
+tokio-postgres = { version = "0.7", optional = true }
+deadpool-postgres = { version = "0.12", optional = true }
 serde.workspace = true
 thiserror.workspace = true
 async-trait.workspace = true
 anyhow.workspace = true
 tracing.workspace = true
+
+[features]
+default = []
+sqlite = ["dep:rusqlite"]
+postgres = ["dep:tokio-postgres", "dep:deadpool-postgres"]
