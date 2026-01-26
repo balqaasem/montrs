@@ -4,14 +4,9 @@ use std::time::Duration;
 
 #[test]
 fn test_config_priority_and_compat() {
-    // Helper to create a loader from a hashmap
-    let make_loader = |map: &HashMap<String, String>| {
-        |key: &str| map.get(key).cloned()
-    };
-
     // 1. Default values
-    let empty_env = HashMap::new();
-    let config = BenchConfig::build_with_env(vec!["bench"], make_loader(&empty_env));
+    let empty_env = HashMap::<String, String>::new();
+    let config = BenchConfig::build_with_env(vec!["bench"], |key: &str| empty_env.get(key).cloned());
     assert_eq!(config.warmup_iterations, 10);
     assert_eq!(config.iterations, 100);
     assert_eq!(config.duration, Some(Duration::from_secs(5)));
@@ -22,7 +17,7 @@ fn test_config_priority_and_compat() {
     old_env.insert("MONT_BENCH_ITERATIONS".to_string(), "200".to_string());
     old_env.insert("MONT_BENCH_TIMEOUT".to_string(), "8".to_string());
     
-    let config = BenchConfig::build_with_env(vec!["bench"], make_loader(&old_env));
+    let config = BenchConfig::build_with_env(vec!["bench"], |key: &str| old_env.get(key).cloned());
     assert_eq!(config.warmup_iterations, 20);
     assert_eq!(config.iterations, 200);
     assert_eq!(config.duration, Some(Duration::from_secs(8)));
@@ -32,7 +27,7 @@ fn test_config_priority_and_compat() {
     mixed_env.insert("MONT_BENCH_WARMUP".to_string(), "20".to_string());
     mixed_env.insert("MONTRS_BENCH_WARMUP".to_string(), "30".to_string());
     
-    let config = BenchConfig::build_with_env(vec!["bench"], make_loader(&mixed_env));
+    let config = BenchConfig::build_with_env(vec!["bench"], |key: &str| mixed_env.get(key).cloned());
     assert_eq!(config.warmup_iterations, 30); // New wins
 
     // 4. CLI Args (Priority over Env)
@@ -40,17 +35,17 @@ fn test_config_priority_and_compat() {
     env_with_val.insert("MONTRS_BENCH_WARMUP".to_string(), "30".to_string());
     
     // We pass args explicitly
-    let config = BenchConfig::build_with_env(vec!["bench", "--warmup", "40"], make_loader(&env_with_val));
+    let config = BenchConfig::build_with_env(vec!["bench", "--warmup", "40"], |key: &str| env_with_val.get(key).cloned());
     assert_eq!(config.warmup_iterations, 40); // Args win
 
     // 5. Duration parsing via CLI
-    let config = BenchConfig::build_with_env(vec!["bench", "--timeout", "10"], make_loader(&empty_env));
+    let config = BenchConfig::build_with_env(vec!["bench", "--timeout", "10"], |key: &str| empty_env.get(key).cloned());
     assert_eq!(config.duration, Some(Duration::from_secs(10)));
     
     // 6. Filter and JSON output
     let config = BenchConfig::build_with_env(
         vec!["bench", "--filter", "my_test", "--json-output", "report.json"],
-        make_loader(&empty_env)
+        |key: &str| empty_env.get(key).cloned()
     );
     assert_eq!(config.filter, Some("my_test".to_string()));
     assert_eq!(config.json_output, Some("report.json".to_string()));
