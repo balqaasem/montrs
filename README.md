@@ -54,6 +54,17 @@ cd my-app
 cargo mont serve
 ```
 
+### Benchmarking
+Run standard benchmarks or use the native mode for quick file/binary testing:
+```bash
+# Standard cargo bench
+cargo mont bench
+
+# Native mode (no project overhead)
+cargo mont bench --simple ./my-script.rs
+cargo mont bench --simple ./my-binary
+```
+
 ## 🛠 Project Structure
 
 - `packages/core`: Core meta-framework logic and Leptos integration.

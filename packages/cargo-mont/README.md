@@ -52,6 +52,16 @@ cargo mont build
 cargo mont serve
 ```
 
+### Benchmarking
+Quickly measure execution speed and file size:
+```bash
+# Benchmark a project (standard cargo bench)
+cargo mont bench
+
+# Simple/Native benchmark for a single file/binary
+cargo mont bench --simple ./main.rs --iterations 500
+```
+
 ## Configuration (`mont.toml`)
 
 `cargo-mont` honors a `mont.toml` file in your project root for extensive configuration:

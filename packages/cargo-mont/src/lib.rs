@@ -99,6 +99,10 @@ pub enum Commands {
     },
     /// Run performance benchmarks.
     Bench {
+        /// The target file to benchmark (optional).
+        #[arg(index = 1)]
+        target: Option<String>,
+
         /// Number of measurement iterations.
         #[arg(long, default_value = "100")]
         iterations: u32,
@@ -118,6 +122,10 @@ pub enum Commands {
         /// Export report to JSON file.
         #[arg(long)]
         json_output: Option<String>,
+
+        /// Simple/Native mode: Benchmarks a file/binary directly without project overhead.
+        #[arg(long)]
+        simple: bool,
     },
     /// Start the server and end-2-end tests.
     #[command(name = "e2e")]
@@ -142,7 +150,7 @@ pub enum Commands {
         #[arg(short, long, default_value = "default")]
         template: String,
     },
-    /// Run a custom task defined in mont.toml.
+    /// Run custom tasks defined in mont.toml.
     Run {
         /// Name of the task to run.
         task: String,
@@ -201,12 +209,14 @@ pub async fn run(cli: MontCli) -> anyhow::Result<()> {
             jobs,
         } => command::test::run(filter, report, output, jobs).await,
         Commands::Bench {
+            target,
             iterations,
             warmup,
             timeout,
             filter,
             json_output,
-        } => command::bench::run(iterations, warmup, timeout, filter, json_output).await,
+            simple,
+        } => command::bench::run(target, iterations, warmup, timeout, filter, json_output, simple).await,
         Commands::E2e { headless, keep_alive, browser } => command::e2e::run(headless, keep_alive, browser).await,
         Commands::New { name, template } => command::new::run(name, template).await,
         Commands::Run { task } => command::run::run(task).await,

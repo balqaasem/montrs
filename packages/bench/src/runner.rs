@@ -3,7 +3,7 @@ use crate::report::Report;
 use crate::stats::BenchStats;
 use crate::BenchCase;
 use colored::*;
-use std::time::{Duration, Instant};
+use std::time::Instant;
 
 /// The main entry point for running benchmarks.
 ///
@@ -17,7 +17,7 @@ use std::time::{Duration, Instant};
 ///
 /// #[tokio::main]
 /// async fn main() -> anyhow::Result<()> {
-///     let mut runner = BenchRunner::new();
+///     let mut runner = BenchRunner::from_args();
 ///     runner.add(Benchmark::new("my_bench", || async {
 ///         // ... workload ...
 ///         Ok(())
@@ -31,7 +31,21 @@ pub struct BenchRunner {
 }
 
 impl BenchRunner {
-    /// Creates a new `BenchRunner` with default configuration.
+    /// Creates a new `BenchRunner` with configuration parsed from command-line arguments and environment variables.
+    ///
+    /// This is the recommended constructor for benchmark binaries.
+    pub fn from_args() -> Self {
+        let config = BenchConfig::from_args();
+        Self::log_config(&config);
+        Self {
+            config,
+            benchmarks: Vec::new(),
+        }
+    }
+
+    /// Creates a new `BenchRunner` with default configuration (ignoring CLI args, but using defaults).
+    ///
+    /// Useful for programmatic usage where CLI args should not be parsed.
     pub fn new() -> Self {
         Self {
             config: BenchConfig::default(),
@@ -41,10 +55,29 @@ impl BenchRunner {
 
     /// Creates a new `BenchRunner` with custom configuration.
     pub fn with_config(config: BenchConfig) -> Self {
+        Self::log_config(&config);
         Self {
             config,
             benchmarks: Vec::new(),
         }
+    }
+
+    fn log_config(config: &BenchConfig) {
+        println!("{}", "Configuration:".bold().blue());
+        println!("  Warmup:     {} iterations", config.warmup_iterations);
+        println!("  Iterations: {}", config.iterations);
+        if let Some(d) = config.duration {
+            println!("  Timeout:    {:?}", d);
+        } else {
+            println!("  Timeout:    None");
+        }
+        if let Some(f) = &config.filter {
+            println!("  Filter:     {}", f);
+        }
+        if let Some(j) = &config.json_output {
+            println!("  JSON Out:   {}", j);
+        }
+        println!("---------------------------------------------------");
     }
 
     /// Adds a benchmark to the runner.
@@ -66,6 +99,10 @@ impl BenchRunner {
 
         println!("{}", "Running MontRS Benchmarks".bold().green());
         println!("System: {} ({})", report.system.os_name, report.system.cpu_brand);
+        if let Some(size) = report.system.binary_size_bytes {
+            let size_mb = size as f64 / 1024.0 / 1024.0;
+            println!("Binary Size: {:.2} MB", size_mb);
+        }
         println!("---------------------------------------------------");
 
         for bench in &self.benchmarks {

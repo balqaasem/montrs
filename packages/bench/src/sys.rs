@@ -22,6 +22,8 @@ pub struct SystemInfo {
     pub total_memory_gb: f64,
     /// Version of the Rust compiler used to build the benchmark.
     pub rust_version: String,
+    /// Size of the benchmark binary in bytes.
+    pub binary_size_bytes: Option<u64>,
 }
 
 impl SystemInfo {
@@ -34,6 +36,11 @@ impl SystemInfo {
         );
         sys.refresh_all();
 
+        let binary_size_bytes = std::env::current_exe()
+            .ok()
+            .and_then(|path| std::fs::metadata(path).ok())
+            .map(|meta| meta.len());
+
         Self {
             os_name: System::name().unwrap_or_else(|| "Unknown".to_string()),
             os_version: System::os_version().unwrap_or_else(|| "Unknown".to_string()),
@@ -43,6 +50,7 @@ impl SystemInfo {
             cpu_cores: sys.physical_core_count().unwrap_or(sys.cpus().len()),
             total_memory_gb: sys.total_memory() as f64 / 1024.0 / 1024.0 / 1024.0,
             rust_version: rustc_version_runtime::version().to_string(),
+            binary_size_bytes,
         }
     }
 }

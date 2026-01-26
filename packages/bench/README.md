@@ -20,7 +20,8 @@ use montrs_bench::{BenchRunner, SimpleBench};
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
-    let mut runner = BenchRunner::new();
+    // Automatically parse args and env vars
+    let mut runner = BenchRunner::from_args();
 
     runner.add(SimpleBench::new("vector_sort", || async {
         let mut v = vec![5, 2, 8, 1, 9];
@@ -56,6 +57,32 @@ impl BenchCase for MyBench {
         Ok(())
     }
 }
+```
+
+## Configuration
+
+`montrs-bench` supports configuration via command-line arguments and environment variables.
+
+### Priority Order
+1. Command-line arguments (e.g., `--warmup 20`)
+2. Environment variables (e.g., `MONTRS_BENCH_WARMUP=20`)
+3. Default values
+
+### Options
+
+| Argument | Env Var | Default | Description |
+|----------|---------|---------|-------------|
+| `--warmup <N>` | `MONTRS_BENCH_WARMUP` | 10 | Number of warm-up iterations |
+| `--iterations <N>` | `MONTRS_BENCH_ITERATIONS` | 100 | Number of measurement iterations |
+| `--timeout <S>` | `MONTRS_BENCH_TIMEOUT` | 5 | Max duration in seconds |
+| `--filter <STR>` | `MONTRS_BENCH_FILTER` | None | Run only matching benchmarks |
+| `--json-output <PATH>` | `MONTRS_BENCH_JSON_OUTPUT` | None | Save results to JSON file |
+
+### Example
+
+```bash
+# Run with custom warmup and iterations
+cargo run --release --bin my_bench -- --warmup 20 --iterations 500
 ```
 
 ## Integration with MontRS

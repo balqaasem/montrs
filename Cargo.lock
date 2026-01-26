@@ -3799,6 +3799,7 @@ dependencies = [
  "anyhow",
  "async-trait",
  "chrono",
+ "clap",
  "colored",
  "hdrhistogram",
  "rustc_version_runtime",
