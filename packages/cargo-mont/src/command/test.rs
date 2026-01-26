@@ -181,7 +181,7 @@ fn generate_junit_report(suites: &[TestSuite], path: &str) -> anyhow::Result<()>
     
     writer.write_event(Event::Decl(BytesDecl::new("1.0", Some("UTF-8"), None)))?;
     
-    let mut root = BytesStart::new("testsuites");
+    let root = BytesStart::new("testsuites");
     writer.write_event(Event::Start(root.clone()))?;
 
     for (i, suite) in suites.iter().enumerate() {

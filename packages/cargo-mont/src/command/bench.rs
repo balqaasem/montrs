@@ -7,11 +7,10 @@
 //!    to the underlying benchmarking harness.
 
 use anyhow::{Context, Result};
-use std::path::{Path, PathBuf};
+use std::path::Path;
 use std::process::Command;
 use std::fs;
 use std::time::Instant;
-use console::style;
 use colored::Colorize;
 
 pub async fn run(

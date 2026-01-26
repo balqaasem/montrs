@@ -5,10 +5,9 @@
 //! for project settings, build options, and server configuration.
 
 use anyhow::{Context, Result};
-use camino::{Utf8Path, Utf8PathBuf};
 use cargo_metadata::MetadataCommand;
 use serde::Deserialize;
-use std::{collections::HashMap, net::SocketAddr, sync::Arc};
+use std::collections::HashMap;
 
 pub mod tailwind;
 
@@ -239,28 +238,42 @@ pub enum TaskConfig {
 }
 
 impl MontConfig {
+    /// Loads configuration from a specific file.
+    pub fn from_file(path: impl AsRef<std::path::Path>) -> Result<Self> {
+        let content = std::fs::read_to_string(path.as_ref())
+            .with_context(|| format!("Failed to read config file: {}", path.as_ref().display()))?;
+        let mut config: Self = toml::from_str(&content)
+            .with_context(|| format!("Failed to parse config file: {}", path.as_ref().display()))?;
+
+        // Try to resolve project name if it's default
+        if config.project.name == "app" {
+            if let Ok(metadata) = MetadataCommand::new().exec() {
+                if let Some(root) = metadata.root_package() {
+                    config.project.name = root.name.clone();
+                }
+            }
+        }
+
+        Ok(config)
+    }
+
     /// Loads configuration from `mont.toml` in the current directory.
     ///
     /// If the file is missing, returns default configuration.
     /// Also attempts to resolve the project name from `Cargo.toml`.
     pub fn load() -> Result<Self> {
-        let metadata = MetadataCommand::new()
-            .exec()
-            .map_err(|e| anyhow::anyhow!("Failed to load cargo metadata: {}", e))?;
-
-        let mut config = if let Ok(content) = std::fs::read_to_string("mont.toml") {
-            toml::from_str(&content).context("Failed to parse mont.toml")?
+        if std::path::Path::new("mont.toml").exists() {
+            Self::from_file("mont.toml")
         } else {
-            Self::default()
-        };
-
-        if let Some(root) = metadata.root_package()
-            && config.project.name == "app"
-        {
-            config.project.name = root.name.clone();
+            let mut config = Self::default();
+            // Try to resolve project name
+            if let Ok(metadata) = MetadataCommand::new().exec() {
+                if let Some(root) = metadata.root_package() {
+                    config.project.name = root.name.clone();
+                }
+            }
+            Ok(config)
         }
-
-        Ok(config)
     }
 
     // to_leptos_config removed as we now use cargo-leptos CLI wrapper

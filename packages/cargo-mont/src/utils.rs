@@ -1,66 +1,57 @@
 use crate::config::MontConfig;
-use anyhow::{Result, bail};
-use cargo_leptos::{Cli, Commands, Opts, BinOpts};
+use anyhow::{Result, anyhow};
+use clap::Parser;
 
 pub async fn run_cargo_leptos(cmd: &str, args: &[String], config: &MontConfig) -> Result<()> {
-    // Set Environment Variables from Config
-    // Note: cargo-leptos reads LEPTOS_* env vars to override Cargo.toml config
-    unsafe {
-        std::env::set_var("LEPTOS_OUTPUT_NAME", &config.project.name);
-        std::env::set_var(
-            "LEPTOS_SITE_ADDR",
-            format!("{}:{}", config.serve.addr, config.serve.port),
-        );
-        std::env::set_var("LEPTOS_SITE_ROOT", &config.build.site_root);
-        std::env::set_var("LEPTOS_SITE_PKG_DIR", &config.build.site_pkg_name);
+    // Build arguments for cargo-leptos
+    let mut args_list = vec!["cargo-leptos".to_string(), cmd.to_string()];
 
-        if let Some(style) = &config.build.style_file {
-            std::env::set_var("LEPTOS_STYLE_FILE", style);
-        }
-        if let Some(assets) = &config.build.assets_dir {
-            std::env::set_var("LEPTOS_ASSETS_DIR", assets);
-        }
-        if let Some(tailwind) = &config.build.tailwind_input_file {
-            std::env::set_var("LEPTOS_TAILWIND_INPUT_FILE", tailwind);
-        }
-        if let Some(tailwind_config) = &config.build.tailwind_config_file {
-            std::env::set_var("LEPTOS_TAILWIND_CONFIG_FILE", tailwind_config);
+    if config.project.release {
+        args_list.push("--release".to_string());
+    }
+    if config.project.precompress {
+        args_list.push("--precompress".to_string());
+    }
+    if config.project.hot_reload {
+        args_list.push("--hot-reload".to_string());
+    }
+    if config.project.wasm_debug {
+        args_list.push("--wasm-debug".to_string());
+    }
+    if config.project.js_minify {
+        args_list.push("--js-minify".to_string());
+    } else {
+        args_list.push("--js-minify=false".to_string());
+    }
+    if config.project.split {
+        args_list.push("--split".to_string());
+    }
+    if config.project.frontend_only {
+        args_list.push("--frontend-only".to_string());
+    }
+    if config.project.server_only {
+        args_list.push("--server-only".to_string());
+    }
+
+    for feature in &config.project.features {
+        args_list.push("--features".to_string());
+        args_list.push(feature.clone());
+    }
+
+    for _ in 0..config.project.verbose {
+        args_list.push("-v".to_string());
+    }
+
+    // Add trailing arguments for serve/watch
+    if !args.is_empty() {
+        args_list.push("--".to_string());
+        for arg in args {
+            args_list.push(arg.clone());
         }
     }
 
-    let opts = Opts {
-        release: config.project.release,
-        precompress: config.project.precompress,
-        hot_reload: config.project.hot_reload,
-        project: None,
-        features: config.project.features.clone(),
-        lib_features: vec![],
-        lib_cargo_args: None,
-        bin_features: vec![],
-        bin_cargo_args: None,
-        wasm_debug: config.project.wasm_debug,
-        verbose: config.project.verbose,
-        clear: false,
-        js_minify: config.project.js_minify,
-        split: config.project.split,
-        frontend_only: config.project.frontend_only,
-        server_only: config.project.server_only,
-    };
+    let cli = cargo_leptos::config::Cli::try_parse_from(args_list)
+        .map_err(|e| anyhow!("Failed to parse cargo-leptos arguments: {}", e))?;
 
-    let command = match cmd {
-        "end-to-end" => Commands::EndToEnd(opts),
-        "serve" => Commands::Serve(BinOpts { opts, bin_args: args.to_vec() }),
-        "build" => Commands::Build(opts),
-        "test" => Commands::Test(opts),
-        "watch" => Commands::Watch(BinOpts { opts, bin_args: args.to_vec() }),
-        _ => bail!("Unknown cargo-leptos command: {}", cmd),
-    };
-
-    let cli = Cli {
-        manifest_path: None,
-        log: vec![], // TODO: map logs if needed
-        command,
-    };
-
-    cargo_leptos::run(cli).await
+    cargo_leptos::run(cli).await.map_err(|e| anyhow!("{:?}", e))
 }
