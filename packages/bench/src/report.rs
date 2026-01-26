@@ -100,6 +100,9 @@ impl Report {
             writeln!(file, "    pub const BASE_NS: f64 = {:.2};", base_ns)?;
             writeln!(file, "    /// Slope execution time in nanoseconds per unit")?;
             writeln!(file, "    pub const SLOPE_NS: f64 = {:.2};", slope_ns)?;
+            writeln!(file, "")?;
+            writeln!(file, "    /// The full weight definition")?;
+            writeln!(file, "    pub const WEIGHT: montrs_bench::Weight = montrs_bench::Weight::from_ns({} as u64, {} as u64);", base_ns.round(), slope_ns.round())?;
             writeln!(file, "}}")?;
             writeln!(file, "")?;
         }

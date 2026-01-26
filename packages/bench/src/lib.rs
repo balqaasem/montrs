@@ -9,11 +9,13 @@ pub mod report;
 pub mod sys;
 pub mod config;
 pub mod parameter;
+pub mod weights;
 
 pub use runner::{BenchRunner, Benchmark};
 pub use config::BenchConfig;
 pub use report::Report;
 pub use parameter::{Parameter, ParametricBench};
+pub use weights::Weight;
 
 use std::future::Future;
 
