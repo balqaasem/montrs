@@ -120,6 +120,11 @@ impl BenchRunner {
             println!("Report saved to {}", path.blue());
         }
 
+        if let Some(path) = &self.config.generate_weights {
+            report.save_weights(path)?;
+            println!("Weights generated at {}", path.blue());
+        }
+
         Ok(())
     }
 
@@ -129,7 +134,7 @@ impl BenchRunner {
         
         bench.setup().await?;
 
-        // Warmup phase: Run without measuring to prime caches/JIT
+        // Warmup
         for _ in 0..self.config.warmup_iterations {
             bench.run().await?;
         }
@@ -137,16 +142,40 @@ impl BenchRunner {
         let mut durations = Vec::with_capacity(self.config.iterations as usize);
         let start_total = Instant::now();
 
-        // Measurement phase
-        for _ in 0..self.config.iterations {
-            let start = Instant::now();
-            bench.run().await?;
-            durations.push(start.elapsed());
+        // Check for parameter support (Substrate-inspired parametric benchmarking)
+        let param_info = bench.parameter();
+        let mut params_used = Vec::new();
 
-            // Check for timeout
-            if let Some(max_dur) = self.config.duration {
-                if start_total.elapsed() > max_dur {
-                    break;
+        if let Some(param) = &param_info {
+            // Parametric mode: Iterate through parameter values
+            let values = param.values();
+            let runs_per_val = std::cmp::max(1, self.config.iterations / values.len() as u32);
+            
+            println!("  Parameter: {} ({} values, {} runs/val)", param.name, values.len(), runs_per_val);
+
+            for &val in &values {
+                bench.set_parameter(val);
+                // Mini-warmup for new param
+                bench.run().await?; 
+
+                for _ in 0..runs_per_val {
+                    let start = Instant::now();
+                    bench.run().await?;
+                    durations.push(start.elapsed());
+                    params_used.push(val);
+                }
+            }
+        } else {
+            // Standard mode
+            for _ in 0..self.config.iterations {
+                let start = Instant::now();
+                bench.run().await?;
+                durations.push(start.elapsed());
+
+                if let Some(max_dur) = self.config.duration {
+                    if start_total.elapsed() > max_dur {
+                        break;
+                    }
                 }
             }
         }
@@ -154,13 +183,25 @@ impl BenchRunner {
         let total_duration = start_total.elapsed();
         bench.teardown().await?;
 
-        let stats = BenchStats::new(&durations);
+        let stats = if !params_used.is_empty() {
+             BenchStats::with_params(&durations, Some(&params_used))
+        } else {
+             BenchStats::new(&durations)
+        };
+        
         report.add_result(bench.name().to_string(), stats.clone(), durations.len() as u32, total_duration.as_secs_f64());
 
         println!("{}", "Done".green());
         println!("  Mean:    {:.4} µs", stats.mean * 1_000_000.0);
         println!("  Median:  {:.4} µs", stats.median * 1_000_000.0);
+        println!("  P99:     {:.4} µs", stats.p99 * 1_000_000.0);
         println!("  StdDev:  {:.4} µs", stats.std_dev * 1_000_000.0);
+        if let Some(slope) = stats.slope {
+            println!("  Slope:   {:.4} ns/param", slope * 1_000_000_000.0);
+        }
+        if let Some(intercept) = stats.intercept {
+            println!("  Intercept: {:.4} µs", intercept * 1_000_000.0);
+        }
         println!("  Ops/sec: {:.2}", stats.ops_per_sec);
         println!("---------------------------------------------------");
 

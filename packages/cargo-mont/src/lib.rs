@@ -126,6 +126,10 @@ pub enum Commands {
         /// Simple/Native mode: Benchmarks a file/binary directly without project overhead.
         #[arg(long)]
         simple: bool,
+
+        /// Generate weight file from benchmark results (Substrate-style).
+        #[arg(long)]
+        generate_weights: Option<String>,
     },
     /// Start the server and end-2-end tests.
     #[command(name = "e2e")]
@@ -216,7 +220,8 @@ pub async fn run(cli: MontCli) -> anyhow::Result<()> {
             filter,
             json_output,
             simple,
-        } => command::bench::run(target, iterations, warmup, timeout, filter, json_output, simple).await,
+            generate_weights,
+        } => command::bench::run(target, iterations, warmup, timeout, filter, json_output, simple, generate_weights).await,
         Commands::E2e { headless, keep_alive, browser } => command::e2e::run(headless, keep_alive, browser).await,
         Commands::New { name, template } => command::new::run(name, template).await,
         Commands::Run { task } => command::run::run(task).await,

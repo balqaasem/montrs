@@ -11,6 +11,8 @@ use std::path::{Path, PathBuf};
 use std::process::Command;
 use std::fs;
 use std::time::Instant;
+use console::style;
+use colored::Colorize;
 
 pub async fn run(
     target: Option<String>,
@@ -20,24 +22,26 @@ pub async fn run(
     filter: Option<String>,
     json_output: Option<String>,
     simple: bool,
+    generate_weights: Option<String>,
 ) -> Result<()> {
     if simple {
         if let Some(target_path) = &target {
             // Handle explicit targets without cargo project overhead
-            return run_native_bench(target_path, iterations, warmup).await;
+            return run_native_bench(target_path, iterations, warmup, generate_weights).await;
         } else {
              anyhow::bail!("--simple mode requires a target file or directory.");
         }
     }
 
     // Default behavior: run cargo bench
-    run_cargo_bench(target, iterations, warmup, timeout, filter, json_output).await
+    run_cargo_bench(target, iterations, warmup, timeout, filter, json_output, generate_weights).await
 }
 
 async fn run_native_bench(
     target_path: &str,
     iterations: u32,
     warmup: u32,
+    generate_weights: Option<String>,
 ) -> Result<()> {
     let path = Path::new(target_path);
     if !path.exists() {
@@ -57,26 +61,29 @@ async fn run_native_bench(
         // AppSpec or Application Directory
         println!("Type:   AppSpec / Application");
         println!("Action: Benchmarking internal config load speed...");
-        return bench_appspec_load(path, iterations, warmup).await;
+        return bench_appspec_load(path, iterations, warmup, generate_weights).await;
     } 
     
     if path.extension().map_or(false, |e| e == "rs") {
         // Rust Source File
         println!("Type:   Rust Source");
         println!("Action: Compiling and benchmarking execution...");
-        return bench_rust_source(path, iterations, warmup).await;
+        return bench_rust_source(path, iterations, warmup, generate_weights).await;
     }
 
     // Assume Binary / Executable
     println!("Type:   Executable / Binary");
     println!("Action: Benchmarking execution speed...");
-    bench_executable(path, iterations, warmup).await
+    bench_executable(path, iterations, warmup, generate_weights).await
 }
 
 /// Benchmarks loading of an AppSpec (mont.toml).
 /// 
 /// This is an internal benchmark that measures how fast `cargo-mont` can parse the configuration.
-async fn bench_appspec_load(path: &Path, iterations: u32, warmup: u32) -> Result<()> {
+async fn bench_appspec_load(path: &Path, iterations: u32, warmup: u32, generate_weights: Option<String>) -> Result<()> {
+    use montrs_bench::stats::BenchStats;
+    use montrs_bench::report::Report;
+
     // Determine the mont.toml path
     let config_path = if path.is_dir() {
         path.join("mont.toml")
@@ -94,20 +101,34 @@ async fn bench_appspec_load(path: &Path, iterations: u32, warmup: u32) -> Result
     }
 
     // Measure
-    let mut total_duration = std::time::Duration::new(0, 0);
+    let mut durations = Vec::with_capacity(iterations as usize);
+    let start_total = Instant::now();
+
     for _ in 0..iterations {
         let start = Instant::now();
         let _ = crate::config::MontConfig::from_file(&config_path)?;
-        total_duration += start.elapsed();
+        durations.push(start.elapsed());
     }
 
-    let avg_duration = total_duration / iterations;
-    println!("Result: {:.4} ms / load (avg over {} runs)", avg_duration.as_secs_f64() * 1000.0, iterations);
+    let total_duration = start_total.elapsed();
+    let stats = BenchStats::new(&durations);
+
+    println!("{}", "Results (AppSpec Load):".bold().green());
+    println!("  Mean:    {:.4} ms", stats.mean * 1000.0);
+    println!("  Median:  {:.4} ms", stats.median * 1000.0);
+    println!("  Ops/sec: {:.2}", stats.ops_per_sec);
+
+    if let Some(weight_path) = generate_weights {
+        let mut report = Report::new();
+        report.add_result("appspec_load".to_string(), stats, iterations, total_duration.as_secs_f64());
+        report.save_weights(&weight_path)?;
+        println!("Weights generated at {}", weight_path.blue());
+    }
     
     Ok(())
 }
 
-async fn bench_rust_source(path: &Path, iterations: u32, warmup: u32) -> Result<()> {
+async fn bench_rust_source(path: &Path, iterations: u32, warmup: u32, generate_weights: Option<String>) -> Result<()> {
     // Attempt to compile using rustc to a temp binary
     // Note: This only works for standalone files without external crate dependencies (except std)
     // If the file relies on `montrs_bench`, this will fail unless we link it manually.
@@ -134,25 +155,47 @@ async fn bench_rust_source(path: &Path, iterations: u32, warmup: u32) -> Result<
     }
 
     // Run the produced binary
-    bench_executable(&binary_path, iterations, warmup).await
+    bench_executable(&binary_path, iterations, warmup, generate_weights).await
 }
 
-async fn bench_executable(path: &Path, iterations: u32, warmup: u32) -> Result<()> {
+async fn bench_executable(path: &Path, iterations: u32, warmup: u32, generate_weights: Option<String>) -> Result<()> {
+    use montrs_bench::stats::BenchStats;
+    use montrs_bench::report::Report;
+
+    println!("Benchmarking execution speed...");
     // Warmup
     for _ in 0..warmup {
         let _ = Command::new(path).output()?;
     }
 
     // Measure
-    let mut total_duration = std::time::Duration::new(0, 0);
+    let mut durations = Vec::with_capacity(iterations as usize);
+    let start_total = Instant::now();
+
     for _ in 0..iterations {
         let start = Instant::now();
         let _ = Command::new(path).output()?;
-        total_duration += start.elapsed();
+        durations.push(start.elapsed());
     }
 
-    let avg_duration = total_duration / iterations;
-    println!("Result: {:.4} ms / run (avg over {} runs)", avg_duration.as_secs_f64() * 1000.0, iterations);
+    let total_duration = start_total.elapsed();
+    let stats = BenchStats::new(&durations);
+
+    println!("{}", "Results:".bold().green());
+    println!("  Mean:    {:.4} ms", stats.mean * 1000.0);
+    println!("  Median:  {:.4} ms", stats.median * 1000.0);
+    println!("  P99:     {:.4} ms", stats.p99 * 1000.0);
+    println!("  StdDev:  {:.4} ms", stats.std_dev * 1000.0);
+    println!("  Ops/sec: {:.2}", stats.ops_per_sec);
+    println!("  Total:   {:.2} s", total_duration.as_secs_f64());
+
+    if let Some(weight_path) = generate_weights {
+        let mut report = Report::new();
+        let name = path.file_name().unwrap().to_string_lossy().to_string();
+        report.add_result(name, stats, iterations, total_duration.as_secs_f64());
+        report.save_weights(&weight_path)?;
+        println!("Weights generated at {}", weight_path.blue());
+    }
 
     Ok(())
 }
@@ -165,6 +208,7 @@ async fn run_cargo_bench(
     timeout: Option<u64>,
     filter: Option<String>,
     json_output: Option<String>,
+    generate_weights: Option<String>,
 ) -> Result<()> {
     // ... existing logic ...
     let mut cmd = Command::new("cargo");
@@ -195,6 +239,10 @@ async fn run_cargo_bench(
         harness_args.push(format!("--json-output={}", json));
     }
 
+    if let Some(weights) = &generate_weights {
+        harness_args.push(format!("--generate-weights={}", weights));
+    }
+
     cmd.args(&harness_args);
 
     // Also set Env vars as a fallback/alternative
@@ -205,6 +253,9 @@ async fn run_cargo_bench(
     }
     if let Some(json) = &json_output {
         cmd.env("MONTRS_BENCH_JSON_OUTPUT", json);
+    }
+    if let Some(weights) = &generate_weights {
+        cmd.env("MONTRS_BENCH_GENERATE_WEIGHTS", weights);
     }
 
     // Legacy support (for older binaries using MONT_BENCH_*)

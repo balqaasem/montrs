@@ -41,6 +41,7 @@ Run performance benchmarks.
 - `--timeout <SECONDS>`: Maximum execution time for each benchmark.
 - `--filter <STRING>`: Filter benchmarks by name.
 - `--json-output <PATH>`: Export results to a JSON file.
+- `--generate-weights <PATH>`: Generate a Rust file with weight constants (Substrate-style).
 - `--simple`: **Native Mode**. Benchmarks a file/binary directly without project overhead. Requires `target`.
 
 **Examples:**

@@ -8,10 +8,12 @@ pub mod stats;
 pub mod report;
 pub mod sys;
 pub mod config;
+pub mod parameter;
 
 pub use runner::{BenchRunner, Benchmark};
 pub use config::BenchConfig;
 pub use report::Report;
+pub use parameter::{Parameter, ParametricBench};
 
 use std::future::Future;
 
@@ -20,6 +22,14 @@ use std::future::Future;
 pub trait BenchCase: Send + Sync {
     /// The name of the benchmark.
     fn name(&self) -> &str;
+
+    /// Optional parameter info for regression testing.
+    fn parameter(&self) -> Option<Parameter> {
+        None
+    }
+
+    /// Set the current parameter value (if applicable).
+    fn set_parameter(&self, _value: u32) {}
 
     /// Optional setup phase (not timed).
     async fn setup(&self) -> anyhow::Result<()> {

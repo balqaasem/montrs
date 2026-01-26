@@ -9,17 +9,6 @@ fn parse_duration(arg: &str) -> Result<Duration, std::num::ParseIntError> {
     Ok(Duration::from_secs(seconds))
 }
 
-use clap::Parser;
-use serde::{Deserialize, Serialize};
-use std::env;
-use std::time::Duration;
-
-/// Parses a duration from a string (in seconds).
-fn parse_duration(arg: &str) -> Result<Duration, std::num::ParseIntError> {
-    let seconds = arg.parse::<u64>()?;
-    Ok(Duration::from_secs(seconds))
-}
-
 /// Internal struct for CLI argument parsing.
 /// Fields are optional to allow distinguishing between "provided" and "missing".
 #[derive(Parser)]
@@ -49,6 +38,11 @@ struct CliArgs {
     /// Env: MONTRS_BENCH_JSON_OUTPUT
     #[arg(long = "json-output")]
     json_output: Option<String>,
+
+    /// Path to generate weights file (Substrate-style).
+    /// Env: MONTRS_BENCH_GENERATE_WEIGHTS
+    #[arg(long = "generate-weights")]
+    generate_weights: Option<String>,
 }
 
 /// Configuration for benchmark execution.
@@ -76,6 +70,9 @@ pub struct BenchConfig {
 
     /// Path to export JSON report.
     pub json_output: Option<String>,
+
+    /// Path to generate weights file (Substrate-style).
+    pub generate_weights: Option<String>,
 }
 
 impl BenchConfig {
@@ -137,12 +134,16 @@ impl BenchConfig {
         let json_output = args.json_output
             .or_else(|| Self::fetch_env_string("MONTRS_BENCH_JSON_OUTPUT", "MONT_BENCH_JSON_OUTPUT", &env_loader));
 
+        let generate_weights = args.generate_weights
+            .or_else(|| Self::fetch_env_string("MONTRS_BENCH_GENERATE_WEIGHTS", "", &env_loader));
+
         Self {
             warmup_iterations,
             iterations,
             duration,
             filter,
             json_output,
+            generate_weights,
         }
     }
 
@@ -193,6 +194,7 @@ impl Default for BenchConfig {
             duration: Some(Duration::from_secs(5)),
             filter: None,
             json_output: None,
+            generate_weights: None,
         }
     }
 }
