@@ -78,7 +78,7 @@ async fn run_native_bench(
 
 /// Benchmarks loading of an AppSpec (montrs.toml).
 /// 
-/// This is an internal benchmark that measures how fast `cargo-montrs` can parse the configuration.
+/// This is an internal benchmark that measures how fast `montrs` can parse the configuration.
 async fn bench_appspec_load(path: &Path, iterations: u32, warmup: u32, generate_weights: Option<String>) -> Result<()> {
     use montrs_bench::stats::BenchStats;
     use montrs_bench::report::Report;

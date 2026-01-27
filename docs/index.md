@@ -14,14 +14,14 @@ MontRS is a Rust-native, trait-driven web framework for teams that value compile
 
 ### Install CLI
 ```bash
-cargo install --path packages/cargo-montrs
+cargo install --path packages/cli
 ```
 
 ### Create a project
 ```bash
-cargo montrs new my-app
+montrs new my-app
 cd my-app
-cargo montrs serve
+montrs serve
 ```
 
 ## Documentation
@@ -30,4 +30,4 @@ cargo montrs serve
 - [Schema & Validation](packages/schema/README.md)
 - [ORM Layer](packages/orm/README.md)
 - [Testing Tools](packages/test/README.md)
-- [cargo-montrs CLI](packages/cargo-montrs/README.md)
+- [CLI Tools](packages/cli/README.md)

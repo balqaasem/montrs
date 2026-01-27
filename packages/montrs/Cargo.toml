@@ -16,12 +16,12 @@ montrs-cli = { path = "../cli", version = "0.1.0", optional = true }
 
 [[bin]]
 name = "montrs"
-path = "src/bin/main.rs"
+path = "src/bin/montrs.rs"
 required-features = ["cli"]
 
 [[bin]]
 name = "cargo-montrs"
-path = "src/bin/main.rs"
+path = "src/bin/cargo-montrs.rs"
 required-features = ["cli"]
 
 [features]

@@ -1,5 +1,5 @@
 # Tailwind CSS Configuration for MontRS Workspace
-# This file is automatically converted to tailwind.config.js by cargo-montrs
+# This file is automatically converted to tailwind.config.js by montrs
 
 # Content paths - tell Tailwind where to look for class usage
 content = [

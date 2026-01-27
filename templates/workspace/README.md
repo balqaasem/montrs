@@ -20,13 +20,13 @@ my-workspace/
 
 ```bash
 # Development with hot-reload
-cargo montrs watch
+montrs watch
 
 # Production build
-cargo montrs build --release
+montrs build --release
 
 # Run tests
-cargo montrs run test
+montrs run test
 ```
 
 ## Adding New Apps/Packages

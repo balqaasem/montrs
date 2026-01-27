@@ -34,4 +34,4 @@ pub mod integration;
 pub mod e2e;
 
 pub use integration::{Fixture, TestRuntime, TestEnv, run_fixture_test};
-pub use unit::{expect, bench, Spy, Mock};
+pub use unit::{expect, Spy, Mock, simple_bench};

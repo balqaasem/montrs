@@ -1,6 +1,6 @@
-# cargo-montrs CLI Reference
+# montrs CLI Reference
 
-The `cargo-montrs` CLI is the primary tool for managing MontRS applications.
+The `montrs` CLI is the primary tool for managing MontRS applications.
 
 ## General Flags
 
@@ -14,19 +14,19 @@ The `cargo-montrs` CLI is the primary tool for managing MontRS applications.
 ### `new`
 Scaffold a new MontRS project from a template.
 ```bash
-cargo montrs new <name> [--template <template>]
+montrs new <name> [--template <template>]
 ```
 
 ### `build`
 Build the project for production.
 ```bash
-cargo montrs build
+montrs build
 ```
 
 ### `serve`
 Start the development server with hot-reloading.
 ```bash
-cargo montrs serve
+montrs serve
 ```
 
 ### `bench`
@@ -47,26 +47,26 @@ Run performance benchmarks.
 **Examples:**
 ```bash
 # Standard project benchmarks
-cargo montrs bench
+montrs bench
 
 # Native benchmark of a script
-cargo montrs bench --simple scripts/process_data.rs
+montrs bench --simple scripts/process_data.rs
 ```
 
 ### `test`
 Run project tests (Unit, Integration, E2E).
 ```bash
-cargo montrs test [--filter <name>] [--report <format>]
+montrs test [--filter <name>] [--report <format>]
 ```
 
 ### `run`
 Run custom tasks defined in `montrs.toml`.
 ```bash
-cargo montrs run <task_name>
+montrs run <task_name>
 ```
 
 ### `watch`
 Watch for changes and rebuild automatically.
 ```bash
-cargo montrs watch
+montrs watch
 ```

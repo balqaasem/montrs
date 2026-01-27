@@ -36,7 +36,7 @@ pub async fn run(name: String, template_url: String) -> anyhow::Result<()> {
         style(&name).cyan().bold()
     );
     println!(
-        "Next steps:\n  cd {}\n  cargo montrs build\n  cargo montrs serve",
+        "Next steps:\n  cd {}\n  montrs build\n  montrs serve",
         name
     );
 

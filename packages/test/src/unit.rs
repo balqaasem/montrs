@@ -14,7 +14,6 @@
 use std::fmt::Debug;
 use std::sync::atomic::{AtomicUsize, Ordering};
 use std::sync::{Arc, Mutex};
-use std::time::Instant;
 
 // =============================================================================
 //  Fluent Assertions
@@ -293,7 +292,7 @@ impl<Args: Clone + Send, Ret: Clone + Send> Mock<Args, Ret> {
 //  Benchmarking
 // =============================================================================
 
-pub use montrs_bench::{bench, Benchmark, BenchConfig};
+pub use montrs_bench::{Benchmark, BenchConfig};
 
 // Re-export old simple bench for backward compatibility if needed, 
 // or deprecate it. For now, we assume the user wants the new power.
@@ -305,9 +304,14 @@ pub use montrs_bench::{bench, Benchmark, BenchConfig};
 pub async fn simple_bench<F, Fut>(name: &str, iterations: u32, func: F)
 where
     F: Fn() -> Fut + Send + Sync + 'static,
-    Fut: std::future::Future<Output = ()> + Send,
+    Fut: std::future::Future<Output = ()> + Send + 'static,
 {
-    use montrs_bench::{BenchRunner, SimpleBench};
+    use montrs_bench::{BenchRunner, SimpleBench, BenchConfig};
+    
+    let mut config = BenchConfig::default();
+    config.iterations = iterations;
+
+    let mut runner = BenchRunner::with_config(config);
     
     let bench = SimpleBench::new(name, move || {
         let f = func();
@@ -317,20 +321,6 @@ where
         }
     });
 
-    let mut runner = BenchRunner::new();
-    runner.add(bench);
-    
-    // We override config to match the simple signature
-    let mut config = montrs_bench::BenchConfig::default();
-    config.iterations = iterations;
-    
-    // Create a temporary runner with this config
-    let runner = BenchRunner::with_config(config);
-    // runner.add(bench); // BenchRunner logic needs ownership or cloning?
-    // Let's just run it manually since BenchRunner consumes benchmarks
-    
-    // Re-instantiate runner because of ownership
-    let mut runner = BenchRunner::with_config(config);
     runner.add(bench);
     
     if let Err(e) = runner.run().await {

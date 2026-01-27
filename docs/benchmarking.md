@@ -7,7 +7,7 @@ MontRS provides a professional-grade benchmarking ecosystem powered by the `mont
 The benchmarking system is designed to be:
 - **Accurate**: Uses high-resolution timers and statistical analysis (mean, median, p95/p99, std dev).
 - **System-Aware**: Captures detailed system information (OS, CPU, RAM) for context.
-- **Integrated**: Works seamlessly with `cargo montrs bench` and standard Rust tests.
+- **Integrated**: Works seamlessly with `montrs bench` and standard Rust tests.
 - **Exportable**: Supports JSON reporting for CI/CD integration.
 
 ## Quick Start
@@ -44,20 +44,20 @@ async fn main() -> anyhow::Result<()> {
 
 ### 3. Run via CLI
 
-Use the `cargo montrs bench` command to execute benchmarks.
+Use the `montrs bench` command to execute benchmarks.
 
 ```bash
 # Run all benchmarks
-cargo montrs bench
+montrs bench
 
 # Customize execution
-cargo montrs bench --iterations 1000 --warmup 50 --timeout 60
+montrs bench --iterations 1000 --warmup 50 --timeout 60
 
 # Filter specific benchmarks
-cargo montrs bench --filter "vector_sort"
+montrs bench --filter "vector_sort"
 
 # Export report
-cargo montrs bench --json-output report.json
+montrs bench --json-output report.json
 ```
 
 ---
@@ -79,19 +79,19 @@ This is ideal for quick testing, measuring script execution, or checking the siz
 
 ```bash
 # Simple bench of a Rust source file
-cargo montrs bench --simple src/utils.rs
+montrs bench --simple src/utils.rs
 
 # Bench an existing binary
-cargo montrs bench --simple ./target/release/my-app
+montrs bench --simple ./target/release/my-app
 
 # Profile AppSpec load time
-cargo montrs bench --simple ./montrs.toml
+montrs bench --simple ./montrs.toml
 
 # Customize iterations and warmup for native mode
-cargo montrs bench --simple ./script.rs --iterations 50 --warmup 5
+montrs bench --simple ./script.rs --iterations 50 --warmup 5
 ```
 
-> **Note**: For `.rs` files, native mode uses `rustc` directly. If your file depends on external crates (other than `std`), you should use the standard project-based `cargo montrs bench` instead.
+> **Note**: For `.rs` files, native mode uses `rustc` directly. If your file depends on external crates (other than `std`), you should use the standard project-based `montrs bench` instead.
 
 ---
 
@@ -222,7 +222,7 @@ Benchmarks in MontRS capture detailed hardware information to ensure results are
  
  ```bash
  # Generate weights from a benchmark run
- cargo montrs bench --generate-weights src/weights.rs
+montrs bench --generate-weights src/weights.rs
  ```
  
  This produces a file like:

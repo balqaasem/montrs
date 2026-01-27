@@ -14,7 +14,7 @@ pub async fn run() -> anyhow::Result<()> {
         }
     }
 
-    // "serve" in cargo-montrs usually implies watching/running the server.
+    // "serve" in montrs usually implies watching/running the server.
     // We map it to "watch" as cargo-leptos doesn't have a standalone "serve" command exposed clearly via CLI
     // other than running the binary, but "watch" is safer for dev.
     run_cargo_leptos("watch", &[], &config).await

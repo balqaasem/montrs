@@ -14,7 +14,7 @@
     - [ORM](packages/orm/README.md): SQL-centric ORM with SQLite and Postgres support.
     - [Test](packages/test/README.md): Deterministic testing suite (Unit, Integration, E2E).
     - [Bench](packages/bench/README.md): Professional-grade benchmarking tools.
-- **Production CLI**: [cargo-montrs](packages/cargo-montrs/README.md) for orchestration.
+- **Production CLI**: [CLI](packages/cli/README.md) for orchestration.
 
 ## Prerequisites
 
@@ -33,36 +33,43 @@ Before installing MontRS, ensure you have the following installed:
 
 ### Install the CLI
 
-#### Published Version
-To install the latest published version of `cargo-montrs`, use:
+#### Recommended
+To install the latest version of the framework including the CLI, use:
 
 ```bash
-cargo install --locked cargo-montrs
+cargo install --locked montrs
+```
+
+#### CLI Package
+To install only the CLI tool, use:
+
+```bash
+cargo install --locked montrs-cli
 ```
 
 #### Local Path
 If you're working on the MontRS repository, you can install the CLI from the local path:
 
 ```bash
-cargo install --path packages/cargo-montrs
+cargo install --path packages/cli
 ```
 
 ### Create a new app
 ```bash
-cargo montrs new my-app
+montrs new my-app
 cd my-app
-cargo montrs serve
+montrs serve
 ```
 
 ### Benchmarking
 Run standard benchmarks or use the native mode for quick file/binary testing:
 ```bash
-# Standard cargo bench
-cargo montrs bench
+# Standard benchmark
+montrs bench
 
 # Native mode (no project overhead)
-cargo montrs bench --simple ./my-script.rs
-cargo montrs bench --simple ./my-binary
+montrs bench --simple ./my-script.rs
+montrs bench --simple ./my-binary
 ```
 
 ## 🛠 Project Structure
@@ -72,7 +79,7 @@ cargo montrs bench --simple ./my-binary
 - `packages/orm`: Flexible database backend traits and drivers.
 - `packages/test`: TestRuntime, E2E drivers, and unit testing utilities.
 - `packages/bench`: Performance benchmarking framework.
-- `packages/cargo-montrs`: The official build and serve tool.
+- `packages/cli`: The official build and serve tool.
 - `templates/`: Project blueprints (including `todo` and `default`).
 
 ## License

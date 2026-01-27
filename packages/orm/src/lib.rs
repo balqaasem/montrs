@@ -7,7 +7,6 @@ use async_trait::async_trait;
 use deadpool_postgres::{Config, Pool, Runtime};
 #[cfg(feature = "sqlite")]
 use rusqlite::Connection;
-use std::sync::{Arc, Mutex};
 use thiserror::Error;
 #[cfg(feature = "postgres")]
 use tokio_postgres::NoTls;

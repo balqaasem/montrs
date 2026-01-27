@@ -2,13 +2,13 @@
 
 **Version:** 0.1 (draft)  
 **License:** MIT  
-**Scope:** Full framework spec \+ `cargo-montrs` CLI \+ repo and template structure \+ docs \+ CI/CD & Cloudflare deployment guidance
+**Scope:** Full framework spec \+ `montrs` CLI \+ repo and template structure \+ docs \+ CI/CD & Cloudflare deployment guidance
 
 # **1\. Executive summary**
 
 MontRS is a Rust-native, trait-driven, deterministic meta-framework built on top of **Leptos**. It leverages Leptos's high-performance fine-grained reactivity and component model as its core engine, while adding engineering disciplines from Remix (web-native routing/HTTP mental model), Dioxus (ergonomic multi-target components), Yew (architecture discipline), Substrate/Setheum (trait-first modularity, deterministic initialization, test harness), and Drizzle (minimal-abstraction SQL ergonomics). MontRS is designed for teams that want the power of Leptos with added structure for compile-time correctness, explicit modular boundaries, and deterministic initialization across server, WASM, and edge targets.
 
-This PRD defines the technical architecture of the MontRS meta-framework, its integration with the Leptos runtime, the module system, schema model, ORM expectations, testing & mocking, the `cargo-montrs` CLI scaffolding tool (including default Leptos template), repository and app folder conventions, documentation layout, CI/CD & Cloudflare deployment guidance, and versioning and release practices to produce a production-ready MontRS v0.1.0 as a first-class Leptos meta-framework.
+This PRD defines the technical architecture of the MontRS meta-framework, its integration with the Leptos runtime, the module system, schema model, ORM expectations, testing & mocking, the `montrs` CLI scaffolding tool (including default Leptos template), repository and app folder conventions, documentation layout, CI/CD & Cloudflare deployment guidance, and versioning and release practices to produce a production-ready MontRS v0.1.0 as a first-class Leptos meta-framework.
 
 # **2\. Guiding philosophy & design constraints**
 
@@ -37,7 +37,7 @@ MontRS splits responsibilities across these layers, sitting on top of the Leptos
 * **Environment:** Typed `EnvConfig` trait and secure secret handling, mockable in TestRuntime.  
 * **Rate limiting & feature flags:** Trait-driven interfaces with deterministic evaluation.  
 * **Test runtime:** `TestRuntime` that boots AppSpec (and the internal Leptos reactive scope) deterministically.  
-* **Tooling & scaffold:** `cargo-montrs` crate provides project scaffolding for Leptos-based MontRS apps, integrating the MontRS build system, `tailwindcss`, and `axum`.
+* **Tooling & scaffold:** `montrs` crate provides project scaffolding for Leptos-based MontRS apps, integrating the MontRS build system, `tailwindcss`, and `axum`.
 
 # **4\. Core runtime APIs (conceptual)**
 
@@ -240,32 +240,32 @@ fn comment\_create(input: CreateComment, ctx: ActionCtx) \-\> Result\<(), Action
     // continue...  
 }
 
-# **10\. `cargo-montrs` — CLI scaffold**
+# **10\. `montrs` — CLI scaffold**
 
 ## **10.1 Purpose & responsibilities**
 
-`cargo-montrs` is a Cargo crate and small binary that scaffolds MontRS projects using a default template. It must:
+`montrs-cli` is a Cargo crate and small binary that scaffolds MontRS projects using a default template. It must:
 
 * Generate a multi-crate workspace (recommended) with:  
   * `montrs-core` crate (runtime primitives)  
   * `montrs-schema` crate (derive macros)  
   * `montrs-orm` crate (DbBackend traits & implementations)  
-  * `cargo-montrs` (CLI tool)  
+  * `montrs` (CLI tool)  
   * `app/` crate (user application)  
 * Populate the AppSpec, example modules, README, docs, CI files, and scripts.  
-* Integrate `cargo-montrs` for common tasks, WASM builds, `tailwindcss` for CSS tooling, `RustUI` for UI abstraction, and `axum` for backend routing in the template app.  
+* Integrate `montrs` for common tasks, WASM builds, `tailwindcss` for CSS tooling, `RustUI` for UI abstraction, and `axum` for backend routing in the template app.  
 * Create a `docs/` directory with starter API docs and contribution guide.
 
 ## **10.2 Command usage (example)**
 
 \# Install  
 ```
-cargo install cargo-montrs
+cargo install montrs-cli
 ```
 
-\# Create a new app  
+# Create a new app  
 ```bash
-cargo montrs new my-shop --template default --license MIT --vcs git  
+montrs new my-shop --template default --license MIT --vcs git  
 ```
 cd my-shop  
 cargo make init
@@ -273,7 +273,7 @@ cargo make init
 Default template choices:
 
 * Build tool: `cargo-make`  
-* WASM build: `cargo-montrs`  
+* WASM build: `montrs`  
 * Styling: `tailwindcss`  
 * UI layer: `RustUI` (opinionated set of components)  
 * Backend routing: `axum`  
@@ -304,7 +304,7 @@ montrs/
 │  ├─ montrs-schema/        \# derive macros for Schema  
 │  ├─ montrs-orm/           \# DbBackend trait \+ backends  
 │  ├─ montrs-test/          \# TestRuntime \+ E2E helpers  
-│  ├─ montrs/         \# cargo-montrs CLI binary  
+│  ├─ montrs/         \# montrs CLI binary  
 │  ├─ bench/         \# Benchmarking engine  
 │  └─ montrs/               \# Meta-crate for unified entry point  
 ├─ docs/  
@@ -326,11 +326,11 @@ montrs/
 ├─ Cargo.toml                \# workspace  
 └─ README.md
 
-## **11.2 Template app layout (cargo-montrs generated)**
+## **11.2 Template app layout (`montrs` generated)**
 
 my-app/  
 ├─ Cargo.toml (workspace)  
-├─ montrs.toml (cargo-montrs configuration)
+├─ montrs.toml (`montrs` configuration)
 ├─ app/                     \# main application crate (server \+ wasm entry)  
 │  ├─ src/  
 │  │  ├─ main.rs  
@@ -366,7 +366,7 @@ The `docs/` directory must be comprehensive. The framework repo and generated ap
 docs/  
 ├─ index.md                 \# overview and quickstart  
 ├─ architecture.md          \# deep design rationale  
-├─ getting-started.md       \# cargo-montrs usage + example  
+├─ getting-started.md       \# `montrs` usage + example  
 ├─ modules.md               \# how to author modules  
 ├─ appspec.md               \# targeting, segments, features  
 ├─ router.md                \# file-based routes, loaders/actions  
@@ -374,7 +374,7 @@ docs/
 ├─ orm.md                   \# DbBackend API & examples  
 ├─ testing.md               \# TestRuntime, mocking patterns  
 ├─ deployment.md            \# Cloudflare / Pages / Edge guidance  
-├─ cli.md                   \# cargo-montrs options & templates  
+├─ cli.md                   \# `montrs` options & templates  
 └─ contributing.md
 
 Docs should include code examples, sequence diagrams where helpful, and a canonical README.md that points to the docs.
@@ -384,7 +384,7 @@ Docs should include code examples, sequence diagrams where helpful, and a canoni
 README must contain:
 
 * Project purpose & philosophy  
-* Quick start (`cargo install cargo-montrs` \+ `cargo montrs new`)  
+* Quick start (`cargo install montrs-cli` \+ `montrs new`)  
 * Example code snippets (boot an AppSpec, register a module)  
 * Testing guide (how to run `cargo make test` with TestRuntime)  
 * Contributing & code of conduct  
@@ -398,7 +398,7 @@ MontRS v0.1 should avoid locking into heavy dependencies. Recommend optionally p
 
 * `tokio` — async runtime (optional for server variant)  
 * `axum` — HTTP routing & server (used in template)  
-* `cargo-montrs` — WASM bundling and orchestration (template)  
+* `montrs` — WASM bundling and orchestration (template)  
 * `tailwindcss` — CSS (via npm in template)  
 * `sqlx` or `postgres`/`rusqlite` — DB drivers (pluggable implementations)  
 * `serde` — (de)serialization  
@@ -424,14 +424,14 @@ Note: Keep runtime optional; each capability is behind traits so implementations
   * `cargo clippy -- -D warnings`  
   * `cargo test --workspace`  
   * `cargo build --workspace --release`  
-  * WASM: `cargo montrs build` (for examples)  
+  * WASM: `montrs build` (for examples)  
   * Lint docs & markdown  
   * Run integration smoke tests under TestRuntime
 
 **Publish pipeline (.github/workflows/publish.yml):**
 
 * Tag-based release using `cargo-release` or manual script `scripts/release.sh`.  
-* Publish `cargo-montrs` to crates.io on release.  
+* Publish `montrs-cli` to crates.io on release.  
 * Generate release artifacts for examples and template (zip).
 
 **Cloudflare deployment (see section 18\)** includes automated `wrangler` steps for worker deployment and Pages static asset publishing.
@@ -452,7 +452,7 @@ Note: Keep runtime optional; each capability is behind traits so implementations
 
 **Cloudflare Workers (Edge)**:
 
-* Build WASM using `cargo-montrs`, bundle serverless handler with `wrangler` or Cloudflare's Workers for Rust support.  
+* Build WASM using `montrs`, bundle serverless handler with `wrangler` or Cloudflare's Workers for Rust support.  
 * Use `AppSpec` target `Edge` to change features (e.g., smaller ORM, different caching).  
 * Provide a `wrangler.toml` in the template, and a `Makefile` target `cargo make deploy:cloudflare` that:  
   * Builds the WASM/worker bundle  
@@ -460,9 +460,9 @@ Note: Keep runtime optional; each capability is behind traits so implementations
 
 **Cloudflare Pages (static \+ functions)**:
 
-* `cargo-montrs` builds static assets; Pages can serve them.  
+* `montrs` builds static assets; Pages can serve them.  
 * For SSR or API, deploy functions as Workers and static frontend to Pages.  
-* CI should run `cargo montrs build` then push static assets to Pages via API or GitHub integration; publish worker via `wrangler` in same pipeline.
+* CI should run `montrs build` then push static assets to Pages via API or GitHub integration; publish worker via `wrangler` in same pipeline.
 
 **Serverful deployments (optional)**:
 
@@ -507,7 +507,7 @@ tests/
 
 * Implement `TestRuntime`, TestEnv, in-memory DB, and module tests for example modules.
 
-**M4 — cargo-montrs CLI**
+**M4 — `montrs` CLI**
 
 * CLI scaffold, workspace template, `app/` example, tailwind integration.
 
@@ -579,7 +579,7 @@ To go from PRD → v0.1 implementable artifact, deliver:
 2. `packages/schema` derive crate with basic validators.  
 3. `packages/orm` crate with DbBackend trait and sqlite + in-memory backends.  
 4. `packages/test` crate with TestRuntime and TestEnv.  
-5. `packages/cargo-montrs` crate implementing the CLI tool.  
+5. `packages/cli` crate implementing the CLI tool.  
 6. Workspace templates in `templates/` demonstrating server+wasm usage.  
 7. `docs/` content for all public APIs and developer guides.  
 8. CI configs and `scripts/release.sh` to perform semantic versioned releases.
@@ -611,7 +611,7 @@ To go from PRD → v0.1 implementable artifact, deliver:
 
 # **26\. Conclusion**
 
-MontRS establishes itself as a premier **Leptos meta-framework**, providing an opinionated and structured layer on top of Leptos's world-class reactivity. It unifies the engineering strengths of Remix (routing), Dioxus (multi-target), Yew (discipline), Substrate (modularity), and Drizzle (minimal ORM) into a cohesive Rust-native ecosystem. The `cargo-montrs` CLI and template accelerate adoption by producing production-capable Leptos projects pre-configured with `tailwindcss` and `axum`. The deterministic AppSpec plus TestRuntime ensures reproducible tests and safe deployments to Cloudflare Workers / Pages and beyond.
+MontRS establishes itself as a premier **Leptos meta-framework**, providing an opinionated and structured layer on top of Leptos's world-class reactivity. It unifies the engineering strengths of Remix (routing), Dioxus (multi-target), Yew (discipline), Substrate (modularity), and Drizzle (minimal ORM) into a cohesive Rust-native ecosystem. The `montrs` CLI and template accelerate adoption by producing production-capable Leptos projects pre-configured with `tailwindcss` and `axum`. The deterministic AppSpec plus TestRuntime ensures reproducible tests and safe deployments to Cloudflare Workers / Pages and beyond.
 
 This PRD defines the actionable transition to MontRS v0.1: a first-class Leptos meta-framework with clear trait interfaces, a deterministic spec, minimal-DSL schema derives, a Drizzle-like ORM, and an approachable developer experience that leverages the best of the Rust web ecosystem.
 

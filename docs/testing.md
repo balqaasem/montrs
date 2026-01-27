@@ -6,7 +6,7 @@ MontRS provides a robust and comprehensive testing ecosystem designed to ensure 
 2.  **Integration Testing**: Tests that verify the interaction between multiple components (e.g., database, router, services).
 3.  **End-to-End (E2E) Testing**: Full-stack tests that simulate real user interactions in a browser environment.
 
-This guide covers how to leverage the `montrs-test` package and the `cargo montrs` CLI to implement these testing strategies.
+This guide covers how to leverage the `montrs-test` package and the `montrs` CLI to implement these testing strategies.
 
 ---
 
@@ -23,13 +23,13 @@ You can run unit tests using the standard Cargo command or the MontRS CLI:
 cargo test
 
 # MontRS CLI (offers enhanced reporting)
-cargo montrs test
+montrs test
 ```
 
-The `cargo montrs test` command supports generating JSON and JUnit reports for CI/CD integration:
+The `montrs test` command supports generating JSON and JUnit reports for CI/CD integration:
 
 ```bash
-cargo montrs test --report junit --output test-results.xml
+montrs test --report junit --output test-results.xml
 ```
 
 ### Writing Unit Tests
@@ -156,14 +156,14 @@ async fn test_database_interaction() {
 
 ## 3. End-to-End (E2E) Testing
 
-MontRS provides a high-level E2E testing framework powered by Playwright (via the `playwright-rs` crate) and integrated into the `cargo montrs` CLI.
+MontRS provides a high-level E2E testing framework powered by Playwright (via the `playwright-rs` crate) and integrated into the `montrs` CLI.
 
 ### Architecture
 
 The E2E module is built around the `MontrsDriver`, a wrapper around the Playwright browser automation library. It handles:
 - **Browser Lifecycle**: Automatically launching and closing browser instances (Chromium, Firefox, WebKit).
 - **Configuration**: Auto-detecting settings from `montrs.toml` or environment variables (`MONTRS_SITE_URL`, `LEPTOS_SITE_ADDR`).
-- **Orchestration**: When run via `cargo montrs e2e`, it manages the full lifecycle of your application server (startup, readiness check, test execution, shutdown).
+- **Orchestration**: When run via `montrs e2e`, it manages the full lifecycle of your application server (startup, readiness check, test execution, shutdown).
 
 ### Setup
 
@@ -265,16 +265,16 @@ async fn test_dashboard() -> anyhow::Result<()> {
 
 ```bash
 # Run all E2E tests
-cargo montrs e2e
+montrs e2e
 
 # Run in a specific browser
-cargo montrs e2e --browser firefox
+montrs e2e --browser firefox
 
 # Run in headed mode (shows the browser)
-cargo montrs e2e --headless false
+montrs e2e --headless false
 ```
 
-The `cargo montrs e2e` command automatically:
+The `montrs e2e` command automatically:
 1. Builds your application.
 2. Starts the development server.
 3. Runs the Playwright test suite against the live server.
@@ -314,8 +314,8 @@ jobs:
         run: npx playwright install-deps
         
       - name: Run Unit Tests
-        run: cargo montrs test --report junit --output unit-results.xml
-        
+        run: montrs test --report junit --output unit-results.xml
+
       - name: Run E2E Tests
-        run: cargo montrs e2e --headless
+        run: montrs e2e --headless
 ```

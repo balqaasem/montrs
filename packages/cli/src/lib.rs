@@ -166,7 +166,7 @@ pub enum Commands {
         /// Shell to generate completions for.
         shell: clap_complete::Shell,
     },
-    /// Upgrade cargo-montrs to the latest version.
+    /// Upgrade montrs to the latest version.
     Upgrade,
 }
 
@@ -229,7 +229,7 @@ pub async fn run(cli: MontrsCli) -> anyhow::Result<()> {
         Commands::Completions { shell } => {
             use clap::CommandFactory;
             let mut cmd = MontrsCli::command();
-            clap_complete::generate(shell, &mut cmd, "cargo-montrs", &mut std::io::stdout());
+            clap_complete::generate(shell, &mut cmd, "montrs", &mut std::io::stdout());
             Ok(())
         }
         Commands::Upgrade => command::upgrade::run().await,
