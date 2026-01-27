@@ -235,3 +235,34 @@ pub async fn run(cli: MontrsCli) -> anyhow::Result<()> {
         Commands::Upgrade => command::upgrade::run().await,
     }
 }
+
+/// Main entry point for the CLI, handling both standalone and cargo subcommand modes.
+pub fn main_entry() {
+    let args: Vec<String> = std::env::args().collect();
+    
+    // Determine if we are being run as a cargo subcommand or standalone
+    let cli = if args.get(1).map(|s| s.as_str()) == Some("montrs") {
+        CargoCli::parse().montrs_cli()
+    } else {
+        MontrsCli::parse()
+    };
+
+    let rt = tokio::runtime::Builder::new_multi_thread()
+        .enable_all()
+        .build()
+        .expect("Failed to create Tokio runtime");
+
+    if let Err(e) = rt.block_on(run(cli)) {
+        use console::style;
+        eprintln!("{} Error: {:?}", style("✘").red().bold(), e);
+        std::process::exit(1);
+    }
+}
+
+impl CargoCli {
+    pub fn montrs_cli(self) -> MontrsCli {
+        match self {
+            CargoCli::Montrs(cli) => cli,
+        }
+    }
+}
