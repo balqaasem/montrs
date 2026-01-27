@@ -6,15 +6,17 @@
 
 use anyhow::{Context, Result};
 use cargo_metadata::MetadataCommand;
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
+use std::fs;
+use std::path::Path;
 
 pub mod tailwind;
 
 /// The root configuration structure for a MontRS project.
 ///
 /// Corresponds to the `montrs.toml` file.
-#[derive(Debug, Deserialize, Clone, Default)]
+#[derive(Debug, Deserialize, Serialize, Clone, Default)]
 pub struct MontrsConfig {
     /// Project identity and core settings.
     #[serde(default)]
@@ -33,12 +35,34 @@ pub struct MontrsConfig {
     pub tasks: HashMap<String, TaskConfig>,
 }
 
+/// Development channel for the project.
+#[derive(Debug, Deserialize, Serialize, Clone, Copy, PartialEq, Eq, Default)]
+#[serde(rename_all = "lowercase")]
+pub enum Channel {
+    #[default]
+    Stable,
+    Nightly,
+}
+
+impl std::fmt::Display for Channel {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Channel::Stable => write!(f, "stable"),
+            Channel::Nightly => write!(f, "nightly"),
+        }
+    }
+}
+
 /// Project metadata and feature flags.
-#[derive(Debug, Deserialize, Clone)]
+#[derive(Debug, Deserialize, Serialize, Clone)]
 pub struct ProjectConfig {
     /// The name of the project (defaults to package name).
     #[serde(default = "default_app_name")]
     pub name: String,
+
+    /// The development channel (stable or nightly).
+    #[serde(default)]
+    pub channel: Channel,
     
     // Internal fields for cargo-leptos compatibility
     #[serde(skip)]

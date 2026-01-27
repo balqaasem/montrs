@@ -70,3 +70,21 @@ Watch for changes and rebuild automatically.
 ```bash
 montrs watch
 ```
+
+### `channel`
+Manage development channels (stable or nightly).
+
+**Arguments:**
+- `name`: (Optional) The channel to switch to (`stable` or `nightly`).
+
+**Examples:**
+```bash
+# View current channel
+montrs channel
+
+# Switch to nightly for experimental features
+montrs channel nightly
+
+# Switch back to stable for production
+montrs channel stable
+```

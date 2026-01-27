@@ -168,6 +168,12 @@ pub enum Commands {
     },
     /// Upgrade montrs to the latest version.
     Upgrade,
+    /// Manage development channels (stable, nightly).
+    Channel {
+        /// The channel to switch to (optional).
+        #[arg(index = 1)]
+        name: Option<String>,
+    },
 }
 
 pub async fn run(cli: MontrsCli) -> anyhow::Result<()> {
@@ -232,7 +238,8 @@ pub async fn run(cli: MontrsCli) -> anyhow::Result<()> {
             clap_complete::generate(shell, &mut cmd, "montrs", &mut std::io::stdout());
             Ok(())
         }
-        Commands::Upgrade => command::upgrade::run().await,
+        Commands::Upgrade => command::upgrade::run().await?,
+        Commands::Channel { name } => command::channel::run(name).await?,
     }
 }
 

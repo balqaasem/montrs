@@ -1,5 +1,6 @@
 pub mod bench;
 pub mod build;
+pub mod channel;
 pub mod e2e;
 pub mod new;
 pub mod run;
