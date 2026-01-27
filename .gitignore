@@ -24,3 +24,7 @@ target
 # Added by cargo
 
 /target
+
+# Some personal reference notes
+
+/.references
