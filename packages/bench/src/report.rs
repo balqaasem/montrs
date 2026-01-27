@@ -38,12 +38,21 @@ impl Report {
     }
 
     /// Adds a result to the report.
-    pub fn add_result(&mut self, name: String, stats: BenchStats, iterations: u32, total_duration_secs: f64) {
-        self.results.insert(name, BenchResult {
-            stats,
-            iterations,
-            total_duration_secs,
-        });
+    pub fn add_result(
+        &mut self,
+        name: String,
+        stats: BenchStats,
+        iterations: u32,
+        total_duration_secs: f64,
+    ) {
+        self.results.insert(
+            name,
+            BenchResult {
+                stats,
+                iterations,
+                total_duration_secs,
+            },
+        );
     }
 
     /// Saves the report to a JSON file.
@@ -72,8 +81,10 @@ impl Report {
         for name in keys {
             let result = &self.results[name];
             // Sanitize name for use as a module/constant
-            let safe_name = name.replace(|c: char| !c.is_alphanumeric(), "_").to_uppercase();
-            
+            let safe_name = name
+                .replace(|c: char| !c.is_alphanumeric(), "_")
+                .to_uppercase();
+
             // We export a struct-like module or just constants
             writeln!(file, "/// Weight for {}", name)?;
             writeln!(file, "pub mod {} {{", safe_name.to_lowercase())?;

@@ -1,10 +1,10 @@
+use crate::BenchCase;
+use async_trait::async_trait;
 use std::future::Future;
 use std::ops::RangeInclusive;
-use async_trait::async_trait;
-use crate::BenchCase;
 
 /// Represents a benchmark parameter with a range of values.
-/// 
+///
 /// Inspired by Substrate's parameter-based benchmarking, this allows
 /// measuring how performance scales with input size.
 #[derive(Debug, Clone)]
@@ -33,7 +33,9 @@ impl Parameter {
         let mut curr = *self.range.start();
         while curr <= *self.range.end() {
             vals.push(curr);
-            if self.step == 0 { break; }
+            if self.step == 0 {
+                break;
+            }
             curr += self.step;
         }
         vals
@@ -69,7 +71,8 @@ where
 
     /// Sets the current parameter value for the next run.
     pub fn set_param(&self, val: u32) {
-        self.current_param.store(val, std::sync::atomic::Ordering::SeqCst);
+        self.current_param
+            .store(val, std::sync::atomic::Ordering::SeqCst);
     }
 }
 

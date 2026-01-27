@@ -86,7 +86,7 @@ impl BenchConfig {
     }
 
     /// Parses configuration from an iterator (useful for testing).
-    pub fn from_iter<I, T>(itr: I) -> Self 
+    pub fn from_iter<I, T>(itr: I) -> Self
     where
         I: IntoIterator<Item = T>,
         T: Into<std::ffi::OsString> + Clone,
@@ -108,19 +108,22 @@ impl BenchConfig {
     }
 
     /// Resolves configuration priority: Args > Env > Default
-    fn resolve<F>(args: CliArgs, env_loader: F) -> Self 
+    fn resolve<F>(args: CliArgs, env_loader: F) -> Self
     where
         F: Fn(&str) -> Option<String>,
     {
-        let warmup_iterations = args.warmup_iterations
+        let warmup_iterations = args
+            .warmup_iterations
             .or_else(|| Self::fetch_env("MONTRS_BENCH_WARMUP", &env_loader))
             .unwrap_or(10);
 
-        let iterations = args.iterations
+        let iterations = args
+            .iterations
             .or_else(|| Self::fetch_env("MONTRS_BENCH_ITERATIONS", &env_loader))
             .unwrap_or(100);
 
-        let duration = args.duration
+        let duration = args
+            .duration
             .or_else(|| {
                 Self::fetch_env_string("MONTRS_BENCH_TIMEOUT", &env_loader)
                     .and_then(|s| s.parse::<u64>().ok())
@@ -128,13 +131,16 @@ impl BenchConfig {
             })
             .or(Some(Duration::from_secs(5)));
 
-        let filter = args.filter
+        let filter = args
+            .filter
             .or_else(|| Self::fetch_env_string("MONTRS_BENCH_FILTER", &env_loader));
 
-        let json_output = args.json_output
+        let json_output = args
+            .json_output
             .or_else(|| Self::fetch_env_string("MONTRS_BENCH_JSON_OUTPUT", &env_loader));
 
-        let generate_weights = args.generate_weights
+        let generate_weights = args
+            .generate_weights
             .or_else(|| Self::fetch_env_string("MONTRS_BENCH_GENERATE_WEIGHTS", &env_loader));
 
         Self {
@@ -166,7 +172,6 @@ impl BenchConfig {
         env_loader(key)
     }
 }
-
 
 impl Default for BenchConfig {
     fn default() -> Self {

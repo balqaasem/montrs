@@ -3,18 +3,18 @@
 //! This crate provides tools for measuring performance, gathering system statistics,
 //! and generating detailed reports.
 
-pub mod runner;
-pub mod stats;
-pub mod report;
-pub mod sys;
 pub mod config;
 pub mod parameter;
+pub mod report;
+pub mod runner;
+pub mod stats;
+pub mod sys;
 pub mod weights;
 
-pub use runner::{BenchRunner, Benchmark};
 pub use config::BenchConfig;
-pub use report::Report;
 pub use parameter::{Parameter, ParametricBench};
+pub use report::Report;
+pub use runner::{BenchRunner, Benchmark};
 pub use weights::Weight;
 
 use std::future::Future;
