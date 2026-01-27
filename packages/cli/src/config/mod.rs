@@ -10,6 +10,7 @@ use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::fs;
 use std::path::Path;
+use montrs_fmt::FormatterSettings;
 
 pub mod tailwind;
 
@@ -30,6 +31,9 @@ pub struct MontrsConfig {
     /// E2E testing configuration.
     #[serde(default)]
     pub e2e: E2eConfig,
+    /// Formatting configuration.
+    #[serde(default)]
+    pub fmt: FormatterSettings,
     /// Custom task definitions.
     #[serde(default)]
     pub tasks: HashMap<String, TaskConfig>,
@@ -286,18 +290,30 @@ impl MontrsConfig {
     /// If the file is missing, returns default configuration.
     /// Also attempts to resolve the project name from `Cargo.toml`.
     pub fn load() -> Result<Self> {
-        if std::path::Path::new("montrs.toml").exists() {
-            Self::from_file("montrs.toml")
+        let mut config = if std::path::Path::new("montrs.toml").exists() {
+            Self::from_file("montrs.toml")?
         } else {
-            let mut config = Self::default();
-            // Try to resolve project name
+            Self::default()
+        };
+
+        // Cascade of Truth: Load montrs-fmt.toml if it exists and override the [fmt] section
+        if std::path::Path::new("montrs-fmt.toml").exists() {
+            let content = std::fs::read_to_string("montrs-fmt.toml")?;
+            if let Ok(fmt_settings) = toml::from_str(&content) {
+                config.fmt = fmt_settings;
+            }
+        }
+
+        // Try to resolve project name if still default
+        if config.project.name == "app" {
             if let Ok(metadata) = MetadataCommand::new().exec() {
                 if let Some(root) = metadata.root_package() {
                     config.project.name = root.name.clone();
                 }
             }
-            Ok(config)
         }
+        
+        Ok(config)
     }
 
     // to_leptos_config removed as we now use cargo-leptos CLI wrapper

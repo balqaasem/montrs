@@ -1289,6 +1289,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "crop"
+version = "0.3.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "959e53a6ca6070e1819d23930c0147cfc0de843451a3b3d78827130c00fb33d2"
+dependencies = [
+ "str_indices",
+]
+
+[[package]]
 name = "crossbeam-channel"
 version = "0.5.15"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3810,6 +3819,7 @@ dependencies = [
  "fs_extra",
  "indicatif 0.17.11",
  "montrs-bench",
+ "montrs-fmt",
  "quick-xml",
  "reqwest 0.12.28",
  "serde",
@@ -3839,6 +3849,27 @@ dependencies = [
  "thiserror 1.0.69",
  "tokio",
  "tracing",
+]
+
+[[package]]
+name = "montrs-fmt"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "clap",
+ "crop",
+ "ignore",
+ "prettyplease",
+ "proc-macro2",
+ "quote",
+ "rstml",
+ "serde",
+ "serde_json",
+ "syn 2.0.114",
+ "thiserror 1.0.69",
+ "toml 0.8.23",
+ "tracing",
+ "walkdir",
 ]
 
 [[package]]
@@ -6041,6 +6072,12 @@ dependencies = [
  "num-traits",
  "rand 0.8.5",
 ]
+
+[[package]]
+name = "str_indices"
+version = "0.4.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d08889ec5408683408db66ad89e0e1f93dff55c73a4ccc71c427d5b277ee47e6"
 
 [[package]]
 name = "string_enum"

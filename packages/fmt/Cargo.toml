@@ -1,0 +1,32 @@
+[package]
+name = "montrs-fmt"
+version = "0.1.0"
+edition = "2024"
+authors = ["Afsall Labs"]
+license = "MIT or Apache-2.0"
+description = "A specialized formatter for MontRS projects, supporting view! macros and non-doc comments."
+
+[dependencies]
+syn = { version = "2.0", features = ["full", "extra-traits", "parsing"] }
+prettyplease = "0.2"
+rstml = "0.12"
+proc-macro2 = { version = "1.0", features = ["span-locations"] }
+quote = "1.0"
+thiserror = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+crop = "0.3"
+toml = "0.8"
+clap = { version = "4.5", features = ["derive"] }
+anyhow = { workspace = true }
+tracing = { workspace = true }
+ignore = "0.4"
+walkdir = "2.5"
+
+[lib]
+name = "montrs_fmt"
+path = "src/lib.rs"
+
+[[bin]]
+name = "montrs-fmt"
+path = "src/bin/montrs-fmt.rs"

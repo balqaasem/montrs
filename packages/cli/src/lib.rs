@@ -131,6 +131,18 @@ pub enum Commands {
         #[arg(long)]
         generate_weights: Option<String>,
     },
+    /// Format the project's Rust and view! code.
+    Fmt {
+        /// Check if files are formatted without modifying them.
+        #[arg(long)]
+        check: bool,
+        /// Path to format (default: current directory).
+        #[arg(default_value = ".")]
+        path: String,
+        /// Verbose output.
+        #[arg(short, long)]
+        verbose: bool,
+    },
     /// Start the server and end-2-end tests.
     #[command(name = "e2e")]
     E2e {
@@ -228,6 +240,7 @@ pub async fn run(cli: MontrsCli) -> anyhow::Result<()> {
             simple,
             generate_weights,
         } => command::bench::run(target, iterations, warmup, timeout, filter, json_output, simple, generate_weights).await,
+        Commands::Fmt { check, path, verbose } => command::fmt::run(config.fmt, check, path, verbose).await,
         Commands::E2e { headless, keep_alive, browser } => command::e2e::run(headless, keep_alive, browser).await,
         Commands::New { name, template } => command::new::run(name, template).await,
         Commands::Run { task } => command::run::run(task).await,

@@ -38,4 +38,5 @@ toml = "0.9.11"
 quick-xml = "0.39.0"
 clap_complete = "4.5.65"
 montrs-bench = { path = "../bench" }
+montrs-fmt = { path = "../fmt" }
 colored = "2.1"

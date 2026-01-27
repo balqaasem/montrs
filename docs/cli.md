@@ -53,6 +53,25 @@ montrs bench
 montrs bench --simple scripts/process_data.rs
 ```
 
+### `fmt`
+Format the project's Rust and view! code.
+
+**Arguments:**
+- `path`: (Optional) The file or directory to format (default: `.`).
+
+**Flags:**
+- `--check`: Verifies if files are formatted without modifying them.
+- `--verbose`: Show detailed output.
+
+**Examples:**
+```bash
+# Format everything
+montrs fmt
+
+# Check formatting in CI
+montrs fmt --check
+```
+
 ### `test`
 Run project tests (Unit, Integration, E2E).
 ```bash
