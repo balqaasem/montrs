@@ -9,13 +9,13 @@ use clap::{Parser, Subcommand};
 #[command(name = "cargo")]
 #[command(bin_name = "cargo")]
 pub enum CargoCli {
-    Mont(MontCli),
+    Montrs(MontrsCli),
 }
 
 #[derive(Parser, Debug)]
-#[command(name = "mont")]
+#[command(name = "montrs")]
 #[command(about = "MontRS Meta-framework CLI", long_about = None)]
-pub struct MontCli {
+pub struct MontrsCli {
     #[command(subcommand)]
     pub command: Commands,
 
@@ -154,7 +154,7 @@ pub enum Commands {
         #[arg(short, long, default_value = "default")]
         template: String,
     },
-    /// Run custom tasks defined in mont.toml.
+    /// Run custom tasks defined in montrs.toml.
     Run {
         /// Name of the task to run.
         task: String,
@@ -166,11 +166,11 @@ pub enum Commands {
         /// Shell to generate completions for.
         shell: clap_complete::Shell,
     },
-    /// Upgrade cargo-mont to the latest version.
+    /// Upgrade cargo-montrs to the latest version.
     Upgrade,
 }
 
-pub async fn run(cli: MontCli) -> anyhow::Result<()> {
+pub async fn run(cli: MontrsCli) -> anyhow::Result<()> {
     // Setup logger based on verbosity
     let log_level = match cli.verbose {
         0 => tracing::Level::INFO,
@@ -183,7 +183,7 @@ pub async fn run(cli: MontCli) -> anyhow::Result<()> {
         .with_max_level(log_level)
         .try_init();
 
-    let mut config = config::MontConfig::load()?;
+    let mut config = config::MontrsConfig::load()?;
     config.project.verbose = cli.verbose;
     config.project.log = cli.log.clone();
     config.project.release = cli.release;
@@ -228,8 +228,8 @@ pub async fn run(cli: MontCli) -> anyhow::Result<()> {
         Commands::Tasks => command::run::list().await,
         Commands::Completions { shell } => {
             use clap::CommandFactory;
-            let mut cmd = MontCli::command();
-            clap_complete::generate(shell, &mut cmd, "cargo-mont", &mut std::io::stdout());
+            let mut cmd = MontrsCli::command();
+            clap_complete::generate(shell, &mut cmd, "cargo-montrs", &mut std::io::stdout());
             Ok(())
         }
         Commands::Upgrade => command::upgrade::run().await,

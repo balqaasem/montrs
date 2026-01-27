@@ -4,7 +4,7 @@
 
 **MontRS** is a Rust-native, trait-driven, deterministic meta-framework built on **Leptos 0.8**. It blends the engineering strengths of Leptos (fine-grained reactivity), Remix (web-native routing), and Drizzle (minimal ORM).
 
-## 🚀 Philosophy
+## Philosophy
 
 - **Compile-time correctness**: Type-driven design; traits and typed configs everywhere.
 - **Leptos Core**: Powered by Leptos for high-performance reactive UI.
@@ -14,9 +14,9 @@
     - [ORM](packages/orm/README.md): SQL-centric ORM with SQLite and Postgres support.
     - [Test](packages/test/README.md): Deterministic testing suite (Unit, Integration, E2E).
     - [Bench](packages/bench/README.md): Professional-grade benchmarking tools.
-- **Production CLI**: [cargo-mont](packages/cargo-mont/README.md) for orchestration.
+- **Production CLI**: [cargo-montrs](packages/cargo-montrs/README.md) for orchestration.
 
-## 📋 Prerequisites
+## Prerequisites
 
 Before installing MontRS, ensure you have the following installed:
 
@@ -29,40 +29,40 @@ Before installing MontRS, ensure you have the following installed:
 - **Perl (Windows only)**: Required for building `openssl-sys` (vendored).
     - Install via winget: `winget install StrawberryPerl.StrawberryPerl`
 
-## 📦 Getting Started
+## Getting Started
 
 ### Install the CLI
 
 #### Published Version
-To install the latest published version of `cargo-mont`, use:
+To install the latest published version of `cargo-montrs`, use:
 
 ```bash
-cargo install --locked cargo-mont
+cargo install --locked cargo-montrs
 ```
 
 #### Local Path
 If you're working on the MontRS repository, you can install the CLI from the local path:
 
 ```bash
-cargo install --path packages/cargo-mont
+cargo install --path packages/cargo-montrs
 ```
 
 ### Create a new app
 ```bash
-cargo mont new my-app
+cargo montrs new my-app
 cd my-app
-cargo mont serve
+cargo montrs serve
 ```
 
 ### Benchmarking
 Run standard benchmarks or use the native mode for quick file/binary testing:
 ```bash
 # Standard cargo bench
-cargo mont bench
+cargo montrs bench
 
 # Native mode (no project overhead)
-cargo mont bench --simple ./my-script.rs
-cargo mont bench --simple ./my-binary
+cargo montrs bench --simple ./my-script.rs
+cargo montrs bench --simple ./my-binary
 ```
 
 ## 🛠 Project Structure
@@ -72,9 +72,9 @@ cargo mont bench --simple ./my-binary
 - `packages/orm`: Flexible database backend traits and drivers.
 - `packages/test`: TestRuntime, E2E drivers, and unit testing utilities.
 - `packages/bench`: Performance benchmarking framework.
-- `packages/cargo-mont`: The official build and serve tool.
+- `packages/cargo-montrs`: The official build and serve tool.
 - `templates/`: Project blueprints (including `todo` and `default`).
 
-## 📄 License
+## License
 
 This project is licensed under the MIT License.

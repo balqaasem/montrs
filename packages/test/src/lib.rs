@@ -7,7 +7,7 @@
 //!
 //! - **Mock Environment Variables**: Use `TestEnv` to simulate different runtime configurations.
 //! - **Manage Test Lifecycles**: Use `Fixture` and `run_fixture_test` for setup/teardown logic.
-//! - **Run E2E Tests**: Use `MontDriver` (via the `e2e` feature) to control browsers with Playwright.
+//! - **Run E2E Tests**: Use `MontrsDriver` (via the `e2e` feature) to control browsers with Playwright.
 //! - **Simulate Application Runtime**: Use `TestRuntime` to execute application logic in-process.
 //!
 //! The E2E capabilities are integrated with `TestRuntime`, allowing you to easily spin up

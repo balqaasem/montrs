@@ -1,42 +1,23 @@
 //! End-to-End (E2E) testing module for MontRS.
-//!
+
 //! This module provides a wrapper around `playwright-rs` to facilitate writing
 //! E2E tests for MontRS applications. It includes configuration management,
 //! test driver orchestration, and helper assertions.
 //!
-//! # Architecture
-//!
-//! The E2E module is built around the [`MontDriver`] struct, which manages the
+//! The E2E module is built around the [`MontrsDriver`] struct, which manages the
 //! Playwright browser instance, context, and page. It abstracts away the
-//! complexity of launching browsers and provides a clean API for common actions.
+//! complexities of managing browser lifecycles in tests.
 //!
-//! # Usage
-//!
-//! Add `montrs-test` with the `e2e` feature to your `Cargo.toml`:
-//!
-//! ```toml
-//! [dependencies]
-//! montrs-test = { version = "...", features = ["e2e"] }
-//! ```
-//!
-//! Then use `MontDriver` in your test:
+//! # Example
 //!
 //! ```rust
-//! use montrs_test::e2e::MontDriver;
+//! use montrs_test::e2e::MontrsDriver;
 //!
 //! #[tokio::test]
-//! async fn my_test() -> anyhow::Result<()> {
-//!     // Initialize the driver (launches browser)
-//!     let driver = MontDriver::new().await?;
-//!
-//!     // Navigate to the application root
-//!     driver.goto("/").await?;
-//!     
-//!     // Perform assertions
-//!     assert!(driver.url().contains("/"));
-//!
-//!     // Cleanup
-//!     driver.close().await?;
+//! async fn test_homepage() -> anyhow::Result<()> {
+//!     let driver = MontrsDriver::new().await?;
+//!     driver.goto("http://localhost:3000").await?;
+//!     driver.assert_text("h1", "Welcome to MontRS").await?;
 //!     Ok(())
 //! }
 //! ```
@@ -56,9 +37,9 @@ pub use playwright;
 ///
 /// # Environment Variables
 ///
-/// - `MONT_SITE_URL`: The base URL of the application under test.
+/// - `MONTRS_SITE_URL`: The base URL of the application under test.
 /// - `LEPTOS_SITE_ADDR`: Alternative source for the base URL (e.g. `127.0.0.1:8080`).
-/// - `MONT_E2E_HEADLESS`: Set to `false` to run in headful mode (default: `true`).
+/// - `MONTRS_E2E_HEADLESS`: Set to `false` to run in headful mode (default: `true`).
 #[derive(Debug, Clone)]
 pub struct E2EConfig {
     /// Whether to run the browser in headless mode.
@@ -73,36 +54,36 @@ pub struct E2EConfig {
 
 impl Default for E2EConfig {
     fn default() -> Self {
-        let base_url = env::var("MONT_SITE_URL")
+        let base_url = env::var("MONTRS_SITE_URL")
             .or_else(|_| env::var("LEPTOS_SITE_ADDR").map(|addr| format!("http://{}", addr)))
             .unwrap_or_else(|_| "http://127.0.0.1:8080".to_string());
 
         Self {
-            headless: env::var("MONT_E2E_HEADLESS").map(|v| v != "false").unwrap_or(true),
+            headless: env::var("MONTRS_E2E_HEADLESS").map(|v| v != "false").unwrap_or(true),
             base_url,
             timeout: 30000,
-            browser: env::var("MONT_E2E_BROWSER").unwrap_or_else(|_| "chromium".to_string()),
+            browser: env::var("MONTRS_E2E_BROWSER").unwrap_or_else(|_| "chromium".to_string()),
         }
     }
 }
 
-/// A trait for extending MontDriver functionality.
+/// A trait for extending MontrsDriver functionality.
 ///
 /// Implement this trait to create reusable plugins for your E2E tests,
 /// such as authentication helpers or custom logging.
 #[async_trait::async_trait]
-pub trait MontPlugin {
+pub trait MontrsPlugin {
     /// Called immediately after the driver is initialized.
     ///
     /// Use this hook to perform setup actions like logging in or mocking network requests.
-    async fn on_init(&self, driver: &MontDriver) -> anyhow::Result<()>;
+    async fn on_init(&self, driver: &MontrsDriver) -> anyhow::Result<()>;
 }
 
 /// The main driver for MontRS E2E tests.
 ///
 /// Wraps Playwright to provide an ergonomic, framework-aware testing experience.
 /// It manages the lifecycle of the browser, context, and page.
-pub struct MontDriver {
+pub struct MontrsDriver {
     /// The underlying Playwright instance.
     pub playwright: Playwright,
     /// The active browser instance.
@@ -115,7 +96,7 @@ pub struct MontDriver {
     pub config: E2EConfig,
 }
 
-impl MontDriver {
+impl MontrsDriver {
     /// Launches a new browser instance and prepares a page for testing.
     ///
     /// Uses the default configuration resolved from environment variables.
@@ -163,7 +144,7 @@ impl MontDriver {
     /// # Arguments
     ///
     /// * `plugin` - The plugin to execute.
-    pub async fn use_plugin<P: MontPlugin>(&self, plugin: P) -> anyhow::Result<&Self> {
+    pub async fn use_plugin<P: MontrsPlugin>(&self, plugin: P) -> anyhow::Result<&Self> {
         plugin.on_init(self).await?;
         Ok(self)
     }

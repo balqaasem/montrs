@@ -17,8 +17,8 @@ port = 8080
 addr = "127.0.0.1"
 
 [tasks]
-dev = "cargo mont watch"
-build = "cargo mont build --release"
+dev = "cargo montrs watch"
+build = "cargo montrs build --release"
 lint = { command = "cargo clippy --workspace -- -D warnings", category = "Quality" }
 fmt = { command = "cargo fmt --all", category = "Quality" }
 test = { command = "cargo test --workspace", category = "Testing" }

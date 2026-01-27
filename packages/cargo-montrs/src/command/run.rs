@@ -1,11 +1,11 @@
-use crate::config::{MontConfig, TaskConfig};
+use crate::config::{MontrsConfig, TaskConfig};
 use crate::ext::exe_command;
 use console::style;
 use std::collections::{HashMap, HashSet};
 use std::process::Command;
 
 pub async fn run(task_name: String) -> anyhow::Result<()> {
-    let config = MontConfig::load()?;
+    let config = MontrsConfig::load()?;
 
     // Resolve dependencies and run them in order
     let mut executed = HashSet::new();
@@ -16,7 +16,7 @@ pub async fn run(task_name: String) -> anyhow::Result<()> {
 
 async fn execute_task_recursive(
     name: &str,
-    config: &MontConfig,
+    config: &MontrsConfig,
     executed: &mut HashSet<String>,
 ) -> anyhow::Result<()> {
     if executed.contains(name) {
@@ -26,7 +26,7 @@ async fn execute_task_recursive(
     let task = config
         .tasks
         .get(name)
-        .ok_or_else(|| anyhow::anyhow!("Task '{}' not found in mont.toml", name))?;
+        .ok_or_else(|| anyhow::anyhow!("Task '{}' not found in montrs.toml", name))?;
 
     // 1. Run dependencies first
     if let TaskConfig::Detailed { dependencies, .. } = task {
@@ -85,10 +85,10 @@ fn run_shell_cmd(cmd_str: &str, env_vars: &HashMap<String, String>) -> anyhow::R
 }
 
 pub async fn list() -> anyhow::Result<()> {
-    let config = MontConfig::load()?;
+    let config = MontrsConfig::load()?;
 
     if config.tasks.is_empty() {
-        println!("No tasks defined in mont.toml");
+        println!("No tasks defined in montrs.toml");
         return Ok(());
     }
 

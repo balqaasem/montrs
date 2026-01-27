@@ -1,8 +1,8 @@
-use crate::config::MontConfig;
+use crate::config::MontrsConfig;
 use crate::utils::run_cargo_leptos;
 
 pub async fn run() -> anyhow::Result<()> {
-    let mut config = MontConfig::load()?;
+    let mut config = MontrsConfig::load()?;
 
     // Handle tailwind.toml
     if let Ok(Some(js_path)) = crate::config::tailwind::ensure_tailwind_config(
@@ -14,5 +14,5 @@ pub async fn run() -> anyhow::Result<()> {
         }
     }
 
-    run_cargo_leptos("watch", &[], &config).await
+    run_cargo_leptos("build", &[], &config).await
 }

@@ -38,7 +38,7 @@ This template includes [`tailwind-fuse`](https://github.com/gaucho-labs/tailwind
 ### Configuration Options
 
 1. **Tailwind v4 (Recommended)**: Use pure CSS for configuration. No JS files required.
-2. **tailwind.toml**: Create a `tailwind.toml` for a pure-Rust configuration experience. `cargo-mont` generates the JS config automatically.
+2. **tailwind.toml**: Create a `tailwind.toml` for a pure-Rust configuration experience. `cargo-montrs` generates the JS config automatically.
 
 ```toml
 content = ["src/**/*.rs", "*.html"]

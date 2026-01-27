@@ -240,7 +240,7 @@ impl<C: AppConfig> TestRuntime<C> {
     /// let driver = runtime.driver().await?;
     /// driver.goto("/").await?;
     /// ```
-    pub async fn driver(&self) -> anyhow::Result<e2e::MontDriver> {
-        e2e::MontDriver::new().await
+    pub async fn driver(&self) -> anyhow::Result<e2e::MontrsDriver> {
+        e2e::MontrsDriver::new().await
     }
 }

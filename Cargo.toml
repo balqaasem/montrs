@@ -3,9 +3,9 @@ resolver = "2"
 
 members = [
     "packages/bench",
-    "packages/cargo-mont",
+    "packages/cargo-montrs",
     "packages/core",
-    "packages/mont",
+    "packages/montrs",
     "packages/orm",
     "packages/schema",
     "packages/test",
@@ -16,7 +16,7 @@ version = "0.1.0"
 edition = "2024"
 license = "MIT"
 authors = ["Afsall Labs"]
-repository = "https://github.com/afsall-labs/mont-rs"
+repository = "https://github.com/afsall-labs/montrs"
 
 [workspace.dependencies]
 serde = { version = "1.0", features = ["derive"] }

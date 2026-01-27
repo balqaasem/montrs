@@ -767,7 +767,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "cargo-mont"
+name = "cargo-montrs"
 version = "0.1.0"
 dependencies = [
  "anyhow",
@@ -3795,7 +3795,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "mont"
+name = "montrs"
 version = "0.1.0"
 dependencies = [
  "montrs-core",

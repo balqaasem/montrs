@@ -1,17 +1,17 @@
-# cargo-mont
+# cargo-montrs
 
 The official build and orchestration tool for the MontRS framework.
 
 ## Overview
 
-`cargo-mont` is a specialized cargo subcommand designed to manage the lifecycle of MontRS applications. It provides high-level commands for scaffolding, building, and serving projects, acting as the primary orchestration hub for the framework.
+`cargo-montrs` is a specialized cargo subcommand designed to manage the lifecycle of MontRS applications. It provides high-level commands for scaffolding, building, and serving projects, acting as the primary orchestration hub for the framework.
 
 ## Key Features
 
-- **Cargo Subcommand**: Seamlessly integrates into the Rust ecosystem as `cargo mont`.
-- **Sophisticated Scaffolding**: Create new projects from local templates via `cargo mont new`.
+- **Cargo Subcommand**: Seamlessly integrates into the Rust ecosystem as `cargo montrs`.
+- **Sophisticated Scaffolding**: Create new projects from local templates via `cargo montrs new`.
 - **Integrated Build System**: Orchestrates both frontend and server-side builds.
-- **Advanced Task Runner**: Define custom shell scripts with dependencies in `mont.toml` and run them via `cargo mont run`.
+- **Advanced Task Runner**: Define custom shell scripts with dependencies in `montrs.toml` and run them via `cargo montrs run`.
 - **Unified Configuration**: Manage ports, addresses, and target directories for both frontend and backend in one place.
 - **Leptos Ready**: Automatically injects environment variables (`LEPTOS_SITE_ROOT`, etc.) for seamless server execution.
 
@@ -20,51 +20,51 @@ The official build and orchestration tool for the MontRS framework.
 ### From Crates.io
 
 ```bash
-cargo install cargo-mont
+cargo install cargo-montrs
 ```
 
 ### From Source
 
 ```bash
-cargo install --path packages/cargo-mont
+cargo install --path packages/cargo-montrs
 ```
 
 ## Usage
 
 ### Create a New Project
 ```bash
-cargo mont new my-app
+cargo montrs new my-app
 ```
 
 ### Run Custom Tasks
 ```bash
-cargo mont tasks        # List all tasks
-cargo mont run lint     # Run the 'lint' task
+cargo montrs tasks        # List all tasks
+cargo montrs run lint     # Run the 'lint' task
 ```
 
 ### Build for Production
 ```bash
-cargo mont build
+cargo montrs build
 ```
 
 ### Start Development Server
 ```bash
-cargo mont serve
+cargo montrs serve
 ```
 
 ### Benchmarking
 Quickly measure execution speed and file size:
 ```bash
 # Benchmark a project (standard cargo bench)
-cargo mont bench
+cargo montrs bench
 
 # Simple/Native benchmark for a single file/binary
-cargo mont bench --simple ./main.rs --iterations 500
+cargo montrs bench --simple ./main.rs --iterations 500
 ```
 
-## Configuration (`mont.toml`)
+## Configuration (`montrs.toml`)
 
-`cargo-mont` honors a `mont.toml` file in your project root for extensive configuration:
+`cargo-montrs` honors a `montrs.toml` file in your project root for extensive configuration:
 
 ```toml
 [project]

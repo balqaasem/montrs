@@ -1,8 +1,8 @@
-use crate::config::MontConfig;
+use crate::config::MontrsConfig;
 use crate::utils::run_cargo_leptos;
 
 pub async fn run() -> anyhow::Result<()> {
-    let mut config = MontConfig::load()?;
+    let mut config = MontrsConfig::load()?;
 
     // Handle tailwind.toml
     if let Ok(Some(js_path)) = crate::config::tailwind::ensure_tailwind_config(
@@ -14,5 +14,8 @@ pub async fn run() -> anyhow::Result<()> {
         }
     }
 
-    run_cargo_leptos("build", &[], &config).await
+    // "serve" in cargo-montrs usually implies watching/running the server.
+    // We map it to "watch" as cargo-leptos doesn't have a standalone "serve" command exposed clearly via CLI
+    // other than running the binary, but "watch" is safer for dev.
+    run_cargo_leptos("watch", &[], &config).await
 }

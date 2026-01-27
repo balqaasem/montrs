@@ -1,6 +1,6 @@
 //! Configuration module for MontRS.
-//!
-//! This module defines the structure of the `mont.toml` configuration file
+
+//! This module defines the structure of the `montrs.toml` configuration file
 //! and handles loading/parsing logic. It serves as the central source of truth
 //! for project settings, build options, and server configuration.
 
@@ -13,9 +13,9 @@ pub mod tailwind;
 
 /// The root configuration structure for a MontRS project.
 ///
-/// Corresponds to the `mont.toml` file.
+/// Corresponds to the `montrs.toml` file.
 #[derive(Debug, Deserialize, Clone, Default)]
-pub struct MontConfig {
+pub struct MontrsConfig {
     /// Project identity and core settings.
     #[serde(default)]
     pub project: ProjectConfig,
@@ -73,7 +73,7 @@ pub enum TailwindStyle {
     /// Automatically detect style.
     #[default]
     Auto,
-    /// Use configuration from `mont.toml`.
+    /// Use configuration from `montrs.toml`.
     Toml,
     /// Use Tailwind v4 conventions.
     V4,
@@ -237,7 +237,7 @@ pub enum TaskConfig {
     },
 }
 
-impl MontConfig {
+impl MontrsConfig {
     /// Loads configuration from a specific file.
     pub fn from_file(path: impl AsRef<std::path::Path>) -> Result<Self> {
         let content = std::fs::read_to_string(path.as_ref())
@@ -257,13 +257,13 @@ impl MontConfig {
         Ok(config)
     }
 
-    /// Loads configuration from `mont.toml` in the current directory.
+    /// Loads configuration from `montrs.toml` in the current directory.
     ///
     /// If the file is missing, returns default configuration.
     /// Also attempts to resolve the project name from `Cargo.toml`.
     pub fn load() -> Result<Self> {
-        if std::path::Path::new("mont.toml").exists() {
-            Self::from_file("mont.toml")
+        if std::path::Path::new("montrs.toml").exists() {
+            Self::from_file("montrs.toml")
         } else {
             let mut config = Self::default();
             // Try to resolve project name

@@ -47,7 +47,7 @@ struct CliArgs {
 
 /// Configuration for benchmark execution.
 ///
-/// Can be loaded from CLI arguments, environment variables `MONTRS_BENCH_*` (or `MONT_BENCH_*` for compat),
+/// Can be loaded from CLI arguments, environment variables `MONTRS_BENCH_*`,
 /// or created programmatically.
 ///
 /// Priority:
@@ -107,35 +107,35 @@ impl BenchConfig {
         Self::resolve(args, env_loader)
     }
 
-    /// Resolves configuration priority: Args > Env > Old Env > Default
+    /// Resolves configuration priority: Args > Env > Default
     fn resolve<F>(args: CliArgs, env_loader: F) -> Self 
     where
         F: Fn(&str) -> Option<String>,
     {
         let warmup_iterations = args.warmup_iterations
-            .or_else(|| Self::fetch_env("MONTRS_BENCH_WARMUP", "MONT_BENCH_WARMUP", &env_loader))
+            .or_else(|| Self::fetch_env("MONTRS_BENCH_WARMUP", &env_loader))
             .unwrap_or(10);
 
         let iterations = args.iterations
-            .or_else(|| Self::fetch_env("MONTRS_BENCH_ITERATIONS", "MONT_BENCH_ITERATIONS", &env_loader))
+            .or_else(|| Self::fetch_env("MONTRS_BENCH_ITERATIONS", &env_loader))
             .unwrap_or(100);
 
         let duration = args.duration
             .or_else(|| {
-                Self::fetch_env_string("MONTRS_BENCH_TIMEOUT", "MONT_BENCH_TIMEOUT", &env_loader)
+                Self::fetch_env_string("MONTRS_BENCH_TIMEOUT", &env_loader)
                     .and_then(|s| s.parse::<u64>().ok())
                     .map(Duration::from_secs)
             })
             .or(Some(Duration::from_secs(5)));
 
         let filter = args.filter
-            .or_else(|| Self::fetch_env_string("MONTRS_BENCH_FILTER", "", &env_loader)); // No compat for filter
+            .or_else(|| Self::fetch_env_string("MONTRS_BENCH_FILTER", &env_loader));
 
         let json_output = args.json_output
-            .or_else(|| Self::fetch_env_string("MONTRS_BENCH_JSON_OUTPUT", "MONT_BENCH_JSON_OUTPUT", &env_loader));
+            .or_else(|| Self::fetch_env_string("MONTRS_BENCH_JSON_OUTPUT", &env_loader));
 
         let generate_weights = args.generate_weights
-            .or_else(|| Self::fetch_env_string("MONTRS_BENCH_GENERATE_WEIGHTS", "", &env_loader));
+            .or_else(|| Self::fetch_env_string("MONTRS_BENCH_GENERATE_WEIGHTS", &env_loader));
 
         Self {
             warmup_iterations,
@@ -147,41 +147,23 @@ impl BenchConfig {
         }
     }
 
-    fn fetch_env<T: std::str::FromStr, F>(new_key: &str, old_key: &str, env_loader: &F) -> Option<T>
+    fn fetch_env<T: std::str::FromStr, F>(key: &str, env_loader: &F) -> Option<T>
     where
         F: Fn(&str) -> Option<String>,
     {
-        if let Some(val) = env_loader(new_key) {
+        if let Some(val) = env_loader(key) {
             if let Ok(parsed) = val.parse() {
                 return Some(parsed);
-            }
-        }
-        
-        if !old_key.is_empty() {
-            if let Some(val) = env_loader(old_key) {
-                // Log warning only if we are using old key (and we can't easily log once here without spamming)
-                // For now, silent compat or log to stderr
-                if let Ok(parsed) = val.parse() {
-                    return Some(parsed);
-                }
             }
         }
         None
     }
 
-    fn fetch_env_string<F>(new_key: &str, old_key: &str, env_loader: &F) -> Option<String>
+    fn fetch_env_string<F>(key: &str, env_loader: &F) -> Option<String>
     where
         F: Fn(&str) -> Option<String>,
     {
-        if let Some(val) = env_loader(new_key) {
-            return Some(val);
-        }
-        if !old_key.is_empty() {
-            if let Some(val) = env_loader(old_key) {
-                return Some(val);
-            }
-        }
-        None
+        env_loader(key)
     }
 }
 

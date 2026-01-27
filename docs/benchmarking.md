@@ -7,7 +7,7 @@ MontRS provides a professional-grade benchmarking ecosystem powered by the `mont
 The benchmarking system is designed to be:
 - **Accurate**: Uses high-resolution timers and statistical analysis (mean, median, p95/p99, std dev).
 - **System-Aware**: Captures detailed system information (OS, CPU, RAM) for context.
-- **Integrated**: Works seamlessly with `cargo mont bench` and standard Rust tests.
+- **Integrated**: Works seamlessly with `cargo montrs bench` and standard Rust tests.
 - **Exportable**: Supports JSON reporting for CI/CD integration.
 
 ## Quick Start
@@ -44,27 +44,27 @@ async fn main() -> anyhow::Result<()> {
 
 ### 3. Run via CLI
 
-Use the `cargo mont bench` command to execute benchmarks.
+Use the `cargo montrs bench` command to execute benchmarks.
 
 ```bash
 # Run all benchmarks
-cargo mont bench
+cargo montrs bench
 
 # Customize execution
-cargo mont bench --iterations 1000 --warmup 50 --timeout 60
+cargo montrs bench --iterations 1000 --warmup 50 --timeout 60
 
 # Filter specific benchmarks
-cargo mont bench --filter "vector_sort"
+cargo montrs bench --filter "vector_sort"
 
 # Export report
-cargo mont bench --json-output report.json
+cargo montrs bench --json-output report.json
 ```
 
 ---
 
 ## Native Benchmarking (`--simple`)
 
-MontRS supports a high-performance "native" mode for benchmarking standalone files, binaries, or `mont.toml` configurations without the overhead of a full Cargo project.
+MontRS supports a high-performance "native" mode for benchmarking standalone files, binaries, or `montrs.toml` configurations without the overhead of a full Cargo project.
 
 This is ideal for quick testing, measuring script execution, or checking the size and load time of an AppSpec.
 
@@ -73,25 +73,25 @@ This is ideal for quick testing, measuring script execution, or checking the siz
 - **File Size Reporting**: Automatically reports the target's size in MB and bytes.
 - **Smart Compilation**: Standalone `.rs` files are compiled with `rustc -O` and benchmarked.
 - **Direct Binary Execution**: Benchmarks existing executables directly.
-- **Config Profiling**: Measures `mont.toml` (AppSpec) parsing and load speed.
+- **Config Profiling**: Measures `montrs.toml` (AppSpec) parsing and load speed.
 
 ### Usage Examples
 
 ```bash
 # Simple bench of a Rust source file
-cargo mont bench --simple src/utils.rs
+cargo montrs bench --simple src/utils.rs
 
 # Bench an existing binary
-cargo mont bench --simple ./target/release/my-app
+cargo montrs bench --simple ./target/release/my-app
 
 # Profile AppSpec load time
-cargo mont bench --simple ./mont.toml
+cargo montrs bench --simple ./montrs.toml
 
 # Customize iterations and warmup for native mode
-cargo mont bench --simple ./script.rs --iterations 50 --warmup 5
+cargo montrs bench --simple ./script.rs --iterations 50 --warmup 5
 ```
 
-> **Note**: For `.rs` files, native mode uses `rustc` directly. If your file depends on external crates (other than `std`), you should use the standard project-based `cargo mont bench` instead.
+> **Note**: For `.rs` files, native mode uses `rustc` directly. If your file depends on external crates (other than `std`), you should use the standard project-based `cargo montrs bench` instead.
 
 ---
 
@@ -222,7 +222,7 @@ Benchmarks in MontRS capture detailed hardware information to ensure results are
  
  ```bash
  # Generate weights from a benchmark run
- cargo mont bench --generate-weights src/weights.rs
+ cargo montrs bench --generate-weights src/weights.rs
  ```
  
  This produces a file like:

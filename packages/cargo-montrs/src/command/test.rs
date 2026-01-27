@@ -1,10 +1,10 @@
 //! Test command implementation for MontRS.
-//!
+
 //! This module handles the execution of unit and integration tests. It wraps `cargo test`
 //! but adds MontRS-specific capabilities like custom reporting (JSON/JUnit) and
 //! automated environment setup.
 
-use crate::config::MontConfig;
+use crate::config::MontrsConfig;
 use std::process::Stdio;
 use tokio::io::{AsyncBufReadExt, BufReader};
 use quick_xml::events::{BytesDecl, BytesStart, Event};
@@ -13,7 +13,7 @@ use quick_xml::Writer;
 /// Runs the test suite for the current project.
 ///
 /// This function:
-/// 1. Loads the `MontConfig` to verify the project context.
+/// 1. Loads the `MontrsConfig` to verify the project context.
 /// 2. Constructs arguments for `cargo test`.
 /// 3. Spawns `cargo test` as a subprocess.
 /// 4. Optionally captures JSON output to generate JUnit/JSON reports.
@@ -37,7 +37,7 @@ pub async fn run(
     // We'll run cargo test directly.
 
     // Load config just to ensure valid project
-    let _ = MontConfig::load()?;
+    let _ = MontrsConfig::load()?;
 
     println!("Running MontRS Unit Tests...");
     

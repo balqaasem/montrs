@@ -87,4 +87,4 @@ cargo run --release --bin my_bench -- --warmup 20 --iterations 500
 
 ## Integration with MontRS
 
-This crate is used by `cargo mont bench` to execute performance tests across the framework.
+This crate is used by `cargo montrs bench` to execute performance tests across the framework.

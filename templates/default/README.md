@@ -1,10 +1,10 @@
 # MontRS Default Template
 
-This is a starter template for building web applications with [MontRS](https://github.com/afsall-labs/mont-rs) and [Leptos](https://github.com/leptos-rs/leptos).
+This is a starter template for building web applications with [MontRS](https://github.com/afsall-labs/montrs) and [Leptos](https://github.com/leptos-rs/leptos).
 
 ## Tailwind Support
 
-This template comes with full Tailwind CSS support powered by `cargo-mont` and `tailwind-fuse`.
+This template comes with full Tailwind CSS support powered by `cargo-montrs` and `tailwind-fuse`.
 
 ### tailwind-fuse Integration
 
@@ -21,11 +21,11 @@ You can configure Tailwind in two ways:
 1.  **Tailwind v4 (Recommended)**:
     - Use pure CSS for configuration in your input file (e.g., `style/input.css`).
     - No `tailwind.config.js` or `tailwind.toml` required.
-    - `cargo-mont` detects this mode automatically if no config file is present.
+    - `cargo-montrs` detects this mode automatically if no config file is present.
 
 2.  **tailwind.toml**:
     - Create a `tailwind.toml` file in your project root for a pure-Rust configuration experience.
-    - `cargo-mont` automatically generates a temporary `tailwind.config.js` for you during build/watch.
+    - `cargo-montrs` automatically generates a temporary `tailwind.config.js` for you during build/watch.
 
     ```toml
     content = ["src/**/*.rs", "*.html"]
@@ -41,5 +41,5 @@ You can configure Tailwind in two ways:
 ## Running the Project
 
 ```bash
-cargo mont watch
+cargo montrs watch
 ```

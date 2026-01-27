@@ -56,7 +56,7 @@ async fn run_native_bench(
     println!("Size:   {:.2} MB ({} bytes)", size_mb, size_bytes);
 
     // 2. Identify Target Type
-    if path.is_dir() || path.file_name() == Some(std::ffi::OsStr::new("mont.toml")) {
+    if path.is_dir() || path.file_name() == Some(std::ffi::OsStr::new("montrs.toml")) {
         // AppSpec or Application Directory
         println!("Type:   AppSpec / Application");
         println!("Action: Benchmarking internal config load speed...");
@@ -76,27 +76,27 @@ async fn run_native_bench(
     bench_executable(path, iterations, warmup, generate_weights).await
 }
 
-/// Benchmarks loading of an AppSpec (mont.toml).
+/// Benchmarks loading of an AppSpec (montrs.toml).
 /// 
-/// This is an internal benchmark that measures how fast `cargo-mont` can parse the configuration.
+/// This is an internal benchmark that measures how fast `cargo-montrs` can parse the configuration.
 async fn bench_appspec_load(path: &Path, iterations: u32, warmup: u32, generate_weights: Option<String>) -> Result<()> {
     use montrs_bench::stats::BenchStats;
     use montrs_bench::report::Report;
 
-    // Determine the mont.toml path
+    // Determine the montrs.toml path
     let config_path = if path.is_dir() {
-        path.join("mont.toml")
+        path.join("montrs.toml")
     } else {
         path.to_path_buf()
     };
 
     if !config_path.exists() {
-        anyhow::bail!("mont.toml not found at {}", config_path.display());
+        anyhow::bail!("montrs.toml not found at {}", config_path.display());
     }
 
     // Warmup
     for _ in 0..warmup {
-        let _ = crate::config::MontConfig::from_file(&config_path);
+        let _ = crate::config::MontrsConfig::from_file(&config_path);
     }
 
     // Measure
@@ -105,7 +105,7 @@ async fn bench_appspec_load(path: &Path, iterations: u32, warmup: u32, generate_
 
     for _ in 0..iterations {
         let start = Instant::now();
-        let _ = crate::config::MontConfig::from_file(&config_path)?;
+        let _ = crate::config::MontrsConfig::from_file(&config_path)?;
         durations.push(start.elapsed());
     }
 
@@ -244,7 +244,7 @@ async fn run_cargo_bench(
 
     cmd.args(&harness_args);
 
-    // Also set Env vars as a fallback/alternative
+    // Set Env vars
     cmd.env("MONTRS_BENCH_ITERATIONS", iterations.to_string());
     cmd.env("MONTRS_BENCH_WARMUP", warmup.to_string());
     if let Some(t) = timeout {
@@ -255,16 +255,6 @@ async fn run_cargo_bench(
     }
     if let Some(weights) = &generate_weights {
         cmd.env("MONTRS_BENCH_GENERATE_WEIGHTS", weights);
-    }
-
-    // Legacy support (for older binaries using MONT_BENCH_*)
-    cmd.env("MONT_BENCH_ITERATIONS", iterations.to_string());
-    cmd.env("MONT_BENCH_WARMUP", warmup.to_string());
-    if let Some(t) = timeout {
-        cmd.env("MONT_BENCH_TIMEOUT", t.to_string());
-    }
-    if let Some(json) = &json_output {
-        cmd.env("MONT_BENCH_JSON_OUTPUT", json);
     }
 
     let status = cmd.status().context("Failed to execute cargo bench")?;

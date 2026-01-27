@@ -1,5 +1,5 @@
 [package]
-name = "cargo-mont"
+name = "cargo-montrs"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
@@ -7,7 +7,7 @@ authors.workspace = true
 repository.workspace = true
 
 [[bin]]
-name = "cargo-mont"
+name = "cargo-montrs"
 path = "src/main.rs"
 
 [dependencies]

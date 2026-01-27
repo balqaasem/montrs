@@ -1,11 +1,11 @@
 [package]
-name = "mont"
+name = "montrs"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
 authors.workspace = true
 repository.workspace = true
-description = "The main entry point for the Mont framework."
+description = "The main entry point for the MontRS framework."
 
 [dependencies]
 montrs-core = { path = "../core", version = "0.1.0" }

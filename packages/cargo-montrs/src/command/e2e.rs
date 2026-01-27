@@ -8,12 +8,12 @@
 //! It delegates the heavy lifting to `cargo-leptos` but ensures the
 //! MontRS configuration is correctly mapped.
 
-use crate::config::MontConfig;
+use crate::config::MontrsConfig;
 use crate::utils::run_cargo_leptos;
 
 /// Executes the E2E tests.
 pub async fn run(headless: bool, keep_alive: bool, browser: Option<String>) -> anyhow::Result<()> {
-    let config = MontConfig::load()?;
+    let config = MontrsConfig::load()?;
 
     // Determine final configuration (CLI > Config > Default)
     let final_headless = headless || config.e2e.headless.unwrap_or(false);
@@ -21,14 +21,14 @@ pub async fn run(headless: bool, keep_alive: bool, browser: Option<String>) -> a
 
     // Set environment variables for runtime configuration
     unsafe {
-        std::env::set_var("MONT_E2E_HEADLESS", final_headless.to_string());
+        std::env::set_var("MONTRS_E2E_HEADLESS", final_headless.to_string());
         if keep_alive {
-            std::env::set_var("MONT_E2E_KEEP_ALIVE", "true");
+            std::env::set_var("MONTRS_E2E_KEEP_ALIVE", "true");
         }
-        std::env::set_var("MONT_E2E_BROWSER", final_browser);
+        std::env::set_var("MONTRS_E2E_BROWSER", final_browser);
 
         if let Some(url) = &config.e2e.base_url {
-            std::env::set_var("MONT_SITE_URL", url);
+            std::env::set_var("MONTRS_SITE_URL", url);
         }
 
         // Default defaults for MontRS structure

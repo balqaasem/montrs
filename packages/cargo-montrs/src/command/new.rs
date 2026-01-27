@@ -14,7 +14,7 @@ pub async fn run(name: String, template_url: String) -> anyhow::Result<()> {
 
     // In a real CLI, we might use include_dir! to embed templates
     // or look relative to the binary path. For now, we look in the CWD
-    // assuming the user is in the mont-rs root.
+    // assuming the user is in the montrs root.
 
     let args = GenerateArgs {
         name: Some(name.clone()),
@@ -36,7 +36,7 @@ pub async fn run(name: String, template_url: String) -> anyhow::Result<()> {
         style(&name).cyan().bold()
     );
     println!(
-        "Next steps:\n  cd {}\n  cargo mont build\n  cargo mont serve",
+        "Next steps:\n  cd {}\n  cargo montrs build\n  cargo montrs serve",
         name
     );
 

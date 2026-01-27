@@ -1,8 +1,8 @@
-use crate::config::MontConfig;
+use crate::config::MontrsConfig;
 use anyhow::{Result, anyhow};
 use clap::Parser;
 
-pub async fn run_cargo_leptos(cmd: &str, args: &[String], config: &MontConfig) -> Result<()> {
+pub async fn run_cargo_leptos(cmd: &str, args: &[String], config: &MontrsConfig) -> Result<()> {
     // Build arguments for cargo-leptos
     let mut args_list = vec!["cargo-leptos".to_string(), cmd.to_string()];
 
