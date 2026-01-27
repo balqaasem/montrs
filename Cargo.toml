@@ -3,7 +3,7 @@ resolver = "2"
 
 members = [
     "packages/bench",
-    "packages/cargo-montrs",
+    "packages/cli",
     "packages/core",
     "packages/montrs",
     "packages/orm",

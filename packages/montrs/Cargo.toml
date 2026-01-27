@@ -12,17 +12,29 @@ montrs-core = { path = "../core", version = "0.1.0" }
 montrs-orm = { path = "../orm", version = "0.1.0", optional = true }
 montrs-schema = { path = "../schema", version = "0.1.0", optional = true }
 montrs-test = { path = "../test", version = "0.1.0", optional = true }
+montrs-cli = { path = "../cli", version = "0.1.0", optional = true }
+
+[[bin]]
+name = "montrs"
+path = "src/bin/main.rs"
+required-features = ["cli"]
+
+[[bin]]
+name = "cargo-montrs"
+path = "src/bin/main.rs"
+required-features = ["cli"]
 
 [features]
 default = ["full"]
 
-# Enable the entire framework
-full = ["orm", "schema", "test"]
+# Enable the entire framework including the CLI
+full = ["orm", "schema", "test", "cli"]
 
 # Basic package activation
 orm = ["dep:montrs-orm"]
 schema = ["dep:montrs-schema"]
 test = ["dep:montrs-test"]
+cli = ["dep:montrs-cli"]
 
 # --- Forwarded Features ---
 

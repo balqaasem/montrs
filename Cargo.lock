@@ -767,36 +767,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "cargo-montrs"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "camino",
- "cargo-generate",
- "cargo-leptos",
- "cargo_metadata 0.18.1",
- "clap",
- "clap_complete",
- "colored",
- "config 0.14.1",
- "console 0.15.11",
- "fs_extra",
- "indicatif 0.17.11",
- "montrs-bench",
- "quick-xml",
- "reqwest 0.12.28",
- "serde",
- "serde_json",
- "shlex",
- "tempfile",
- "tokio",
- "toml 0.9.11+spec-1.1.0",
- "tracing",
- "tracing-subscriber",
- "which 6.0.3",
-]
-
-[[package]]
 name = "cargo-platform"
 version = "0.1.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3798,6 +3768,7 @@ dependencies = [
 name = "montrs"
 version = "0.1.0"
 dependencies = [
+ "montrs-cli",
  "montrs-core",
  "montrs-orm",
  "montrs-schema",
@@ -3820,6 +3791,36 @@ dependencies = [
  "statrs",
  "sysinfo",
  "tokio",
+]
+
+[[package]]
+name = "montrs-cli"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "camino",
+ "cargo-generate",
+ "cargo-leptos",
+ "cargo_metadata 0.18.1",
+ "clap",
+ "clap_complete",
+ "colored",
+ "config 0.14.1",
+ "console 0.15.11",
+ "fs_extra",
+ "indicatif 0.17.11",
+ "montrs-bench",
+ "quick-xml",
+ "reqwest 0.12.28",
+ "serde",
+ "serde_json",
+ "shlex",
+ "tempfile",
+ "tokio",
+ "toml 0.9.11+spec-1.1.0",
+ "tracing",
+ "tracing-subscriber",
+ "which 6.0.3",
 ]
 
 [[package]]
