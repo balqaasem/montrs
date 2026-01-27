@@ -15,6 +15,7 @@ async-trait.workspace = true
 anyhow.workspace = true
 tracing.workspace = true
 futures.workspace = true
+regex.workspace = true
 
 leptos.workspace = true
 

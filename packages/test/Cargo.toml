@@ -9,7 +9,13 @@ repository.workspace = true
 [dependencies]
 montrs-core = { path = "../core" }
 montrs-orm = { path = "../orm" }
+playwright = { package = "playwright-rs", version = "0.8.2", optional = true }
 serde.workspace = true
 tokio.workspace = true
 async-trait.workspace = true
 anyhow.workspace = true
+montrs-bench = { version = "0.1.0", path = "../bench" }
+
+[features]
+default = []
+e2e = ["dep:playwright"]

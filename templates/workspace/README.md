@@ -1,6 +1,6 @@
 # MontRS Workspace Template
 
-A flexible monorepo structure for building scalable web applications with [MontRS](https://github.com/afsall-labs/mont-rs) and [Leptos](https://github.com/leptos-rs/leptos).
+A flexible monorepo structure for building scalable web applications with [MontRS](https://github.com/afsall-labs/montrs) and [Leptos](https://github.com/leptos-rs/leptos).
 
 ## Structure
 
@@ -11,7 +11,8 @@ my-workspace/
 ├── packages/       # Shared libraries
 │   └── ui/         # Shared UI components
 ├── Cargo.toml      # Workspace root
-├── mont.toml       # MontRS configuration
+├── montrs.toml     # MontRS
+ configuration
 └── README.md
 ```
 
@@ -19,13 +20,13 @@ my-workspace/
 
 ```bash
 # Development with hot-reload
-cargo mont watch
+montrs watch
 
 # Production build
-cargo mont build --release
+montrs build --release
 
 # Run tests
-cargo mont run test
+montrs run test
 ```
 
 ## Adding New Apps/Packages

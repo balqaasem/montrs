@@ -3,10 +3,12 @@
 //! SQLite and PostgreSQL, enabling unified database access.
 
 use async_trait::async_trait;
+#[cfg(feature = "postgres")]
 use deadpool_postgres::{Config, Pool, Runtime};
+#[cfg(feature = "sqlite")]
 use rusqlite::Connection;
-use std::sync::{Arc, Mutex};
 use thiserror::Error;
+#[cfg(feature = "postgres")]
 use tokio_postgres::NoTls;
 
 /// Errors that can occur during database operations.
@@ -24,26 +26,31 @@ pub enum DbError {
 /// Bridges the gap between rusqlite::ToSql and tokio_postgres::types::ToSql.
 pub trait ToSql: Send + Sync {
     /// Returns a reference that can be used by rusqlite.
+    #[cfg(feature = "sqlite")]
     fn as_rusqlite(&self) -> &dyn rusqlite::ToSql;
 }
 
 // Implementations for common types to be used as query parameters.
 impl ToSql for String {
+    #[cfg(feature = "sqlite")]
     fn as_rusqlite(&self) -> &dyn rusqlite::ToSql {
         self
     }
 }
 impl ToSql for i32 {
+    #[cfg(feature = "sqlite")]
     fn as_rusqlite(&self) -> &dyn rusqlite::ToSql {
         self
     }
 }
 impl ToSql for bool {
+    #[cfg(feature = "sqlite")]
     fn as_rusqlite(&self) -> &dyn rusqlite::ToSql {
         self
     }
 }
 impl ToSql for &str {
+    #[cfg(feature = "sqlite")]
     fn as_rusqlite(&self) -> &dyn rusqlite::ToSql {
         self
     }
@@ -53,8 +60,10 @@ impl ToSql for &str {
 /// Requires backend-specific mapping methods.
 pub trait FromRow: Sized {
     /// Maps a rusqlite row to the implementor type.
+    #[cfg(feature = "sqlite")]
     fn from_row_sqlite(row: &rusqlite::Row) -> rusqlite::Result<Self>;
     /// Maps a tokio-postgres row to the implementor type.
+    #[cfg(feature = "postgres")]
     fn from_row_postgres(row: &tokio_postgres::Row) -> Result<Self, DbError>;
 }
 
@@ -70,11 +79,13 @@ pub trait DbBackend: Send + Sync + 'static {
 
 /// SQLite-specific database backend implementation.
 /// Uses synchronous rusqlite under the hood with internal locking.
+#[cfg(feature = "sqlite")]
 #[derive(Clone)]
 pub struct SqliteBackend {
     conn: Arc<Mutex<Connection>>,
 }
 
+#[cfg(feature = "sqlite")]
 impl SqliteBackend {
     /// Creates a new SqliteBackend connecting to the specified path (or :memory:).
     pub fn new(path: &str) -> Result<Self, DbError> {
@@ -91,6 +102,7 @@ impl SqliteBackend {
     }
 }
 
+#[cfg(feature = "sqlite")]
 #[async_trait]
 impl DbBackend for SqliteBackend {
     async fn execute(&self, sql: &str, params: &[&dyn ToSql]) -> Result<usize, DbError> {
@@ -125,11 +137,13 @@ impl DbBackend for SqliteBackend {
 
 /// PostgreSQL-specific database backend implementation.
 /// Uses deadpool-postgres for async connection pooling.
+#[cfg(feature = "postgres")]
 #[derive(Clone)]
 pub struct PostgresBackend {
     pool: Pool,
 }
 
+#[cfg(feature = "postgres")]
 impl PostgresBackend {
     /// Creates a new PostgresBackend with the provided configuration.
     pub fn new(config: Config) -> Result<Self, DbError> {
@@ -140,6 +154,7 @@ impl PostgresBackend {
     }
 }
 
+#[cfg(feature = "postgres")]
 #[async_trait]
 impl DbBackend for PostgresBackend {
     async fn execute(&self, sql: &str, _params: &[&dyn ToSql]) -> Result<usize, DbError> {
