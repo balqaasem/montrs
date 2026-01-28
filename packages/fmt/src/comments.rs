@@ -1,6 +1,6 @@
 use crop::Rope;
-use proc_macro2::{LineColumn, Span, TokenStream, TokenTree};
-use std::collections::{BTreeMap, HashMap};
+use proc_macro2::LineColumn;
+use std::collections::BTreeMap;
 
 #[derive(Debug, Clone)]
 pub struct Comment {
@@ -21,7 +21,7 @@ pub fn extract_comments(source: &str) -> (Rope, Vec<Comment>) {
     let mut line = 1;
     let mut col = 0;
 
-    while let Some((idx, c)) = chars.next() {
+    while let Some((_idx, c)) = chars.next() {
         if c == '\n' {
             line += 1;
             col = 0;
@@ -184,7 +184,8 @@ pub fn get_text_between_spans(source: &Rope, start: LineColumn, end: LineColumn)
 
     let mut result = String::new();
     for line_idx in (start.line - 1)..end.line {
-        if let Some(line) = source.line(line_idx) {
+        if line_idx < source.line_len() {
+            let line = source.line(line_idx);
             let line_str = line.to_string();
             let start_col = if line_idx == start.line - 1 { start.column } else { 0 };
             let end_col = if line_idx == end.line - 1 { end.column } else { line_str.len() };

@@ -1,11 +1,11 @@
 use crate::{FormatError, FormatterSettings};
 use crop::Rope;
 use rstml::node::{Node, NodeAttribute, NodeElement};
-use rstml::{Parser, ParserConfig};
 use syn::visit::{self, Visit};
-use syn::{ExprMacro, File, Macro};
+use syn::{File, Macro};
 use quote::ToTokens;
 
+#[derive(Debug)]
 pub struct MacroEdit {
     pub start_line: usize,
     pub start_col: usize,
@@ -16,13 +16,12 @@ pub struct MacroEdit {
 
 pub fn collect_and_format_macros(
     file: &File,
-    source: &Rope,
+    _source: &Rope,
     settings: &FormatterSettings,
     edits: &mut Vec<MacroEdit>,
 ) -> Result<(), FormatError> {
     let mut visitor = MacroVisitor {
         settings,
-        source,
         edits,
         errors: Vec::new(),
     };
@@ -37,17 +36,17 @@ pub fn collect_and_format_macros(
 
 struct MacroVisitor<'a> {
     settings: &'a FormatterSettings,
-    source: &'a Rope,
     edits: &'a mut Vec<MacroEdit>,
     errors: Vec<String>,
 }
 
 impl<'ast> Visit<'ast> for MacroVisitor<'_> {
-    fn visit_expr_macro(&mut self, i: &'ast ExprMacro) {
-        if self.is_view_macro(&i.mac) {
-            match self.format_macro(&i.mac) {
+    fn visit_macro(&mut self, i: &'ast Macro) {
+        if self.is_view_macro(i) {
+            match self.format_macro(i) {
                 Ok(formatted) => {
-                    let span = i.mac.delimiter.span().join();
+                    let span = i.delimiter.span().join();
+                    
                     self.edits.push(MacroEdit {
                         start_line: span.start().line,
                         start_col: span.start().column,
@@ -56,10 +55,12 @@ impl<'ast> Visit<'ast> for MacroVisitor<'_> {
                         new_content: formatted,
                     });
                 }
-                Err(e) => self.errors.push(e.to_string()),
+                Err(e) => {
+                    self.errors.push(e.to_string());
+                }
             }
         }
-        visit::visit_expr_macro(self, i);
+        visit::visit_macro(self, i);
     }
 }
 
@@ -70,22 +71,23 @@ impl MacroVisitor<'_> {
     }
 
     fn format_macro(&self, mac: &Macro) -> Result<String, FormatError> {
-        let config = ParserConfig::default().recover_errors(true);
-        let parser = Parser::new(config);
         let tokens = mac.tokens.clone();
         
-        let nodes = parser.parse_tokens(tokens).map_err(|e| FormatError::Macro(e.to_string()))?;
+        // rstml 0.12.x provides a top-level parse2 function
+        let nodes = rstml::parse2(tokens).map_err(|e| FormatError::Macro(e.to_string()))?;
         
         let mut printer = RstmlPrinter {
             settings: self.settings,
-            indent: 0,
+            indent: self.settings.tab_spaces, // Start with one level of indentation
             result: String::new(),
         };
 
         printer.print_nodes(&nodes);
         
-        let macro_name = mac.path.segments.last().unwrap().ident.to_string();
-        Ok(format!("{}! {{ {} }}", macro_name, printer.result.trim()))
+        let result = printer.result.trim_end();
+        
+        // Return only the contents of the braces, with the braces themselves
+        Ok(format!("{{\n{}\n}}", result))
     }
 }
 
@@ -96,18 +98,24 @@ struct RstmlPrinter<'a> {
 }
 
 impl RstmlPrinter<'_> {
-    fn print_nodes(&mut self, nodes: &[Node]) {
+    fn print_nodes<C>(&mut self, nodes: &[Node<C>]) 
+    where 
+        C: rstml::node::CustomNode + ToTokens + std::fmt::Debug 
+    {
         for node in nodes {
             self.print_node(node);
         }
     }
 
-    fn print_node(&mut self, node: &Node) {
+    fn print_node<C>(&mut self, node: &Node<C>) 
+    where 
+        C: rstml::node::CustomNode + ToTokens + std::fmt::Debug 
+    {
         match node {
             Node::Element(el) => self.print_element(el),
             Node::Text(text) => {
                 self.add_indent();
-                self.result.push_str(&text.value.value());
+                self.result.push_str(&text.value.to_token_stream().to_string());
                 self.result.push('\n');
             }
             Node::Block(block) => {
@@ -120,13 +128,16 @@ impl RstmlPrinter<'_> {
         }
     }
 
-    fn print_element(&mut self, el: &NodeElement) {
+    fn print_element<C>(&mut self, el: &NodeElement<C>) 
+    where 
+        C: rstml::node::CustomNode + ToTokens + std::fmt::Debug 
+    {
         self.add_indent();
         let name = el.name().to_string();
         self.result.push('<');
         self.result.push_str(&name);
 
-        for attr in &el.attributes() {
+        for attr in el.attributes() {
             self.result.push(' ');
             self.print_attribute(attr);
         }
@@ -152,7 +163,7 @@ impl RstmlPrinter<'_> {
             }
             NodeAttribute::Attribute(a) => {
                 self.result.push_str(&a.key.to_string());
-                if let Some(value) = &a.value() {
+                if let Some(value) = a.value() {
                     self.result.push('=');
                     self.result.push_str(&value.to_token_stream().to_string());
                 }
@@ -188,7 +199,7 @@ pub fn apply_edits(source: &mut Rope, edits: Vec<MacroEdit>) {
 }
 
 fn line_col_to_byte_offset(source: &Rope, line: usize, col: usize) -> Option<usize> {
-    if line == 0 || line > source.line_count() {
+    if line == 0 || line > source.line_len() {
         return None;
     }
     let line_start = source.byte_of_line(line - 1);

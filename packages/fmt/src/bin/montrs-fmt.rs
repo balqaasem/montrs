@@ -1,5 +1,5 @@
 use clap::Parser;
-use montrs_fmt::{format_file, FormatterSettings};
+use montrs_fmt::FormatterSettings;
 use std::path::{Path, PathBuf};
 use walkdir::WalkDir;
 
