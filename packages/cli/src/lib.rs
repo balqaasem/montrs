@@ -78,7 +78,7 @@ pub enum Commands {
     Build,
     /// Serve the project for development with hot-reload.
     Serve,
-    /// Watch for changes and rebuild.
+    /// Watch for changes and rebuild automatically.
     Watch,
     /// Run cargo tests for app, client and server.
     Test {
@@ -178,14 +178,8 @@ pub enum Commands {
         /// Shell to generate completions for.
         shell: clap_complete::Shell,
     },
-    /// Upgrade montrs to the latest version.
+    /// Upgrade the MontRS CLI to the latest version.
     Upgrade,
-    /// Manage development channels (stable, nightly).
-    Channel {
-        /// The channel to switch to (optional).
-        #[arg(index = 1)]
-        name: Option<String>,
-    },
 }
 
 pub async fn run(cli: MontrsCli) -> anyhow::Result<()> {
@@ -252,7 +246,6 @@ pub async fn run(cli: MontrsCli) -> anyhow::Result<()> {
             Ok(())
         }
         Commands::Upgrade => command::upgrade::run().await?,
-        Commands::Channel { name } => command::channel::run(name).await?,
     }
 }
 

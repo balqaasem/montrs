@@ -1,17 +1,8 @@
-use crate::config::{Channel, MontrsConfig};
+use crate::config::MontrsConfig;
 use crate::utils::run_cargo_leptos;
-use colored::*;
 
 pub async fn run() -> anyhow::Result<()> {
     let mut config = MontrsConfig::load()?;
-
-    if config.project.channel == Channel::Nightly {
-        println!(
-            "{} Using {} features and optimizations.",
-            "Nightly:".yellow().bold(),
-            "experimental".italic()
-        );
-    }
 
     // Handle tailwind.toml
     if let Ok(Some(js_path)) = crate::config::tailwind::ensure_tailwind_config(

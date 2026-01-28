@@ -2,7 +2,7 @@
 
 # MontRS
 
-**MontRS** is a Rust-native, trait-driven, deterministic meta-framework built on **Leptos 0.8**. It blends the engineering strengths of Leptos (fine-grained reactivity), Remix (web-native routing), and Drizzle (minimal ORM).
+**MontRS** is a Full-Stack Framework for Cross-Platform Rust Applications (A Leptos Framework). **MontRS** is Rust-native, trait-driven, composable, modular and deterministic. Testing and mocking is a lot easier with MontRS.
 
 ## Philosophy
 
@@ -14,7 +14,7 @@
     - [ORM](packages/orm/README.md): SQL-centric ORM with SQLite and Postgres support.
     - [Test](packages/test/README.md): Deterministic testing suite (Unit, Integration, E2E).
     - [Bench](packages/bench/README.md): Professional-grade benchmarking tools.
-- **Production CLI**: [CLI](packages/cli/README.md) for orchestration.
+    - [CLI](packages/cli/README.md) for orchestration.
 
 ## Prerequisites
 
@@ -59,13 +59,6 @@ cargo install --path packages/cli
 montrs new my-app
 cd my-app
 montrs serve
-```
-
-### Development Channels
-MontRS supports `stable` and `nightly` channels to balance stability with innovation.
-```bash
-# Switch to the experimental nightly channel
-montrs channel nightly
 ```
 
 ### Benchmarking

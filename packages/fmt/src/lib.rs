@@ -29,7 +29,7 @@ pub fn format_source(source: &str, settings: &FormatterSettings) -> Result<Strin
     let (source_rope, comments) = comments::extract_comments(source);
 
     // 2. Parse the file into a syn::File
-    let mut file = syn::parse_file(source)?;
+    let file = syn::parse_file(source)?;
 
     // 3. Collect and format view! macros
     let mut edits = Vec::new();
@@ -37,7 +37,7 @@ pub fn format_source(source: &str, settings: &FormatterSettings) -> Result<Strin
 
     // 4. Format the file using prettyplease
     // Note: prettyplease will format the macros too, but we will overwrite them
-    let mut formatted = prettyplease::unparse(&file);
+    let formatted = prettyplease::unparse(&file);
     
     // 5. Re-apply macro edits to the formatted output
     // This is tricky because prettyplease changed the spans.
@@ -48,8 +48,10 @@ pub fn format_source(source: &str, settings: &FormatterSettings) -> Result<Strin
     // Simplified: re-parse the formatted output and find macros again to apply edits
     let formatted_ast = syn::parse_file(&formatted)?;
     let mut formatted_rope = crop::Rope::from(formatted);
+
     let mut formatted_edits = Vec::new();
     macro_fmt::collect_and_format_macros(&formatted_ast, &formatted_rope, settings, &mut formatted_edits)?;
+
     macro_fmt::apply_edits(&mut formatted_rope, formatted_edits);
 
     // 6. Re-insert comments

@@ -39,24 +39,6 @@ pub struct MontrsConfig {
     pub tasks: HashMap<String, TaskConfig>,
 }
 
-/// Development channel for the project.
-#[derive(Debug, Deserialize, Serialize, Clone, Copy, PartialEq, Eq, Default)]
-#[serde(rename_all = "lowercase")]
-pub enum Channel {
-    #[default]
-    Stable,
-    Nightly,
-}
-
-impl std::fmt::Display for Channel {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            Channel::Stable => write!(f, "stable"),
-            Channel::Nightly => write!(f, "nightly"),
-        }
-    }
-}
-
 /// Project metadata and feature flags.
 #[derive(Debug, Deserialize, Serialize, Clone)]
 pub struct ProjectConfig {
@@ -64,10 +46,6 @@ pub struct ProjectConfig {
     #[serde(default = "default_app_name")]
     pub name: String,
 
-    /// The development channel (stable or nightly).
-    #[serde(default)]
-    pub channel: Channel,
-    
     // Internal fields for cargo-leptos compatibility
     #[serde(skip)]
     pub verbose: u8,

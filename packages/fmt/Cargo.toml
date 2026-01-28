@@ -7,7 +7,7 @@ license = "MIT or Apache-2.0"
 description = "A specialized formatter for MontRS projects, supporting view! macros and non-doc comments."
 
 [dependencies]
-syn = { version = "2.0", features = ["full", "extra-traits", "parsing"] }
+syn = { version = "2.0", features = ["full", "extra-traits", "parsing", "visit"] }
 prettyplease = "0.2"
 rstml = "0.12"
 proc-macro2 = { version = "1.0", features = ["span-locations"] }
