@@ -90,20 +90,8 @@ Watch for changes and rebuild automatically.
 montrs watch
 ```
 
-### `channel`
-Manage development channels (stable or nightly).
-
-**Arguments:**
-- `name`: (Optional) The channel to switch to (`stable` or `nightly`).
-
-**Examples:**
+### `upgrade`
+Upgrade the montrs CLI to the latest version.
 ```bash
-# View current channel
-montrs channel
-
-# Switch to nightly for experimental features
-montrs channel nightly
-
-# Switch back to stable for production
-montrs channel stable
+montrs upgrade
 ```

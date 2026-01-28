@@ -61,13 +61,6 @@ cd my-app
 montrs serve
 ```
 
-### Development Channels
-MontRS supports `stable` and `nightly` channels to balance stability with innovation.
-```bash
-# Switch to the experimental nightly channel
-montrs channel nightly
-```
-
 ### Benchmarking
 Run standard benchmarks or use the native mode for quick file/binary testing:
 ```bash
