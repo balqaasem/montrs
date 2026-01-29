@@ -5,6 +5,7 @@ pub mod fmt;
 pub mod new;
 pub mod run;
 pub mod serve;
+pub mod spec;
 pub mod test;
 pub mod upgrade;
 pub mod watch;

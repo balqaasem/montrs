@@ -2,6 +2,13 @@
 
 Procedural macros for schema validation in the MontRS framework.
 
+## Key Features
+
+- **Declarative Validation**: `#[derive(Schema)]` for easy validation rules.
+- **Rich Constraints**: Support for `min_len`, `email`, `regex`, and `custom` validation.
+- **AI-Discoverable Schemas**: Automatically generates JSON schemas for LLMs to understand data constraints.
+- **Zero-Cost Abstraction**: Validation is resolved at compile-time wherever possible.
+
 ## Overview
 
 `montrs-schema` provides a powerful `#[derive(Schema)]` macro that enables declarative validation of data structures at compile-time. It generates a `validate()` method for your structs based on schema attributes.

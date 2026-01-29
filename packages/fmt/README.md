@@ -2,6 +2,13 @@
 
 A powerful, non-doc comment preserving formatter for MontRS projects. It wraps `prettyplease` and provides custom formatting for `view!` macros.
 
+## Key Features
+
+- **Non-Doc Comment Preservation**: Unlike standard `prettyplease` or `syn` based formatters, `montrs-fmt` preserves your line and block comments even within code blocks.
+- **Macro Formatting**: Intelligent formatting for `view!` macros using a custom RSTML printer.
+- **The Cascade of Truth**: Hierarchical configuration system for flexible settings.
+- **AI-Native Metadata**: Structured error reporting and formatting hints for LLMs.
+
 ## The Cascade of Truth
 
 `montrs-fmt` uses a hierarchical configuration system we call the **Cascade of Truth**. This ensures flexibility while maintaining a single source of truth for your project.

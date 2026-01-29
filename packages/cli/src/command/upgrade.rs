@@ -1,6 +1,5 @@
 use crate::config::MontrsConfig;
 use std::process::Command;
-use colored::*;
 
 pub async fn run() -> anyhow::Result<()> {
     let _config = MontrsConfig::load().unwrap_or_default();

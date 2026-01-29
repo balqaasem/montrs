@@ -2,6 +2,13 @@
 
 Professional-grade benchmarking utilities for the MontRS ecosystem.
 
+## Key Features
+
+- **High-Resolution Timing**: Uses `std::time::Instant` for precise measurements.
+- **Statistical Analysis**: Calculates Mean, Median, StdDev, P95, P99, and Ops/Sec.
+- **System Profiling**: Captures OS, CPU, RAM, and Rust version for context.
+- **Reporting**: Supports colored CLI output and detailed JSON export.
+
 ## Overview
 
 `montrs-bench` provides a robust foundation for measuring the performance of MontRS applications and libraries. It includes:

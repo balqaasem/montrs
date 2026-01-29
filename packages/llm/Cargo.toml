@@ -1,0 +1,25 @@
+[package]
+name = "montrs-llm"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+
+[dependencies]
+serde = { workspace = true, features = ["derive"] }
+serde_json.workspace = true
+serde_yaml = "0.9"
+thiserror.workspace = true
+anyhow.workspace = true
+chrono = { version = "0.4", features = ["serde"] }
+montrs-core = { path = "../core" }
+ignore = "0.4"
+regex = "1.10"
+walkdir = "2.5"
+toml = "0.8"
+uuid = { version = "1.8", features = ["v4", "serde"] }
+
+[dev-dependencies]
+tempfile = "3.10"
+tokio = { version = "1.0", features = ["full"] }

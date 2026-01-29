@@ -19,11 +19,37 @@ pub use router::{Action, ActionCtx, Loader, LoaderCtx, Router};
 pub use validation::{Validate, ValidationError};
 
 use async_trait::async_trait;
+use serde::{Deserialize, Serialize};
 use std::error::Error as StdError;
+
+/// A trait for errors that provide AI-accessible metadata.
+pub trait AiError: StdError {
+    /// A stable identifier for the error type.
+    fn error_code(&self) -> &'static str;
+
+    /// A structured explanation of the error, its cause, and context.
+    fn explanation(&self) -> String;
+
+    /// Suggested fixes or remediation steps.
+    fn suggested_fixes(&self) -> Vec<String> {
+        Vec::new()
+    }
+
+    /// The subsystem or package where the error originated.
+    fn subsystem(&self) -> &'static str {
+        "core"
+    }
+
+    /// Optional raw compiler error if applicable.
+    fn rustc_error(&self) -> Option<String> {
+        None
+    }
+}
 
 /// The execution environment context for the application.
 /// Used to differentiate logic between server-side rendering, WASM hydration,
 /// and other deployment targets like Edge or Mobile.
+#[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq)]
 pub enum Target {
     /// Server-side rendering (SSR) context.
     Server,
@@ -48,6 +74,16 @@ pub enum Target {
 pub trait Module<C: AppConfig>: Send + Sync + 'static {
     /// Returns a static name for the module, used for logging and debugging.
     fn name(&self) -> &'static str;
+
+    /// Returns a description of what this module does, useful for AI models.
+    fn description(&self) -> &'static str {
+        ""
+    }
+
+    /// Returns key-value metadata for the module.
+    fn metadata(&self) -> std::collections::HashMap<String, String> {
+        std::collections::HashMap::new()
+    }
 
     /// The primary initialization point for a module.
     ///
@@ -83,6 +119,11 @@ pub trait AppConfig: Sized + Send + Sync + Clone + 'static {
     type Error: StdError + Send + Sync;
     /// The strongly-typed environment configuration.
     type Env: EnvConfig + Clone;
+
+    /// Returns key-value metadata for the application.
+    fn metadata(&self) -> std::collections::HashMap<String, String> {
+        std::collections::HashMap::new()
+    }
 }
 
 /// The deterministic blueprint of a MontRS application.
@@ -103,7 +144,37 @@ pub struct AppSpec<C: AppConfig> {
     pub target: Target,
 }
 
+/// A serializable version of AppSpec for external consumption (e.g., by AI models).
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct AppSpecExport {
+    pub name: String,
+    pub target: Target,
+    pub modules: Vec<ModuleMetadata>,
+    pub router: crate::router::RouterSpec,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct ModuleMetadata {
+    pub name: String,
+    pub description: String,
+    pub metadata: std::collections::HashMap<String, String>,
+}
+
 impl<C: AppConfig> AppSpec<C> {
+    /// Exports the application specification to a serializable format.
+    pub fn export_spec(&self, app_name: &str) -> AppSpecExport {
+        AppSpecExport {
+            name: app_name.to_string(),
+            target: self.target,
+            modules: self.modules.iter().map(|m| ModuleMetadata {
+                name: m.name().to_string(),
+                description: m.description().to_string(),
+                metadata: m.metadata(),
+            }).collect(),
+            router: self.router.spec(),
+        }
+    }
+
     /// Creates a new, empty AppSpec with required config and environment.
     pub fn new(config: C, env: C::Env) -> Self {
         Self {

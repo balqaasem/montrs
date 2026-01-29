@@ -1,5 +1,7 @@
 //! Professional-grade benchmarking utilities for MontRS.
 //!
+//! // @ai-tool: name="bench_run" desc="Runs performance benchmarks for the project or specific targets."
+//!
 //! This crate provides tools for measuring performance, gathering system statistics,
 //! and generating detailed reports.
 
@@ -17,7 +19,72 @@ pub use report::Report;
 pub use runner::{BenchRunner, Benchmark};
 pub use weights::Weight;
 
+use montrs_core::AiError;
 use std::future::Future;
+use thiserror::Error;
+
+/// Errors that can occur during benchmarking.
+#[derive(Error, Debug)]
+pub enum BenchError {
+    #[error("Benchmark setup failed: {0}")]
+    Setup(String),
+    #[error("Benchmark run failed: {0}")]
+    Run(String),
+    #[error("Benchmark teardown failed: {0}")]
+    Teardown(String),
+    #[error("IO error during reporting: {0}")]
+    Io(#[from] std::io::Error),
+    #[error("Serialization error: {0}")]
+    Serialization(#[from] serde_json::Error),
+}
+
+impl AiError for BenchError {
+    fn error_code(&self) -> &'static str {
+        match self {
+            BenchError::Setup(_) => "BENCH_SETUP",
+            BenchError::Run(_) => "BENCH_RUN",
+            BenchError::Teardown(_) => "BENCH_TEARDOWN",
+            BenchError::Io(_) => "BENCH_IO",
+            BenchError::Serialization(_) => "BENCH_SERIALIZATION",
+        }
+    }
+
+    fn explanation(&self) -> String {
+        match self {
+            BenchError::Setup(e) => format!("The benchmark setup phase failed: {}.", e),
+            BenchError::Run(e) => format!("The benchmark execution phase failed: {}.", e),
+            BenchError::Teardown(e) => format!("The benchmark teardown phase failed: {}.", e),
+            BenchError::Io(e) => format!("An I/O error occurred while writing the benchmark report: {}.", e),
+            BenchError::Serialization(e) => format!("Failed to serialize the benchmark report: {}.", e),
+        }
+    }
+
+    fn suggested_fixes(&self) -> Vec<String> {
+        match self {
+            BenchError::Setup(_) => vec![
+                "Check the setup code for resource initialization errors.".to_string(),
+                "Ensure required environment variables or files are present.".to_string(),
+            ],
+            BenchError::Run(_) => vec![
+                "Debug the workload code for logic errors.".to_string(),
+                "Check for race conditions if the benchmark is multi-threaded.".to_string(),
+            ],
+            BenchError::Teardown(_) => vec![
+                "Check the teardown code for resource cleanup errors.".to_string(),
+            ],
+            BenchError::Io(_) => vec![
+                "Verify that the output directory exists and is writable.".to_string(),
+            ],
+            BenchError::Serialization(_) => vec![
+                "Ensure that all data in the report is serializable to JSON.".to_string(),
+            ],
+        }
+    }
+
+    fn subsystem(&self) -> &'static str {
+        "bench"
+    }
+}
 
 /// Defines a benchmark case.
 #[async_trait::async_trait]

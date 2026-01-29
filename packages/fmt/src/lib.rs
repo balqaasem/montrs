@@ -1,3 +1,6 @@
+// @ai-tool: name="code_format" desc="Formats Rust and view! code according to MontRS standards."
+
+use montrs_core::AiError;
 use std::path::Path;
 use thiserror::Error;
 
@@ -15,6 +18,45 @@ pub enum FormatError {
     Io(#[from] std::io::Error),
     #[error("Macro format error: {0}")]
     Macro(String),
+}
+
+impl AiError for FormatError {
+    fn error_code(&self) -> &'static str {
+        match self {
+            FormatError::Parse(_) => "FMT_PARSE",
+            FormatError::Io(_) => "FMT_IO",
+            FormatError::Macro(_) => "FMT_MACRO",
+        }
+    }
+
+    fn explanation(&self) -> String {
+        match self {
+            FormatError::Parse(e) => format!("Failed to parse Rust source code: {}.", e),
+            FormatError::Io(e) => format!("An I/O error occurred during formatting: {}.", e),
+            FormatError::Macro(e) => format!("An error occurred while formatting a MontRS macro: {}.", e),
+        }
+    }
+
+    fn suggested_fixes(&self) -> Vec<String> {
+        match self {
+            FormatError::Parse(_) => vec![
+                "Check the Rust source code for syntax errors.".to_string(),
+                "Ensure that all macros are properly closed.".to_string(),
+            ],
+            FormatError::Io(_) => vec![
+                "Verify that the file path is correct and accessible.".to_string(),
+                "Check for file system permissions.".to_string(),
+            ],
+            FormatError::Macro(_) => vec![
+                "Check the syntax within the view! or other MontRS macros.".to_string(),
+                "Ensure that the macro contents follow the expected MontRS schema.".to_string(),
+            ],
+        }
+    }
+
+    fn subsystem(&self) -> &'static str {
+        "fmt"
+    }
 }
 
 /// Formats a single Rust file.

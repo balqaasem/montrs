@@ -2,6 +2,7 @@ pub mod command;
 pub mod config;
 pub mod utils;
 pub mod ext;
+pub mod error;
 
 use clap::{Parser, Subcommand};
 
@@ -180,6 +181,15 @@ pub enum Commands {
     },
     /// Upgrade the MontRS CLI to the latest version.
     Upgrade,
+    /// Generate an AI-readable specification and snapshot of the project.
+    Spec {
+        /// Include documentation in the snapshot.
+        #[arg(long)]
+        include_docs: bool,
+        /// Output format (json, yaml).
+        #[arg(long, default_value = "json")]
+        format: String,
+    },
 }
 
 pub async fn run(cli: MontrsCli) -> anyhow::Result<()> {
@@ -242,16 +252,56 @@ pub async fn run(cli: MontrsCli) -> anyhow::Result<()> {
         Commands::Completions { shell } => {
             use clap::CommandFactory;
             let mut cmd = MontrsCli::command();
-            clap_complete::generate(shell, &mut cmd, "montrs", &mut std::io::stdout());
+            let name = cmd.get_name().to_string();
+            clap_complete::generate(shell, &mut cmd, name, &mut std::io::stdout());
             Ok(())
         }
-        Commands::Upgrade => command::upgrade::run().await?,
+        Commands::Spec { include_docs, format } => {
+            command::spec::run(include_docs, format).await
+        }
+        Commands::Upgrade => command::upgrade::run().await,
     }
 }
 
 /// Main entry point for the CLI, handling both standalone and cargo subcommand modes.
 pub fn main_entry() {
     let args: Vec<String> = std::env::args().collect();
+
+    // AI-First: Autogenerate .llm folder on every CLI interaction (even before parsing)
+    if let Ok(cwd) = std::env::current_dir() {
+        let llm_manager = montrs_llm::LlmManager::new(&cwd);
+        let app_name = std::fs::read_to_string("montrs.toml")
+            .ok()
+            .and_then(|c| toml::from_str::<toml::Value>(&c).ok())
+            .and_then(|v| v.get("project").and_then(|p| p.get("name")).and_then(|n| n.as_str()).map(|s| s.to_string()))
+            .unwrap_or_else(|| "app".to_string());
+
+        // Initialize .llm if it doesn't exist
+        if !llm_manager.llm_dir().exists() {
+            if let Err(e) = llm_manager.ensure_dir() {
+                eprintln!("Warning: Failed to create .llm directory: {}", e);
+            }
+        }
+
+        // AI-First: Update tools and snapshot if we are in an existing project
+        if args.len() > 1 && args[1] != "new" {
+            if let Err(e) = llm_manager.write_tools_spec() {
+                eprintln!("Warning: Failed to update tools spec: {}", e);
+            }
+            
+            match llm_manager.generate_snapshot(app_name) {
+                Ok(snapshot) => {
+                    if let Err(e) = llm_manager.write_snapshot(&snapshot, "json") {
+                        eprintln!("AI-First: Failed to write JSON snapshot: {}", e);
+                    }
+                    if let Err(e) = llm_manager.write_snapshot(&snapshot, "txt") {
+                        eprintln!("AI-First: Failed to write TXT snapshot: {}", e);
+                    }
+                }
+                Err(e) => eprintln!("AI-First: Failed to generate LLM snapshot: {}", e),
+            }
+        }
+    }
     
     // Determine if we are being run as a cargo subcommand or standalone
     let cli = if args.get(1).map(|s| s.as_str()) == Some("montrs") {
@@ -268,7 +318,24 @@ pub fn main_entry() {
     if let Err(e) = rt.block_on(run(cli)) {
         use console::style;
         eprintln!("{} Error: {:?}", style("✘").red().bold(), e);
+        
+        // AI-First: Report error to .llm/errorfile.json
+        if let Ok(cwd) = std::env::current_dir() {
+            let llm_manager = montrs_llm::LlmManager::new(&cwd);
+            // Try to downcast to AiError if possible (this is simplified for now)
+            let _ = llm_manager.report_error(format!("{:?}", e));
+        }
+        
         std::process::exit(1);
+    } else {
+        // AI-First: On success, check if we resolved any active errors
+        if let Ok(cwd) = std::env::current_dir() {
+            let llm_manager = montrs_llm::LlmManager::new(&cwd);
+            let diff = llm_manager.generate_diff();
+            if let Err(err) = llm_manager.auto_resolve_active_errors("Build/Command succeeded".to_string(), diff) {
+                eprintln!("AI-First: Failed to resolve active errors: {}", err);
+            }
+        }
     }
 }
 

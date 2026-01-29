@@ -8,12 +8,10 @@ A trait-driven, async-first ORM layer for the MontRS framework.
 
 ## Key Features
 
-- **Multi-Backend support**:
-    - **SQLite**: Using `rusqlite`.
-    - **PostgreSQL**: Using `tokio-postgres` and `deadpool-postgres`.
+- **Multi-Backend support**: SQLite and PostgreSQL.
 - **Async API**: All database operations are `async` from the ground up.
-- **Unified Parameters**: The `ToSql` trait allows passing parameters to different backends using a single API.
-- **Type-Safe Mapping**: The `FromRow` trait ensures database rows are correctly mapped to Rust structs.
+- **Type-Safe Mapping**: `FromRow` trait for Rust structs.
+- **AI-Native Querying**: Metadata hooks for LLMs to understand schema and relationships.
 
 ## Usage
 

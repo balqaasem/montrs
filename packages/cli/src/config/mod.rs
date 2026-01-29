@@ -8,8 +8,6 @@ use anyhow::{Context, Result};
 use cargo_metadata::MetadataCommand;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
-use std::fs;
-use std::path::Path;
 use montrs_fmt::FormatterSettings;
 
 pub mod tailwind;
@@ -74,7 +72,7 @@ pub struct ProjectConfig {
 }
 
 /// Tailwind CSS integration style.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+#[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq, Default)]
 pub enum TailwindStyle {
     /// Automatically detect style.
     #[default]
@@ -110,7 +108,7 @@ fn default_app_name() -> String {
 }
 
 /// Build configuration settings.
-#[derive(Debug, Deserialize, Clone)]
+#[derive(Debug, Deserialize, Serialize, Clone)]
 pub struct BuildConfig {
     /// The HTML file to use as the index page (default: "index.html").
     #[serde(default = "default_target")]
@@ -178,7 +176,7 @@ fn default_assets_dir() -> Option<String> {
 }
 
 /// Development server configuration.
-#[derive(Debug, Deserialize, Clone)]
+#[derive(Debug, Deserialize, Serialize, Clone)]
 pub struct ServeConfig {
     /// The port to listen on (default: 8080).
     #[serde(default = "default_port")]
@@ -205,7 +203,7 @@ fn default_addr() -> String {
 }
 
 /// E2E testing configuration.
-#[derive(Debug, Deserialize, Clone, Default)]
+#[derive(Debug, Deserialize, Serialize, Clone, Default)]
 pub struct E2eConfig {
     /// Run browsers in headless mode.
     #[serde(default)]
@@ -219,7 +217,7 @@ pub struct E2eConfig {
 }
 
 /// Configuration for custom tasks.
-#[derive(Debug, Deserialize, Clone)]
+#[derive(Debug, Deserialize, Serialize, Clone)]
 #[serde(untagged)]
 pub enum TaskConfig {
     /// A simple command string.

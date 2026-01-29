@@ -10,6 +10,11 @@ use std::num::NonZeroU32;
 pub trait Limiter: Send + Sync + 'static {
     /// Returns true if the request is allowed, false otherwise.
     fn check(&self) -> bool;
+
+    /// Returns a description of the rate limiting strategy, useful for AI models.
+    fn description(&self) -> &'static str {
+        "A generic rate limiter."
+    }
 }
 
 /// A rate limiter implementation backed by the governor crate.

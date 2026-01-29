@@ -18,9 +18,11 @@ path = "src/bin/cargo-montrs.rs"
 clap = { version = "4.5", features = ["derive"] }
 tokio = { version = "1.40", features = ["full"] }
 cargo-leptos = { version = "0.3.2", default-features = false, features = ["no_downloads"] }
+thiserror.workspace = true
 anyhow.workspace = true
 serde = { workspace = true, features = ["derive"] }
 serde_json.workspace = true
+serde_yaml = "0.9"
 tracing.workspace = true
 tracing-subscriber = "0.3"
 console = "0.15"
@@ -37,6 +39,10 @@ tempfile = "3.10"
 toml = "0.9.11"
 quick-xml = "0.39.0"
 clap_complete = "4.5.65"
+ignore = "0.4"
+walkdir = "2.5"
+montrs-core = { path = "../core" }
+montrs-llm = { path = "../llm" }
 montrs-bench = { path = "../bench" }
 montrs-fmt = { path = "../fmt" }
 colored = "2.1"

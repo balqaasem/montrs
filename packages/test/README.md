@@ -2,6 +2,13 @@
 
 Deterministic testing utilities for the MontRS framework.
 
+## Key Features
+
+- **Multi-Level Testing**: Unit, Integration, and E2E support.
+- **AI-Guided Test Generation**: Metadata for LLMs to generate valid test cases and fixtures.
+- **E2E Automation**: Integrated Playwright support via `MontrsDriver`.
+- **Deterministic Mocking**: Robust `TestEnv` and `TestRuntime` for predictable results.
+
 ## Overview
 
 `montrs-test` provides the infrastructure needed to write robust unit, integration, and end-to-end tests for MontRS applications. It includes tools for mocking, fixture management, and browser automation.

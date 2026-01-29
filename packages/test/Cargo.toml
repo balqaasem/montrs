@@ -8,6 +8,7 @@ repository.workspace = true
 
 [dependencies]
 montrs-core = { path = "../core" }
+thiserror = "1.0"
 montrs-orm = { path = "../orm" }
 playwright = { package = "playwright-rs", version = "0.8.2", optional = true }
 serde.workspace = true

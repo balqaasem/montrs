@@ -1,0 +1,581 @@
+LlmSnapshot {
+    project_name: "app",
+    timestamp: 2026-01-29T01:01:21.406395700Z,
+    framework_version: "0.1.0",
+    structure: [
+        FileEntry {
+            path: ".github\\actions\\build\\action.yml",
+            description: None,
+        },
+        FileEntry {
+            path: ".github\\workflows\\ci.yml",
+            description: None,
+        },
+        FileEntry {
+            path: ".gitignore",
+            description: None,
+        },
+        FileEntry {
+            path: "Cargo.lock",
+            description: None,
+        },
+        FileEntry {
+            path: "Cargo.toml",
+            description: None,
+        },
+        FileEntry {
+            path: "docs\\appspec.md",
+            description: None,
+        },
+        FileEntry {
+            path: "docs\\architecture.md",
+            description: None,
+        },
+        FileEntry {
+            path: "docs\\benchmarking.md",
+            description: None,
+        },
+        FileEntry {
+            path: "docs\\cli.md",
+            description: None,
+        },
+        FileEntry {
+            path: "docs\\deployment.md",
+            description: None,
+        },
+        FileEntry {
+            path: "docs\\fmt.md",
+            description: None,
+        },
+        FileEntry {
+            path: "docs\\getting-started.md",
+            description: None,
+        },
+        FileEntry {
+            path: "docs\\index.md",
+            description: None,
+        },
+        FileEntry {
+            path: "docs\\modules.md",
+            description: None,
+        },
+        FileEntry {
+            path: "docs\\orm.md",
+            description: None,
+        },
+        FileEntry {
+            path: "docs\\router.md",
+            description: None,
+        },
+        FileEntry {
+            path: "docs\\schema.md",
+            description: None,
+        },
+        FileEntry {
+            path: "docs\\testing.md",
+            description: None,
+        },
+        FileEntry {
+            path: "fmt-prd.md",
+            description: None,
+        },
+        FileEntry {
+            path: "LICENSE-APACHE",
+            description: None,
+        },
+        FileEntry {
+            path: "LICENSE-MIT",
+            description: None,
+        },
+        FileEntry {
+            path: "mont_rs_router_product_requirements_document_prd.md",
+            description: None,
+        },
+        FileEntry {
+            path: "packages\\bench\\Cargo.toml",
+            description: None,
+        },
+        FileEntry {
+            path: "packages\\bench\\docs\\ai-guide.md",
+            description: None,
+        },
+        FileEntry {
+            path: "packages\\bench\\README.md",
+            description: None,
+        },
+        FileEntry {
+            path: "packages\\bench\\src\\config.rs",
+            description: None,
+        },
+        FileEntry {
+            path: "packages\\bench\\src\\lib.rs",
+            description: None,
+        },
+        FileEntry {
+            path: "packages\\bench\\src\\parameter.rs",
+            description: None,
+        },
+        FileEntry {
+            path: "packages\\bench\\src\\report.rs",
+            description: None,
+        },
+        FileEntry {
+            path: "packages\\bench\\src\\runner.rs",
+            description: None,
+        },
+        FileEntry {
+            path: "packages\\bench\\src\\stats.rs",
+            description: None,
+        },
+        FileEntry {
+            path: "packages\\bench\\src\\sys.rs",
+            description: None,
+        },
+        FileEntry {
+            path: "packages\\bench\\src\\weights.rs",
+            description: None,
+        },
+        FileEntry {
+            path: "packages\\bench\\tests\\config_priority.rs",
+            description: None,
+        },
+        FileEntry {
+            path: "packages\\bench\\tests\\integration_test.rs",
+            description: None,
+        },
+        FileEntry {
+            path: "packages\\cli\\Cargo.toml",
+            description: None,
+        },
+        FileEntry {
+            path: "packages\\cli\\docs\\ai-guide.md",
+            description: None,
+        },
+        FileEntry {
+            path: "packages\\cli\\README.md",
+            description: None,
+        },
+        FileEntry {
+            path: "packages\\cli\\src\\bin\\cargo-montrs.rs",
+            description: None,
+        },
+        FileEntry {
+            path: "packages\\cli\\src\\bin\\montrs.rs",
+            description: None,
+        },
+        FileEntry {
+            path: "packages\\cli\\src\\command\\bench.rs",
+            description: None,
+        },
+        FileEntry {
+            path: "packages\\cli\\src\\command\\build.rs",
+            description: None,
+        },
+        FileEntry {
+            path: "packages\\cli\\src\\command\\e2e.rs",
+            description: None,
+        },
+        FileEntry {
+            path: "packages\\cli\\src\\command\\fmt.rs",
+            description: None,
+        },
+        FileEntry {
+            path: "packages\\cli\\src\\command\\mod.rs",
+            description: None,
+        },
+        FileEntry {
+            path: "packages\\cli\\src\\command\\new.rs",
+            description: None,
+        },
+        FileEntry {
+            path: "packages\\cli\\src\\command\\run.rs",
+            description: None,
+        },
+        FileEntry {
+            path: "packages\\cli\\src\\command\\serve.rs",
+            description: None,
+        },
+        FileEntry {
+            path: "packages\\cli\\src\\command\\spec.rs",
+            description: None,
+        },
+        FileEntry {
+            path: "packages\\cli\\src\\command\\test.rs",
+            description: None,
+        },
+        FileEntry {
+            path: "packages\\cli\\src\\command\\upgrade.rs",
+            description: None,
+        },
+        FileEntry {
+            path: "packages\\cli\\src\\command\\watch.rs",
+            description: None,
+        },
+        FileEntry {
+            path: "packages\\cli\\src\\config\\mod.rs",
+            description: None,
+        },
+        FileEntry {
+            path: "packages\\cli\\src\\config\\tailwind.rs",
+            description: None,
+        },
+        FileEntry {
+            path: "packages\\cli\\src\\error.rs",
+            description: None,
+        },
+        FileEntry {
+            path: "packages\\cli\\src\\ext\\mod.rs",
+            description: None,
+        },
+        FileEntry {
+            path: "packages\\cli\\src\\lib.rs",
+            description: None,
+        },
+        FileEntry {
+            path: "packages\\cli\\src\\utils.rs",
+            description: None,
+        },
+        FileEntry {
+            path: "packages\\core\\Cargo.toml",
+            description: None,
+        },
+        FileEntry {
+            path: "packages\\core\\docs\\ai-guide.md",
+            description: None,
+        },
+        FileEntry {
+            path: "packages\\core\\README.md",
+            description: None,
+        },
+        FileEntry {
+            path: "packages\\core\\src\\env.rs",
+            description: None,
+        },
+        FileEntry {
+            path: "packages\\core\\src\\features.rs",
+            description: None,
+        },
+        FileEntry {
+            path: "packages\\core\\src\\lib.rs",
+            description: None,
+        },
+        FileEntry {
+            path: "packages\\core\\src\\limiter.rs",
+            description: None,
+        },
+        FileEntry {
+            path: "packages\\core\\src\\router.rs",
+            description: None,
+        },
+        FileEntry {
+            path: "packages\\core\\src\\validation.rs",
+            description: None,
+        },
+        FileEntry {
+            path: "packages\\fmt\\Cargo.toml",
+            description: None,
+        },
+        FileEntry {
+            path: "packages\\fmt\\docs\\ai-guide.md",
+            description: None,
+        },
+        FileEntry {
+            path: "packages\\fmt\\README.md",
+            description: None,
+        },
+        FileEntry {
+            path: "packages\\fmt\\src\\bin\\montrs-fmt.rs",
+            description: None,
+        },
+        FileEntry {
+            path: "packages\\fmt\\src\\comments.rs",
+            description: None,
+        },
+        FileEntry {
+            path: "packages\\fmt\\src\\config.rs",
+            description: None,
+        },
+        FileEntry {
+            path: "packages\\fmt\\src\\lib.rs",
+            description: None,
+        },
+        FileEntry {
+            path: "packages\\fmt\\src\\macro_fmt.rs",
+            description: None,
+        },
+        FileEntry {
+            path: "packages\\fmt\\tests\\integration.rs",
+            description: None,
+        },
+        FileEntry {
+            path: "packages\\llm\\Cargo.toml",
+            description: None,
+        },
+        FileEntry {
+            path: "packages\\llm\\docs\\ai-guide.md",
+            description: None,
+        },
+        FileEntry {
+            path: "packages\\llm\\docs\\design-system.md",
+            description: None,
+        },
+        FileEntry {
+            path: "packages\\llm\\README.md",
+            description: None,
+        },
+        FileEntry {
+            path: "packages\\llm\\src\\error_parser.rs",
+            description: None,
+        },
+        FileEntry {
+            path: "packages\\llm\\src\\guides.rs",
+            description: None,
+        },
+        FileEntry {
+            path: "packages\\llm\\src\\lib.rs",
+            description: None,
+        },
+        FileEntry {
+            path: "packages\\llm\\tests\\llm_test.rs",
+            description: None,
+        },
+        FileEntry {
+            path: "packages\\montrs\\Cargo.toml",
+            description: None,
+        },
+        FileEntry {
+            path: "packages\\montrs\\src\\bin\\cargo-montrs.rs",
+            description: None,
+        },
+        FileEntry {
+            path: "packages\\montrs\\src\\bin\\montrs.rs",
+            description: None,
+        },
+        FileEntry {
+            path: "packages\\montrs\\src\\lib.rs",
+            description: None,
+        },
+        FileEntry {
+            path: "packages\\orm\\Cargo.toml",
+            description: None,
+        },
+        FileEntry {
+            path: "packages\\orm\\docs\\ai-guide.md",
+            description: None,
+        },
+        FileEntry {
+            path: "packages\\orm\\README.md",
+            description: None,
+        },
+        FileEntry {
+            path: "packages\\orm\\src\\lib.rs",
+            description: None,
+        },
+        FileEntry {
+            path: "packages\\schema\\Cargo.toml",
+            description: None,
+        },
+        FileEntry {
+            path: "packages\\schema\\docs\\ai-guide.md",
+            description: None,
+        },
+        FileEntry {
+            path: "packages\\schema\\README.md",
+            description: None,
+        },
+        FileEntry {
+            path: "packages\\schema\\src\\lib.rs",
+            description: None,
+        },
+        FileEntry {
+            path: "packages\\schema\\tests\\validation_test.rs",
+            description: None,
+        },
+        FileEntry {
+            path: "packages\\test\\Cargo.toml",
+            description: None,
+        },
+        FileEntry {
+            path: "packages\\test\\docs\\ai-guide.md",
+            description: None,
+        },
+        FileEntry {
+            path: "packages\\test\\README.md",
+            description: None,
+        },
+        FileEntry {
+            path: "packages\\test\\src\\e2e.rs",
+            description: None,
+        },
+        FileEntry {
+            path: "packages\\test\\src\\integration.rs",
+            description: None,
+        },
+        FileEntry {
+            path: "packages\\test\\src\\lib.rs",
+            description: None,
+        },
+        FileEntry {
+            path: "packages\\test\\src\\unit.rs",
+            description: None,
+        },
+        FileEntry {
+            path: "README.md",
+            description: None,
+        },
+        FileEntry {
+            path: "rust-toolchain.toml",
+            description: None,
+        },
+        FileEntry {
+            path: "templates\\default\\.gitignore",
+            description: None,
+        },
+        FileEntry {
+            path: "templates\\default\\.vscode\\settings.json",
+            description: None,
+        },
+        FileEntry {
+            path: "templates\\default\\app\\Cargo.toml",
+            description: None,
+        },
+        FileEntry {
+            path: "templates\\default\\app\\src\\main.rs",
+            description: None,
+        },
+        FileEntry {
+            path: "templates\\default\\Cargo.toml",
+            description: None,
+        },
+        FileEntry {
+            path: "templates\\default\\e2e\\Cargo.toml",
+            description: None,
+        },
+        FileEntry {
+            path: "templates\\default\\e2e\\src\\main.rs",
+            description: None,
+        },
+        FileEntry {
+            path: "templates\\default\\montrs.toml",
+            description: None,
+        },
+        FileEntry {
+            path: "templates\\default\\README.md",
+            description: None,
+        },
+        FileEntry {
+            path: "templates\\default\\style\\main.css",
+            description: None,
+        },
+        FileEntry {
+            path: "templates\\default\\tailwind.toml",
+            description: None,
+        },
+        FileEntry {
+            path: "templates\\todo\\.gitignore",
+            description: None,
+        },
+        FileEntry {
+            path: "templates\\todo\\.vscode\\settings.json",
+            description: None,
+        },
+        FileEntry {
+            path: "templates\\todo\\Cargo.toml",
+            description: None,
+        },
+        FileEntry {
+            path: "templates\\todo\\e2e\\Cargo.toml",
+            description: None,
+        },
+        FileEntry {
+            path: "templates\\todo\\e2e\\src\\lib.rs",
+            description: None,
+        },
+        FileEntry {
+            path: "templates\\todo\\e2e\\tests\\e2e.rs",
+            description: None,
+        },
+        FileEntry {
+            path: "templates\\todo\\montrs.toml",
+            description: None,
+        },
+        FileEntry {
+            path: "templates\\todo\\README.md",
+            description: None,
+        },
+        FileEntry {
+            path: "templates\\todo\\src\\main.rs",
+            description: None,
+        },
+        FileEntry {
+            path: "templates\\todo\\style\\main.css",
+            description: None,
+        },
+        FileEntry {
+            path: "templates\\todo\\tailwind.toml",
+            description: None,
+        },
+        FileEntry {
+            path: "templates\\workspace\\.gitignore",
+            description: None,
+        },
+        FileEntry {
+            path: "templates\\workspace\\.vscode\\settings.json",
+            description: None,
+        },
+        FileEntry {
+            path: "templates\\workspace\\apps\\web\\Cargo.toml",
+            description: None,
+        },
+        FileEntry {
+            path: "templates\\workspace\\apps\\web\\src\\main.rs",
+            description: None,
+        },
+        FileEntry {
+            path: "templates\\workspace\\Cargo.toml",
+            description: None,
+        },
+        FileEntry {
+            path: "templates\\workspace\\e2e\\Cargo.toml",
+            description: None,
+        },
+        FileEntry {
+            path: "templates\\workspace\\e2e\\src\\main.rs",
+            description: None,
+        },
+        FileEntry {
+            path: "templates\\workspace\\montrs.toml",
+            description: None,
+        },
+        FileEntry {
+            path: "templates\\workspace\\packages\\ui\\Cargo.toml",
+            description: None,
+        },
+        FileEntry {
+            path: "templates\\workspace\\packages\\ui\\src\\lib.rs",
+            description: None,
+        },
+        FileEntry {
+            path: "templates\\workspace\\README.md",
+            description: None,
+        },
+        FileEntry {
+            path: "templates\\workspace\\style\\main.css",
+            description: None,
+        },
+        FileEntry {
+            path: "templates\\workspace\\tailwind.toml",
+            description: None,
+        },
+        FileEntry {
+            path: "The AI Specfication.md",
+            description: None,
+        },
+    ],
+    modules: [],
+    routes: [],
+    documentation_snippets: {
+        "debugging": "\n# Debugging MontRS\nMontRS provides an `errorfile.txt` in the `.llm` folder when a build or test fails.\nAI models should use this file to understand the context of the error and propose fixes.\n",
+        "architecture": "\n# MontRS Architecture Guide\nMontRS is a trait-driven, deterministic web framework built on Leptos 0.8.\n\n## Core Concepts\n- **AppSpec**: The single source of truth for the application blueprint.\n- **Module**: A unit of composition (Auth, Blog, etc.) that registers routes and providers.\n- **Loaders**: Read-only, idempotent data fetching.\n- **Actions**: State-changing mutations.\n\n## How to build a module\n1. Implement the `Module` trait.\n2. Define your `Loader` and `Action` implementations.\n3. Register them in `register_routes`.\n",
+    },
+}

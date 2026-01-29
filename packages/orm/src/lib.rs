@@ -1,8 +1,11 @@
 //! montrs-orm: A trait-driven ORM layer for MontRS.
 //! This crate defines the DbBackend trait and provides implementations for
 //! SQLite and PostgreSQL, enabling unified database access.
+//!
+//! // @ai-tool: name="db_query" desc="Executes a SQL query on the configured database backend."
 
 use async_trait::async_trait;
+use montrs_core::AiError;
 #[cfg(feature = "postgres")]
 use deadpool_postgres::{Config, Pool, Runtime};
 #[cfg(feature = "sqlite")]
@@ -20,6 +23,48 @@ pub enum DbError {
     Query(String),
     #[error("Migration error: {0}")]
     Migration(String),
+}
+
+impl AiError for DbError {
+    fn error_code(&self) -> &'static str {
+        match self {
+            DbError::Connection(_) => "DB_CONNECTION",
+            DbError::Query(_) => "DB_QUERY",
+            DbError::Migration(_) => "DB_MIGRATION",
+        }
+    }
+
+    fn explanation(&self) -> String {
+        match self {
+            DbError::Connection(e) => format!("Failed to establish a connection to the database: {}.", e),
+            DbError::Query(e) => format!("An error occurred while executing a SQL query: {}.", e),
+            DbError::Migration(e) => format!("Database migration failed: {}.", e),
+        }
+    }
+
+    fn suggested_fixes(&self) -> Vec<String> {
+        match self {
+            DbError::Connection(_) => vec![
+                "Verify that the database server is running.".to_string(),
+                "Check your connection string and credentials in the environment configuration.".to_string(),
+                "Ensure that the network path to the database is accessible.".to_string(),
+            ],
+            DbError::Query(_) => vec![
+                "Check the SQL syntax for errors.".to_string(),
+                "Ensure all tables and columns referenced in the query exist.".to_string(),
+                "Verify that the parameters passed to the query match the expected types.".to_string(),
+            ],
+            DbError::Migration(_) => vec![
+                "Check for conflicts in migration files.".to_string(),
+                "Ensure the database user has sufficient permissions to modify the schema.".to_string(),
+                "Verify that the migration scripts are compatible with the target database backend.".to_string(),
+            ],
+        }
+    }
+
+    fn subsystem(&self) -> &'static str {
+        "orm"
+    }
 }
 
 /// A unified trait for parameters to support multiple backends.

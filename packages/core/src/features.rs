@@ -9,6 +9,7 @@ use std::collections::HashMap;
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct FeatureFlag {
     pub name: String,
+    pub description: Option<String>,
     pub enabled: bool,
     /// Optional whitelist of segments that have access to this feature.
     pub segment_whitelist: Vec<String>,
