@@ -26,9 +26,9 @@ It is the engine behind the `montrs bench` command. It allows developers to veri
 - When validating the performance of a new MontRS module before submission.
 
 ## 6. Deeper Documentation
-- [Benchmarking Best Practices](../../docs/benchmarking.md)
-- [Interpreting Statistics](../../docs/benchmarking.md#statistics)
-- [Writing Advanced Benchmarks](../../docs/benchmarking.md#advanced-usage)
+- [Benchmarking Best Practices](../../docs/testing/benchmarking.md)
+- [Interpreting Statistics](../../docs/testing/benchmarking.md#statistics)
+- [Writing Advanced Benchmarks](../../docs/testing/benchmarking.md#advanced-usage)
 
 ## 7. Notes for AI Agents
 - **Native Mode**: The CLI supports `montrs bench --simple <FILE>` which uses this package to run quick, zero-config benchmarks.

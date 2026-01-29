@@ -27,9 +27,9 @@ It is the **entry point** for developers. It coordinates the lifecycle of an app
 - When generating an AI-ready specification (`montrs spec`).
 
 ## 6. Deeper Documentation
-- [CLI Command Reference](../../docs/cli.md)
-- [Project Configuration](../../docs/getting-started.md#configuration)
-- [Task Runner Guide](../../docs/tasks.md)
+- [CLI Command Reference](../../docs/tooling/cli.md)
+- [Project Configuration](../../docs/getting-started/introduction.md#configuration)
+- [Task Runner Guide](../../docs/tooling/tasks.md)
 
 ## 7. Notes for AI Agents
 - **Primary Tool**: Use `montrs spec` to get a machine-readable view of the current project state.

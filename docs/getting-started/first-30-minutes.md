@@ -27,7 +27,7 @@ MontRS is a Rust-native, trait-driven web framework built for teams that value *
 To build effectively with MontRS, you only need to understand four core concepts:
 
 1.  **Signals**: Fine-grained reactivity. Instead of re-rendering everything, MontRS updates only the specific parts of the UI that change when a "Signal" value is updated.
-2.  **Modules**: The unit of organization. Your app is a collection of independent modules (Pallets) that register their own routes and logic.
+2.  **Modules**: The unit of organization. Your app is a collection of independent modules that register their own routes and logic.
 3.  **Routes (Loaders & Actions)**: The boundaries of your app.
     -   **Loaders** are for reading data (GET).
     -   **Actions** are for writing/mutating data (POST/PUT/DELETE).

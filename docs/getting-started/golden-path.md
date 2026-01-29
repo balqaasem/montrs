@@ -21,9 +21,9 @@ Avoid mixing data fetching and mutations. Use `Loader` for read operations and `
 - **Loaders**: Should be side-effect free and return the state needed for a view.
 - **Actions**: Should handle validation, persistence, and return the result of the mutation.
 
-## 3. Modularize with Pallets
+## 3. Modularize with Modules
 
-Group related functionality into a `Module`. If the functionality is reusable across projects, package it as a "Pallet."
+Group related functionality into a `Module`. If the functionality is reusable across projects, package it as a standalone crate.
 
 ```rust
 impl Module for TodoModule {

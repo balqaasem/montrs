@@ -26,9 +26,9 @@ It provides the **persistence layer** for `Module`s. It implements the traits de
 - When defining data models that need to be persisted in a relational database.
 
 ## 6. Deeper Documentation
-- [ORM Architecture](../../docs/orm.md)
-- [Backend Support Guide](../../docs/orm-backends.md)
-- [Async Patterns in ORM](../../docs/orm-async.md)
+- [ORM Architecture](../../docs/orm/index.md)
+- [Backend Support Guide](../../docs/orm/backends.md)
+- [Async Patterns in ORM](../../docs/orm/async.md)
 
 ## 7. Notes for AI Agents
 - **SQL Preference**: Prefer writing raw SQL queries using the provided backend execute methods over complex abstractions.

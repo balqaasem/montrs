@@ -65,22 +65,22 @@ impl Loader for HelloLoader {
 
 ### 1. Application Developers
 *People building apps **with** MontRS.*
-- [First 30 Minutes](docs/first-30-minutes.md): **Start here!** Your first onboarding experience.
-- [Getting Started](docs/getting-started.md): Your first 10 minutes.
-- [The Golden Path](docs/golden-path.md): How to build the right way.
-- [Common Pitfalls](docs/pitfalls.md): What to avoid.
+- [First 30 Minutes](docs/getting-started/first-30-minutes.md): **Start here!** Your first onboarding experience.
+- [Introduction](docs/getting-started/introduction.md): Your first 10 minutes.
+- [The Golden Path](docs/getting-started/golden-path.md): How to build the right way.
+- [Common Pitfalls](docs/guides/pitfalls.md): What to avoid.
 
 ### 2. Framework Contributors
 *People working **on** MontRS itself.*
-- [Architecture Overview](docs/architecture.md): How the engine works.
-- [Package Boundaries](docs/packages.md): Responsibility of each crate.
-- [Invariants & Philosophy](docs/philosophy.md): The rules we don't break.
+- [Architecture Overview](docs/architecture/overview.md): How the engine works.
+- [Package Boundaries](docs/architecture/packages.md): Responsibility of each crate.
+- [Invariants & Philosophy](docs/architecture/philosophy.md): The rules we don't break.
 
 ### 3. AI Agents
 *Machine-readable context for models.*
-- [AI Condensed Onboarding](docs/ai-onboarding.md): **Start here!** Rules and invariants for AI agents.
+- [AI Condensed Onboarding](docs/ai/onboarding.md): **Start here!** Rules and invariants for AI agents.
 - [AI Usage Guide](packages/llm/README.md): How to use `llm.json` and `tools.json`.
-- [Spec Snapshot](docs/spec.md): Understanding the machine-readable project state.
+- [Spec Snapshot](docs/ai/spec.md): Understanding the machine-readable project state.
 - **Metadata Markers**: Look for `@ai-tool` and `AiError` implementations in the source.
 
 ---

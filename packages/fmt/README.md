@@ -26,10 +26,10 @@ It is integrated into the CLI as the `montrs fmt` command. It ensures that all p
 - When they need to verify formatting in CI (`montrs fmt --check`).
 
 ## 6. Deeper Documentation
-- [The Cascade of Truth](../../docs/fmt.md#the-cascade-of-truth) - Understanding how configuration is resolved.
-- [View Macro Formatting](../../docs/fmt.md#view-macro-formatting) - Detailed rules and examples for `view!` blocks.
-- [Configuration Reference](../../docs/fmt.md#configuration-reference) - Full list of available `[fmt]` settings.
-- [Span-Gap Algorithm](../../docs/fmt.md#internal-architecture-the-span-gap-algorithm) - For framework contributors.
+- [The Cascade of Truth](../../docs/tooling/fmt.md#the-cascade-of-truth) - Understanding how configuration is resolved.
+- [View Macro Formatting](../../docs/tooling/fmt.md#view-macro-formatting) - Detailed rules and examples for `view!` blocks.
+- [Configuration Reference](../../docs/tooling/fmt.md#configuration-reference) - Full list of available `[fmt]` settings.
+- [Span-Gap Algorithm](../../docs/tooling/fmt.md#internal-architecture-the-span-gap-algorithm) - For framework contributors.
 
 ## 7. Notes for AI Agents
 - **Formatting Constraints**: When generating code for MontRS, follow the rules defined in `montrs.toml` under the `[fmt]` section.

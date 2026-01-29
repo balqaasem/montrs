@@ -26,9 +26,8 @@ It acts as a **sidecar** to the CLI. While the CLI handles the "doing," `montrs-
 - When implementing a new error reporting or diagnostics system.
 
 ## 6. Deeper Documentation
-- [AI Specification Reference](../../The%20AI%20Specfication.md)
-- [Snapshot Structure Guide](../../docs/spec.md)
-- [Error Tracking Lifecycle](../../docs/errors.md)
+- [Snapshot Structure Guide](../../docs/ai/spec.md)
+- [Error Tracking Lifecycle](../../docs/core/errors.md)
 
 ## 7. Notes for AI Agents
 - **Self-Documentation**: This package is the primary source of truth for your own capabilities within a MontRS project.

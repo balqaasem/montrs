@@ -8,7 +8,7 @@ MontRS uses a **heuristic discovery engine** to map your source code into an `Ap
 
 1.  **Static Analysis**: The CLI scans your `src/` directory for implementations of core traits (`Module`, `Loader`, `Action`).
 2.  **Metadata Extraction**: It invokes the `description()`, `input_schema()`, and `output_schema()` methods on these implementations.
-3.  **Dependency Mapping**: It identifies how modules are composed and which pallets are being used.
+3.  **Dependency Mapping**: It identifies how modules are composed and which external modules are being used.
 4.  **Serialization**: The resulting graph is serialized into `.llm/llm.json` (for AI context) and used internally by the CLI to orchestrate the build.
 
 ## 🛠️ The Structure of a Spec

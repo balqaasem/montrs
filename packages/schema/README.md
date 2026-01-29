@@ -26,9 +26,9 @@ It is used in the **Data Layer**. It integrates with `montrs-core` to provide va
 - When they want to provide clear validation metadata to an AI agent.
 
 ## 6. Deeper Documentation
-- [Schema Attributes Reference](../../docs/schema.md)
-- [Custom Validation Logic](../../docs/schema.md#custom-validation)
-- [AI-First Validation Metadata](../../docs/schema.md#ai-integration)
+- [Schema Attributes Reference](../../docs/core/schema.md)
+- [Custom Validation Logic](../../docs/core/schema.md#custom-validation)
+- [AI-First Validation Metadata](../../docs/core/schema.md#ai-integration)
 
 ## 7. Notes for AI Agents
 - **Constraint Discovery**: Use the `#[schema(...)]` attributes to understand the valid range and format of any field.

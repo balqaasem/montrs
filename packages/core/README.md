@@ -26,9 +26,9 @@ This is the **root dependency**. Every other package in the ecosystem depends on
 - When building a new integration package for MontRS.
 
 ## 6. Deeper Documentation
-- [Architecture Overview](../../docs/architecture.md)
-- [Module Lifecycle](../../docs/modules.md)
-- [Routing System](../../docs/router.md)
+- [Architecture Overview](../../docs/architecture/overview.md)
+- [Module Lifecycle](../../docs/core/modules.md)
+- [Routing System](../../docs/core/router.md)
 
 ## 7. Notes for AI Agents
 - **Core Contract**: All significant framework behaviors are defined via traits in this package.

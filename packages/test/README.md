@@ -26,10 +26,10 @@ It is the **validation layer**. It uses the `AppSpec` from `montrs-core` to spin
 - When creating end-to-end user journey tests using a browser.
 
 ## 6. Deeper Documentation
-- [Testing Philosophy](../../docs/testing.md)
-- [Using the TestRuntime](../../docs/testing.md#test-runtime)
-- [E2E with MontrsDriver](../../docs/testing.md#e2e-testing)
-- [Table-Driven Testing](../../docs/testing.md#table-driven-tests)
+- [Testing Philosophy](../../docs/testing/index.md)
+- [Using the TestRuntime](../../docs/testing/index.md#test-runtime)
+- [E2E with MontrsDriver](../../docs/testing/index.md#e2e-testing)
+- [Table-Driven Testing](../../docs/testing/index.md#table-driven-tests)
 
 ## 7. Notes for AI Agents
 - **Deterministic Assertions**: Use `expect(...)` for fluent, human-readable assertions in generated tests.

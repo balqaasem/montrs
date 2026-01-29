@@ -1,6 +1,6 @@
-# Modules and Pallets: Composable Applications
+# Modules: Composable Applications
 
-In MontRS, a **Module** is the primary unit of composition. Applications are built by combining multiple modules (often called "Pallets" when they are reusable components).
+In MontRS, a **Module** is the primary unit of composition. Applications are built by combining multiple modules (often called "reusable modules" when they are shared components).
 
 ## 🧩 What is a Module?
 
@@ -17,25 +17,25 @@ impl Module for AuthModule {
 }
 ```
 
-## 📦 Pallets: Reusable Modules
+## 📦 Reusable Modules
 
-Pallets are modules designed to be shared across projects. Examples include:
-- `AuthPallet`: Handles user authentication and sessions.
-- `BlogPallet`: Provides a complete blogging engine.
-- `AdminPallet`: Generates an administrative dashboard.
+Reusable modules are designed to be shared across projects. Examples include:
+- `AuthModule`: Handles user authentication and sessions.
+- `BlogModule`: Provides a complete blogging engine.
+- `AdminModule`: Generates an administrative dashboard.
 
-## 🛠️ Practical Example: Creating a Pallet
+## 🛠️ Practical Example: Creating a Reusable Module
 
-A Pallet is just a reusable module. Here is how you might structure one:
+A reusable module is just a standard module designed for portability. Here is how you might structure one:
 
 ```rust
-// packages/pallets/blog/src/lib.rs
-pub struct BlogPallet {
+// packages/modules/blog/src/lib.rs
+pub struct BlogModule {
     pub db_pool: Database,
 }
 
-impl Module for BlogPallet {
-    fn name(&self) -> &str { "BlogPallet" }
+impl Module for BlogModule {
+    fn name(&self) -> &str { "BlogModule" }
     
     fn description(&self) -> Option<String> {
         Some("A complete blogging system with posts and comments.".to_string())
