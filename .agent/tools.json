@@ -1,0 +1,163 @@
+{
+  "tools": [
+    {
+      "description": "Builds the MontRS project.",
+      "name": "montrs_build",
+      "parameters": {
+        "properties": {
+          "release": {
+            "description": "Build in release mode",
+            "type": "boolean"
+          }
+        },
+        "type": "object"
+      }
+    },
+    {
+      "description": "Generates a project specification.",
+      "name": "montrs_spec",
+      "parameters": {
+        "properties": {
+          "format": {
+            "enum": [
+              "json",
+              "yaml",
+              "txt"
+            ],
+            "type": "string"
+          }
+        },
+        "type": "object"
+      }
+    },
+    {
+      "description": "Formats the project's Rust and view! code.",
+      "name": "montrs_fmt",
+      "parameters": {
+        "properties": {
+          "check": {
+            "description": "Check if files are formatted without modifying them",
+            "type": "boolean"
+          },
+          "path": {
+            "description": "Path to format (default: .)",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      }
+    },
+    {
+      "description": "Capability provided by package bench. Refer to its README for details.",
+      "name": "montrs_pkg_bench",
+      "parameters": {
+        "properties": {},
+        "type": "object"
+      }
+    },
+    {
+      "description": "Runs performance benchmarks for the project or specific targets.",
+      "name": "bench_run",
+      "parameters": {
+        "properties": {},
+        "type": "object"
+      }
+    },
+    {
+      "description": "Capability provided by package cli. Refer to its README for details.",
+      "name": "montrs_pkg_cli",
+      "parameters": {
+        "properties": {},
+        "type": "object"
+      }
+    },
+    {
+      "description": "Capability provided by package core. Refer to its README for details.",
+      "name": "montrs_pkg_core",
+      "parameters": {
+        "properties": {},
+        "type": "object"
+      }
+    },
+    {
+      "description": "Capability provided by package fmt. Refer to its README for details.",
+      "name": "montrs_pkg_fmt",
+      "parameters": {
+        "properties": {},
+        "type": "object"
+      }
+    },
+    {
+      "description": "Formats Rust and view! code according to MontRS standards.",
+      "name": "code_format",
+      "parameters": {
+        "properties": {},
+        "type": "object"
+      }
+    },
+    {
+      "description": "Capability provided by package llm. Refer to its README for details.",
+      "name": "montrs_pkg_llm",
+      "parameters": {
+        "properties": {},
+        "type": "object"
+      }
+    },
+    {
+      "description": "description",
+      "name": "tool_name",
+      "parameters": {
+        "properties": {},
+        "type": "object"
+      }
+    },
+    {
+      "description": "description",
+      "name": "name",
+      "parameters": {
+        "properties": {},
+        "type": "object"
+      }
+    },
+    {
+      "description": "Capability provided by package orm. Refer to its README for details.",
+      "name": "montrs_pkg_orm",
+      "parameters": {
+        "properties": {},
+        "type": "object"
+      }
+    },
+    {
+      "description": "Executes a SQL query on the configured database backend.",
+      "name": "db_query",
+      "parameters": {
+        "properties": {},
+        "type": "object"
+      }
+    },
+    {
+      "description": "Capability provided by package schema. Refer to its README for details.",
+      "name": "montrs_pkg_schema",
+      "parameters": {
+        "properties": {},
+        "type": "object"
+      }
+    },
+    {
+      "description": "Capability provided by package test. Refer to its README for details.",
+      "name": "montrs_pkg_test",
+      "parameters": {
+        "properties": {},
+        "type": "object"
+      }
+    },
+    {
+      "description": "Runs unit, integration, and end-to-end tests for the MontRS project.",
+      "name": "test_run",
+      "parameters": {
+        "properties": {},
+        "type": "object"
+      }
+    }
+  ]
+}

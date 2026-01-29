@@ -1,7 +1,8 @@
 //! montrs-core/src/env.rs: Typed environment variable management.
-//! This module provides traits and implementations for accessing environment
+//! This file provides traits and implementations for accessing environment
 //! variables in a type-safe and mockable manner.
 
+use crate::AgentError;
 use std::error::Error;
 use std::fmt;
 
@@ -23,6 +24,38 @@ impl fmt::Display for EnvError {
 
 impl Error for EnvError {}
 
+impl AgentError for EnvError {
+    fn error_code(&self) -> &'static str {
+        match self {
+            EnvError::MissingKey(_) => "ENV_MISSING_KEY",
+            EnvError::InvalidType(_) => "ENV_INVALID_TYPE",
+        }
+    }
+
+    fn explanation(&self) -> String {
+        match self {
+            EnvError::MissingKey(k) => format!("The application expected the environment variable '{}' to be set, but it was not found.", k),
+            EnvError::InvalidType(k) => format!("The environment variable '{}' was found, but its value could not be parsed into the expected type.", k),
+        }
+    }
+
+    fn suggested_fixes(&self) -> Vec<String> {
+        match self {
+            EnvError::MissingKey(k) => vec![
+                format!("Set the '{}' environment variable in your shell or .env file.", k),
+                format!("Check if '{}' is correctly spelled in your configuration.", k),
+            ],
+            EnvError::InvalidType(k) => vec![
+                format!("Ensure the value of '{}' matches the expected format (e.g., a number, boolean, or valid string).", k),
+            ],
+        }
+    }
+
+    fn subsystem(&self) -> &'static str {
+        "env"
+    }
+}
+
 /// Trait for types that can be initialized from an environment variable string.
 pub trait FromEnv: Sized {
     fn from_env(val: String) -> Result<Self, EnvError>;
@@ -39,6 +72,11 @@ impl FromEnv for String {
 pub trait EnvConfig: Send + Sync + 'static {
     /// Retrieves a raw string value for the given key.
     fn get_var(&self, key: &str) -> Result<String, EnvError>;
+
+    /// Returns a list of expected environment variables and their descriptions.
+    fn vars(&self) -> std::collections::HashMap<String, String> {
+        std::collections::HashMap::new()
+    }
 }
 
 /// Extension trait to provide ergonomic typed access to environment variables.

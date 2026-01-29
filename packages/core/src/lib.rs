@@ -19,11 +19,37 @@ pub use router::{Action, ActionCtx, Loader, LoaderCtx, Router};
 pub use validation::{Validate, ValidationError};
 
 use async_trait::async_trait;
+use serde::{Deserialize, Serialize};
 use std::error::Error as StdError;
+
+/// A trait for errors that provide agent-accessible metadata.
+pub trait AgentError: StdError {
+    /// A stable identifier for the error type.
+    fn error_code(&self) -> &'static str;
+
+    /// A structured explanation of the error, its cause, and context.
+    fn explanation(&self) -> String;
+
+    /// Suggested fixes or remediation steps.
+    fn suggested_fixes(&self) -> Vec<String> {
+        Vec::new()
+    }
+
+    /// The subsystem or package where the error originated.
+    fn subsystem(&self) -> &'static str {
+        "core"
+    }
+
+    /// Optional raw compiler error if applicable.
+    fn rustc_error(&self) -> Option<String> {
+        None
+    }
+}
 
 /// The execution environment context for the application.
 /// Used to differentiate logic between server-side rendering, WASM hydration,
 /// and other deployment targets like Edge or Mobile.
+#[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq)]
 pub enum Target {
     /// Server-side rendering (SSR) context.
     Server,
@@ -41,33 +67,43 @@ pub enum Target {
 
 /// The unit of composition in MontRS.
 ///
-/// A `Module` encapsulates a logical piece of functionality (e.g., Auth, Users, Blog).
+/// A `Plate` encapsulates a logical piece of functionality (e.g., Auth, Users, Blog).
 /// It provides hooks for initialization, context provision, and route registration.
-/// Modules are designed to be portable across different `Target` environments.
+/// Plates are designed to be portable across different `Target` environments.
 #[async_trait]
-pub trait Module<C: AppConfig>: Send + Sync + 'static {
-    /// Returns a static name for the module, used for logging and debugging.
+pub trait Plate<C: AppConfig>: Send + Sync + 'static {
+    /// Returns a static name for the plate, used for logging and debugging.
     fn name(&self) -> &'static str;
 
-    /// The primary initialization point for a module.
+    /// Returns a description of what this plate does, useful for agents.
+    fn description(&self) -> &'static str {
+        ""
+    }
+
+    /// Returns key-value metadata for the plate.
+    fn metadata(&self) -> std::collections::HashMap<String, String> {
+        std::collections::HashMap::new()
+    }
+
+    /// The primary initialization point for a plate.
     ///
     /// This is called during the application bootstrap process. It should be used to:
     /// 1. Initialize local resources (database connections, etc.)
     /// 2. Provide Leptos contexts using `provide_context`.
     /// 3. Perform any required async setup.
-    async fn init(&self, ctx: &mut ModuleContext<C>)
+    async fn init(&self, ctx: &mut PlateContext<C>)
     -> Result<(), Box<dyn StdError + Send + Sync>>;
 
-    /// Register routes for this module.
+    /// Register routes for this plate.
     ///
-    /// This allows modules to define their own URL structure and link them to
+    /// This allows plates to define their own URL structure and link them to
     /// specific Loaders and Actions.
     fn register_routes(&self, _router: &mut Router<C>) {}
 }
 
-/// Dynamic context provided to modules during their `init` phase.
+/// Dynamic context provided to plates during their `init` phase.
 /// Includes access to the global application configuration and environment.
-pub struct ModuleContext<'a, C: AppConfig> {
+pub struct PlateContext<'a, C: AppConfig> {
     /// The strongly-typed application configuration.
     pub config: &'a C,
     /// The environment variable provider.
@@ -83,18 +119,23 @@ pub trait AppConfig: Sized + Send + Sync + Clone + 'static {
     type Error: StdError + Send + Sync;
     /// The strongly-typed environment configuration.
     type Env: EnvConfig + Clone;
+
+    /// Returns key-value metadata for the application.
+    fn metadata(&self) -> std::collections::HashMap<String, String> {
+        std::collections::HashMap::new()
+    }
 }
 
 /// The deterministic blueprint of a MontRS application.
 ///
 /// `AppSpec` contains everything needed to boot the application: configuration,
-/// registered modules, the environment, and the routing table. It is the single
+/// registered plates, the environment, and the routing table. It is the single
 /// source of truth for the application's structure.
 pub struct AppSpec<C: AppConfig> {
     /// Global application configuration.
     pub config: C,
-    /// List of registered functional modules.
-    pub modules: Vec<Box<dyn Module<C>>>,
+    /// List of registered functional plates.
+    pub plates: Vec<Box<dyn Plate<C>>>,
     /// Resolved environment configuration.
     pub env: C::Env,
     /// The centralized routing table.
@@ -103,21 +144,51 @@ pub struct AppSpec<C: AppConfig> {
     pub target: Target,
 }
 
+/// A serializable version of AppSpec for external consumption (e.g., by agents).
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct AppSpecExport {
+    pub name: String,
+    pub target: Target,
+    pub plates: Vec<PlateMetadata>,
+    pub router: crate::router::RouterSpec,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct PlateMetadata {
+    pub name: String,
+    pub description: String,
+    pub metadata: std::collections::HashMap<String, String>,
+}
+
 impl<C: AppConfig> AppSpec<C> {
+    /// Exports the application specification to a serializable format.
+    pub fn export_spec(&self, app_name: &str) -> AppSpecExport {
+        AppSpecExport {
+            name: app_name.to_string(),
+            target: self.target,
+            plates: self.plates.iter().map(|m| PlateMetadata {
+                name: m.name().to_string(),
+                description: m.description().to_string(),
+                metadata: m.metadata(),
+            }).collect(),
+            router: self.router.spec(),
+        }
+    }
+
     /// Creates a new, empty AppSpec with required config and environment.
     pub fn new(config: C, env: C::Env) -> Self {
         Self {
             config,
-            modules: Vec::new(),
+            plates: Vec::new(),
             env,
             router: Router::new(),
             target: Target::Server,
         }
     }
 
-    /// Builder method to add a module to the specification.
-    pub fn with_module(mut self, module: Box<dyn Module<C>>) -> Self {
-        self.modules.push(module);
+    /// Builder method to add a plate to the specification.
+    pub fn with_plate(mut self, plate: Box<dyn Plate<C>>) -> Self {
+        self.plates.push(plate);
         self
     }
 
@@ -131,7 +202,7 @@ impl<C: AppConfig> AppSpec<C> {
     ///
     /// Inside this method:
     /// 1. The global config and env are provided as Leptos contexts.
-    /// 2. All registered modules are initialized sequentially.
+    /// 2. All registered plates are initialized sequentially.
     /// 3. The `main_view` is rendered as the application root.
     pub fn mount<F, IV>(self, main_view: F)
     where
@@ -140,16 +211,16 @@ impl<C: AppConfig> AppSpec<C> {
     {
         let config = self.config;
         let env = self.env;
-        let modules = self.modules;
+        let plates = self.plates;
 
         leptos::mount::mount_to_body(move || {
             // Provide global application context for easy access via use_context().
             provide_context(config.clone());
             provide_context(env.clone());
 
-            // Initialize modules.
-            for module in modules {
-                println!("Booting module: {}", module.name());
+            // Initialize plates.
+            for plate in plates {
+                println!("Booting plate: {}", plate.name());
                 // In v0.1, we acknowledge the async balance; true async init
                 // typically happens outside the reactive loop or via Resources.
             }

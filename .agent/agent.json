@@ -1,0 +1,606 @@
+{
+  "project_name": "app",
+  "timestamp": "2026-01-29T05:00:02.853845700Z",
+  "framework_version": "0.1.0",
+  "structure": [
+    {
+      "path": ".github\\actions\\build\\action.yml",
+      "description": null
+    },
+    {
+      "path": ".github\\workflows\\ci.yml",
+      "description": null
+    },
+    {
+      "path": ".gitignore",
+      "description": null
+    },
+    {
+      "path": "Cargo.lock",
+      "description": null
+    },
+    {
+      "path": "Cargo.toml",
+      "description": null
+    },
+    {
+      "path": "docs\\appspec.md",
+      "description": null
+    },
+    {
+      "path": "docs\\architecture.md",
+      "description": null
+    },
+    {
+      "path": "docs\\benchmarking.md",
+      "description": null
+    },
+    {
+      "path": "docs\\cli.md",
+      "description": null
+    },
+    {
+      "path": "docs\\deployment.md",
+      "description": null
+    },
+    {
+      "path": "docs\\fmt.md",
+      "description": null
+    },
+    {
+      "path": "docs\\getting-started.md",
+      "description": null
+    },
+    {
+      "path": "docs\\index.md",
+      "description": null
+    },
+    {
+      "path": "docs\\plates.md",
+      "description": null
+    },
+    {
+      "path": "docs\\orm.md",
+      "description": null
+    },
+    {
+      "path": "docs\\router.md",
+      "description": null
+    },
+    {
+      "path": "docs\\schema.md",
+      "description": null
+    },
+    {
+      "path": "docs\\testing.md",
+      "description": null
+    },
+    {
+      "path": "fmt-prd.md",
+      "description": null
+    },
+    {
+      "path": "LICENSE-APACHE",
+      "description": null
+    },
+    {
+      "path": "LICENSE-MIT",
+      "description": null
+    },
+    {
+      "path": "mont_rs_router_product_requirements_document_prd.md",
+      "description": null
+    },
+    {
+      "path": "packages\\bench\\Cargo.toml",
+      "description": null
+    },
+    {
+      "path": "packages\\bench\\docs\\ai-guide.md",
+      "description": null
+    },
+    {
+      "path": "packages\\bench\\README.md",
+      "description": null
+    },
+    {
+      "path": "packages\\bench\\src\\config.rs",
+      "description": "Parses a duration from a string (in seconds)."
+    },
+    {
+      "path": "packages\\bench\\src\\lib.rs",
+      "description": "Professional-grade benchmarking utilities for MontRS."
+    },
+    {
+      "path": "packages\\bench\\src\\parameter.rs",
+      "description": "Represents a benchmark parameter with a range of values."
+    },
+    {
+      "path": "packages\\bench\\src\\report.rs",
+      "description": "A full benchmark report containing system info and results."
+    },
+    {
+      "path": "packages\\bench\\src\\runner.rs",
+      "description": "The main entry point for running benchmarks."
+    },
+    {
+      "path": "packages\\bench\\src\\stats.rs",
+      "description": "Statistical analysis of benchmark results."
+    },
+    {
+      "path": "packages\\bench\\src\\sys.rs",
+      "description": "Captures system information for the benchmark report."
+    },
+    {
+      "path": "packages\\bench\\src\\weights.rs",
+      "description": "Weight utilities for resource accounting and performance modeling."
+    },
+    {
+      "path": "packages\\bench\\tests\\config_priority.rs",
+      "description": null
+    },
+    {
+      "path": "packages\\bench\\tests\\integration_test.rs",
+      "description": null
+    },
+    {
+      "path": "packages\\cli\\Cargo.toml",
+      "description": null
+    },
+    {
+      "path": "packages\\cli\\docs\\ai-guide.md",
+      "description": null
+    },
+    {
+      "path": "packages\\cli\\README.md",
+      "description": null
+    },
+    {
+      "path": "packages\\cli\\src\\bin\\cargo-montrs.rs",
+      "description": null
+    },
+    {
+      "path": "packages\\cli\\src\\bin\\montrs.rs",
+      "description": null
+    },
+    {
+      "path": "packages\\cli\\src\\command\\bench.rs",
+      "description": "Bench command handler."
+    },
+    {
+      "path": "packages\\cli\\src\\command\\build.rs",
+      "description": null
+    },
+    {
+      "path": "packages\\cli\\src\\command\\e2e.rs",
+      "description": "E2E test command."
+    },
+    {
+      "path": "packages\\cli\\src\\command\\fmt.rs",
+      "description": null
+    },
+    {
+      "path": "packages\\cli\\src\\command\\mod.rs",
+      "description": null
+    },
+    {
+      "path": "packages\\cli\\src\\command\\new.rs",
+      "description": null
+    },
+    {
+      "path": "packages\\cli\\src\\command\\run.rs",
+      "description": null
+    },
+    {
+      "path": "packages\\cli\\src\\command\\serve.rs",
+      "description": null
+    },
+    {
+      "path": "packages\\cli\\src\\command\\spec.rs",
+      "description": null
+    },
+    {
+      "path": "packages\\cli\\src\\command\\test.rs",
+      "description": "Test command implementation for MontRS."
+    },
+    {
+      "path": "packages\\cli\\src\\command\\upgrade.rs",
+      "description": null
+    },
+    {
+      "path": "packages\\cli\\src\\command\\watch.rs",
+      "description": null
+    },
+    {
+      "path": "packages\\cli\\src\\config\\mod.rs",
+      "description": "Configuration plate for MontRS."
+    },
+    {
+      "path": "packages\\cli\\src\\config\\tailwind.rs",
+      "description": null
+    },
+    {
+      "path": "packages\\cli\\src\\error.rs",
+      "description": null
+    },
+    {
+      "path": "packages\\cli\\src\\ext\\mod.rs",
+      "description": null
+    },
+    {
+      "path": "packages\\cli\\src\\lib.rs",
+      "description": "Build artifacts in release mode, with optimizations."
+    },
+    {
+      "path": "packages\\cli\\src\\utils.rs",
+      "description": null
+    },
+    {
+      "path": "packages\\core\\Cargo.toml",
+      "description": null
+    },
+    {
+      "path": "packages\\core\\docs\\ai-guide.md",
+      "description": null
+    },
+    {
+      "path": "packages\\core\\README.md",
+      "description": null
+    },
+    {
+      "path": "packages\\core\\src\\env.rs",
+      "description": "montrs-core/src/env.rs: Typed environment variable management."
+    },
+    {
+      "path": "packages\\core\\src\\features.rs",
+      "description": "montrs-core/src/features.rs: Dynamic feature flags and user segmentation."
+    },
+    {
+      "path": "packages\\core\\src\\lib.rs",
+      "description": "montrs-core: The core architectural engine for MontRS."
+    },
+    {
+      "path": "packages\\core\\src\\limiter.rs",
+      "description": "montrs-core/src/limiter.rs: Rate limiting primitives."
+    },
+    {
+      "path": "packages\\core\\src\\router.rs",
+      "description": "montrs-core/src/router.rs: Explicit routing primitives inspired by Remix."
+    },
+    {
+      "path": "packages\\core\\src\\validation.rs",
+      "description": "Errors that can occur during schema validation."
+    },
+    {
+      "path": "packages\\core\\tests\\discovery_test.rs",
+      "description": null
+    },
+    {
+      "path": "packages\\fmt\\Cargo.toml",
+      "description": null
+    },
+    {
+      "path": "packages\\fmt\\docs\\ai-guide.md",
+      "description": null
+    },
+    {
+      "path": "packages\\fmt\\README.md",
+      "description": null
+    },
+    {
+      "path": "packages\\fmt\\src\\bin\\montrs-fmt.rs",
+      "description": "Files or directories to format"
+    },
+    {
+      "path": "packages\\fmt\\src\\comments.rs",
+      "description": "Extracts all comments from the source string."
+    },
+    {
+      "path": "packages\\fmt\\src\\config.rs",
+      "description": "Load settings using the \"Cascade of Truth\":"
+    },
+    {
+      "path": "packages\\fmt\\src\\lib.rs",
+      "description": "Formats a single Rust file."
+    },
+    {
+      "path": "packages\\fmt\\src\\macro_fmt.rs",
+      "description": null
+    },
+    {
+      "path": "packages\\fmt\\tests\\integration.rs",
+      "description": null
+    },
+    {
+      "path": "packages\\llm\\Cargo.toml",
+      "description": null
+    },
+    {
+      "path": "packages\\llm\\docs\\ai-guide.md",
+      "description": null
+    },
+    {
+      "path": "packages\\llm\\docs\\design-system.md",
+      "description": null
+    },
+    {
+      "path": "packages\\llm\\README.md",
+      "description": null
+    },
+    {
+      "path": "packages\\llm\\src\\error_parser.rs",
+      "description": null
+    },
+    {
+      "path": "packages\\llm\\src\\guides.rs",
+      "description": null
+    },
+    {
+      "path": "packages\\llm\\src\\lib.rs",
+      "description": "Generates a comprehensive snapshot of the codebase."
+    },
+    {
+      "path": "packages\\llm\\tests\\llm_test.rs",
+      "description": null
+    },
+    {
+      "path": "packages\\montrs\\Cargo.toml",
+      "description": null
+    },
+    {
+      "path": "packages\\montrs\\src\\bin\\cargo-montrs.rs",
+      "description": null
+    },
+    {
+      "path": "packages\\montrs\\src\\bin\\montrs.rs",
+      "description": null
+    },
+    {
+      "path": "packages\\montrs\\src\\lib.rs",
+      "description": "The MontRS Framework - A full-stack Rust framework."
+    },
+    {
+      "path": "packages\\orm\\Cargo.toml",
+      "description": null
+    },
+    {
+      "path": "packages\\orm\\docs\\ai-guide.md",
+      "description": null
+    },
+    {
+      "path": "packages\\orm\\README.md",
+      "description": null
+    },
+    {
+      "path": "packages\\orm\\src\\lib.rs",
+      "description": "montrs-orm: A trait-driven ORM layer for MontRS."
+    },
+    {
+      "path": "packages\\schema\\Cargo.toml",
+      "description": null
+    },
+    {
+      "path": "packages\\schema\\docs\\ai-guide.md",
+      "description": null
+    },
+    {
+      "path": "packages\\schema\\README.md",
+      "description": null
+    },
+    {
+      "path": "packages\\schema\\src\\lib.rs",
+      "description": "montrs-schema: Procedural macros for schema validation in MontRS."
+    },
+    {
+      "path": "packages\\schema\\tests\\validation_test.rs",
+      "description": null
+    },
+    {
+      "path": "packages\\test\\Cargo.toml",
+      "description": null
+    },
+    {
+      "path": "packages\\test\\docs\\ai-guide.md",
+      "description": null
+    },
+    {
+      "path": "packages\\test\\README.md",
+      "description": null
+    },
+    {
+      "path": "packages\\test\\src\\e2e.rs",
+      "description": "End-to-End (E2E) testing plate for MontRS."
+    },
+    {
+      "path": "packages\\test\\src\\integration.rs",
+      "description": "Integration testing plate for MontRS."
+    },
+    {
+      "path": "packages\\test\\src\\lib.rs",
+      "description": "# montrs-test"
+    },
+    {
+      "path": "packages\\test\\src\\unit.rs",
+      "description": "Production-grade unit testing utilities for MontRS."
+    },
+    {
+      "path": "README.md",
+      "description": null
+    },
+    {
+      "path": "rust-toolchain.toml",
+      "description": null
+    },
+    {
+      "path": "templates\\default\\.gitignore",
+      "description": null
+    },
+    {
+      "path": "templates\\default\\.vscode\\settings.json",
+      "description": null
+    },
+    {
+      "path": "templates\\default\\app\\Cargo.toml",
+      "description": null
+    },
+    {
+      "path": "templates\\default\\app\\src\\main.rs",
+      "description": null
+    },
+    {
+      "path": "templates\\default\\Cargo.toml",
+      "description": null
+    },
+    {
+      "path": "templates\\default\\e2e\\Cargo.toml",
+      "description": null
+    },
+    {
+      "path": "templates\\default\\e2e\\src\\main.rs",
+      "description": null
+    },
+    {
+      "path": "templates\\default\\montrs.toml",
+      "description": null
+    },
+    {
+      "path": "templates\\default\\README.md",
+      "description": null
+    },
+    {
+      "path": "templates\\default\\style\\main.css",
+      "description": null
+    },
+    {
+      "path": "templates\\default\\tailwind.toml",
+      "description": null
+    },
+    {
+      "path": "templates\\todo\\.gitignore",
+      "description": null
+    },
+    {
+      "path": "templates\\todo\\.vscode\\settings.json",
+      "description": null
+    },
+    {
+      "path": "templates\\todo\\Cargo.toml",
+      "description": null
+    },
+    {
+      "path": "templates\\todo\\e2e\\Cargo.toml",
+      "description": null
+    },
+    {
+      "path": "templates\\todo\\e2e\\src\\lib.rs",
+      "description": null
+    },
+    {
+      "path": "templates\\todo\\e2e\\tests\\e2e.rs",
+      "description": null
+    },
+    {
+      "path": "templates\\todo\\montrs.toml",
+      "description": null
+    },
+    {
+      "path": "templates\\todo\\README.md",
+      "description": null
+    },
+    {
+      "path": "templates\\todo\\src\\main.rs",
+      "description": "todo-example: A comprehensive example demonstrating MontRS features."
+    },
+    {
+      "path": "templates\\todo\\style\\main.css",
+      "description": null
+    },
+    {
+      "path": "templates\\todo\\tailwind.toml",
+      "description": null
+    },
+    {
+      "path": "templates\\workspace\\.gitignore",
+      "description": null
+    },
+    {
+      "path": "templates\\workspace\\.vscode\\settings.json",
+      "description": null
+    },
+    {
+      "path": "templates\\workspace\\apps\\web\\Cargo.toml",
+      "description": null
+    },
+    {
+      "path": "templates\\workspace\\apps\\web\\src\\main.rs",
+      "description": null
+    },
+    {
+      "path": "templates\\workspace\\Cargo.toml",
+      "description": null
+    },
+    {
+      "path": "templates\\workspace\\e2e\\Cargo.toml",
+      "description": null
+    },
+    {
+      "path": "templates\\workspace\\e2e\\src\\main.rs",
+      "description": null
+    },
+    {
+      "path": "templates\\workspace\\montrs.toml",
+      "description": null
+    },
+    {
+      "path": "templates\\workspace\\packages\\ui\\Cargo.toml",
+      "description": null
+    },
+    {
+      "path": "templates\\workspace\\packages\\ui\\src\\lib.rs",
+      "description": "Shared UI components for the workspace."
+    },
+    {
+      "path": "templates\\workspace\\README.md",
+      "description": null
+    },
+    {
+      "path": "templates\\workspace\\style\\main.css",
+      "description": null
+    },
+    {
+      "path": "templates\\workspace\\tailwind.toml",
+      "description": null
+    },
+    {
+      "path": "The AI Specfication.md",
+      "description": null
+    }
+  ],
+  "plates": [
+    {
+      "name": "TodoPlate",
+      "description": "todo-example: A comprehensive example demonstrating MontRS features.",
+      "metadata": {}
+    }
+  ],
+  "routes": [
+    {
+      "path": "(impl) TestLoader",
+      "kind": "Loader",
+      "description": "Heuristically discovered Loader: TestLoader",
+      "input_schema": null,
+      "output_schema": null
+    },
+    {
+      "path": "(impl) TestAction",
+      "kind": "Action",
+      "description": "Heuristically discovered Action: TestAction",
+      "input_schema": null,
+      "output_schema": null
+    }
+  ],
+  "documentation_snippets": {
+    "architecture": "\n# MontRS Architecture Guide\nMontRS is a trait-driven, deterministic web framework built on Leptos 0.8.\n\n## Core Concepts\n- **AppSpec**: The single source of truth for the application blueprint.\n- **Plate**: A unit of composition (Auth, Blog, etc.) that registers routes and providers.\n- **Loaders**: Read-only, idempotent data fetching.\n- **Actions**: State-changing mutations.\n\n## How to build a plate\n1. Implement the `Plate` trait.\n2. Define your `Loader` and `Action` implementations.\n3. Register them in `register_routes`.\n",
+    "debugging": "\n# Debugging MontRS\nMontRS provides an `errorfile.txt` in the `.llm` folder when a build or test fails.\nAI models should use this file to understand the context of the error and propose fixes.\n"
+  }
+}

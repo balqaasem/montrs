@@ -1,5 +1,5 @@
 //! montrs-core/src/router.rs: Explicit routing primitives inspired by Remix.
-//! This module defines Loaders for data fetching and Actions for data mutation,
+//! This file defines Loaders for data fetching and Actions for data mutation,
 //! ensuring clear boundaries between reads and writes.
 
 use crate::AppConfig;
@@ -15,6 +15,21 @@ pub trait Loader<C: AppConfig>: Send + Sync + 'static {
         &self,
         ctx: LoaderCtx<C>,
     ) -> Result<LoaderResponse, Box<dyn std::error::Error + Send + Sync>>;
+
+    /// Returns a description of what this loader fetches.
+    fn description(&self) -> &'static str {
+        ""
+    }
+
+    /// Returns the expected JSON schema for the input data (e.g., query params).
+    fn input_schema(&self) -> Option<serde_json::Value> {
+        None
+    }
+
+    /// Returns the expected JSON schema for the output data.
+    fn output_schema(&self) -> Option<serde_json::Value> {
+        None
+    }
 }
 
 /// Trait for data mutation components. Actions are responsible for handling
@@ -26,6 +41,21 @@ pub trait Action<C: AppConfig>: Send + Sync + 'static {
         input: serde_json::Value,
         ctx: ActionCtx<C>,
     ) -> Result<ActionResponse, Box<dyn std::error::Error + Send + Sync>>;
+
+    /// Returns a description of what this action does.
+    fn description(&self) -> &'static str {
+        ""
+    }
+
+    /// Returns the expected JSON schema for the input data.
+    fn input_schema(&self) -> Option<serde_json::Value> {
+        None
+    }
+
+    /// Returns the expected JSON schema for the output data.
+    fn output_schema(&self) -> Option<serde_json::Value> {
+        None
+    }
 }
 
 /// Context passed to a Loader, providing access to the application configuration.
@@ -54,6 +84,58 @@ pub struct ActionResponse {
 pub struct Router<C: AppConfig> {
     loaders: HashMap<String, Box<dyn Loader<C>>>,
     actions: HashMap<String, Box<dyn Action<C>>>,
+}
+
+/// A machine-readable specification of the router, useful for agents and documentation.
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct RouterSpec {
+    pub loaders: HashMap<String, LoaderMetadata>,
+    pub actions: HashMap<String, ActionMetadata>,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct LoaderMetadata {
+    pub description: String,
+    pub input_schema: Option<serde_json::Value>,
+    pub output_schema: Option<serde_json::Value>,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct ActionMetadata {
+    pub description: String,
+    pub input_schema: Option<serde_json::Value>,
+    pub output_schema: Option<serde_json::Value>,
+}
+
+impl<C: AppConfig> Router<C> {
+    /// Generates a serializable specification of the current router state.
+    pub fn spec(&self) -> RouterSpec {
+        let mut loaders = HashMap::new();
+        for (path, loader) in &self.loaders {
+            loaders.insert(
+                path.clone(),
+                LoaderMetadata {
+                    description: loader.description().to_string(),
+                    input_schema: loader.input_schema(),
+                    output_schema: loader.output_schema(),
+                },
+            );
+        }
+
+        let mut actions = HashMap::new();
+        for (path, action) in &self.actions {
+            actions.insert(
+                path.clone(),
+                ActionMetadata {
+                    description: action.description().to_string(),
+                    input_schema: action.input_schema(),
+                    output_schema: action.output_schema(),
+                },
+            );
+        }
+
+        RouterSpec { loaders, actions }
+    }
 }
 
 impl<C: AppConfig> Default for Router<C> {

@@ -78,11 +78,25 @@ Run project tests (Unit, Integration, E2E).
 montrs test [--filter <name>] [--report <format>]
 ```
 
+### `spec`
+Generate a machine-readable specification of the project.
+```bash
+montrs spec [--format <json|yaml|txt>]
+```
+This command refreshes the `.agent/agent.json` file used by agents.
+
 ### `run`
 Run custom tasks defined in `montrs.toml`.
 ```bash
 montrs run <task_name>
 ```
+
+## 🤖 Agent-first CLI
+
+MontRS CLI is built to be a primary communication channel between the developer and agents:
+
+- **Error Capturing**: When a command fails, the CLI generates a versioned `errorfile.json` in `.agent/errorfiles/`.
+- **Context Awareness**: The CLI knows the state of your project through the `.agent` folder, allowing it to provide smarter error messages and suggested fixes.
 
 ### `watch`
 Watch for changes and rebuild automatically.

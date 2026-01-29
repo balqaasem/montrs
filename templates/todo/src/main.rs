@@ -3,7 +3,7 @@
 //! to build a simple but functional Todo management system.
 
 use leptos::prelude::*;
-use montrs_core::{AppConfig, AppSpec, Module, ModuleContext, Router, Target};
+use montrs_core::{AppConfig, AppSpec, Plate, PlateContext, Router, Target};
 use montrs_orm::{DbBackend, FromRow, SqliteBackend};
 use montrs_schema::Schema;
 use serde::{Deserialize, Serialize};
@@ -68,25 +68,25 @@ impl montrs_core::EnvConfig for MyEnv {
     }
 }
 
-// 3. Define a Module for Todo logic.
-pub struct TodoModule;
+// 3. Define a Plate for Todo logic.
+pub struct TodoPlate;
 
 #[async_trait::async_trait]
-impl Module<MyConfig> for TodoModule {
+impl Plate<MyConfig> for TodoPlate {
     fn name(&self) -> &'static str {
         "todo"
     }
 
     async fn init(
         &self,
-        _ctx: &mut ModuleContext<MyConfig>,
+        _ctx: &mut PlateContext<MyConfig>,
     ) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
-        println!("TodoModule initialized");
+        println!("TodoPlate initialized");
         Ok(())
     }
 
     fn register_routes(&self, _router: &mut Router<MyConfig>) {
-        println!("Routes registered for TodoModule");
+        println!("Routes registered for TodoPlate");
     }
 }
 
@@ -126,7 +126,7 @@ async fn main() -> anyhow::Result<()> {
 
     let spec = AppSpec::new(config, env)
         .with_target(Target::Wasm)
-        .with_module(Box::new(TodoModule));
+        .with_plate(Box::new(TodoPlate));
 
     println!("Bootstrapping MontRS application...");
 

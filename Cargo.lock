@@ -3785,6 +3785,26 @@ dependencies = [
 ]
 
 [[package]]
+name = "montrs-agent"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "chrono",
+ "ignore",
+ "montrs-core",
+ "regex",
+ "serde",
+ "serde_json",
+ "serde_yaml",
+ "tempfile",
+ "thiserror 1.0.69",
+ "tokio",
+ "toml 0.8.23",
+ "uuid",
+ "walkdir",
+]
+
+[[package]]
 name = "montrs-bench"
 version = "0.1.0"
 dependencies = [
@@ -3794,11 +3814,13 @@ dependencies = [
  "clap",
  "colored",
  "hdrhistogram",
+ "montrs-core",
  "rustc_version_runtime",
  "serde",
  "serde_json",
  "statrs",
  "sysinfo",
+ "thiserror 1.0.69",
  "tokio",
 ]
 
@@ -3817,19 +3839,25 @@ dependencies = [
  "config 0.14.1",
  "console 0.15.11",
  "fs_extra",
+ "ignore",
  "indicatif 0.17.11",
+ "montrs-agent",
  "montrs-bench",
+ "montrs-core",
  "montrs-fmt",
  "quick-xml",
  "reqwest 0.12.28",
  "serde",
  "serde_json",
+ "serde_yaml",
  "shlex",
  "tempfile",
+ "thiserror 1.0.69",
  "tokio",
  "toml 0.9.11+spec-1.1.0",
  "tracing",
  "tracing-subscriber",
+ "walkdir",
  "which 6.0.3",
 ]
 
@@ -3859,6 +3887,7 @@ dependencies = [
  "clap",
  "crop",
  "ignore",
+ "montrs-core",
  "prettyplease",
  "proc-macro2",
  "quote",
@@ -3879,6 +3908,7 @@ dependencies = [
  "anyhow",
  "async-trait",
  "deadpool-postgres",
+ "montrs-core",
  "rusqlite",
  "serde",
  "thiserror 1.0.69",
@@ -3910,6 +3940,7 @@ dependencies = [
  "montrs-orm",
  "playwright-rs",
  "serde",
+ "thiserror 1.0.69",
  "tokio",
 ]
 
@@ -5806,6 +5837,19 @@ dependencies = [
  "itoa",
  "ryu",
  "serde",
+]
+
+[[package]]
+name = "serde_yaml"
+version = "0.9.34+deprecated"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "6a8b1a1a2ebf674015cc02edccce75287f1a0130d394307b36743c2f5d504b47"
+dependencies = [
+ "indexmap",
+ "itoa",
+ "ryu",
+ "serde",
+ "unsafe-libyaml",
 ]
 
 [[package]]
@@ -7880,6 +7924,12 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "81e544489bf3d8ef66c953931f56617f423cd4b5494be343d9b9d3dda037b9a3"
 
 [[package]]
+name = "unsafe-libyaml"
+version = "0.2.11"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "673aac59facbab8a9007c7f6108d11f63b603f7cabff99fabf650fea5c32b861"
+
+[[package]]
 name = "untrusted"
 version = "0.9.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -7929,6 +7979,7 @@ checksum = "e2e054861b4bd027cd373e18e8d8d8e6548085000e41290d95ce0c373a654b4a"
 dependencies = [
  "getrandom 0.3.4",
  "js-sys",
+ "serde_core",
  "wasm-bindgen",
 ]
 

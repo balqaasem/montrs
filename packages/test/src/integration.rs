@@ -1,6 +1,6 @@
-//! Integration testing module for MontRS.
+//! Integration testing plate for MontRS.
 //!
-//! This module provides tools for testing interactions between components
+//! This plate provides tools for testing interactions between components
 //! and managing test environments.
 //!
 //! It includes:

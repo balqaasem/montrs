@@ -1,98 +1,41 @@
 # montrs-test
 
-Deterministic testing utilities for the MontRS framework.
+Deterministic testing utilities for the MontRS ecosystem.
 
-## Overview
+**Target Audiences:** Application Developers, Framework Contributors, Agents.
 
-`montrs-test` provides the infrastructure needed to write robust unit, integration, and end-to-end tests for MontRS applications. It includes tools for mocking, fixture management, and browser automation.
+## 1. What this package is
+`montrs-test` provides the infrastructure for writing robust unit, integration, and end-to-end tests. It emphasizes determinism, allowing developers to boot their entire application spec in-process for fast and reliable verification.
 
-## Key Features
+## 2. What problems it solves
+- **Flaky Tests**: By providing a deterministic `TestRuntime`, it eliminates "it works on my machine" issues caused by timing or environment variance.
+- **Complex Setup**: The `Fixture` system automates the setup and teardown of external resources like databases or file systems.
+- **E2E Overhead**: Integrated Playwright support via `MontrsDriver` simplifies browser automation for full-stack tests.
 
-- **Integration Testing**:
-  - `Fixture` trait for setup/teardown logic.
-  - `run_fixture_test` helper for isolated test execution.
-- **Unit Testing**: 
-  - `bench` utility for simple performance measurements.
-  - Fluent assertions (`expect`).
-  - Spies and Mocks (`Spy`, `Mock`).
-  - Table-driven tests (`table_test!`).
-- **E2E Testing** (via `e2e` feature):
-  - `MontrsDriver` wrapper around Playwright (uses `playwright-rs` v0.8.2).
-  - `MontrsPlugin` trait for extending driver functionality.
-  - Runtime-agnostic design (works with or without MontRS runtime).
-- **Environment Mocking**:
-  - `TestEnv` for simulating environment variables.
-  - `TestRuntime` for in-process application testing.
+## 3. What it intentionally does NOT do
+- **Test Execution**: It does not replace `cargo test`; it provides the tools used *within* your tests.
+- **Static Analysis**: It does not check code for bugs without running it (use `clippy` for that).
+- **Code Coverage**: It does not generate coverage reports (use `cargo-tarpaulin` or similar).
 
-## Environment Mocking
+## 4. How it fits into the MontRS system
+It is the **validation layer**. It uses the `AppSpec` from `montrs-core` to spin up isolated environments for testing.
 
-```rust
-use montrs_test::integration::TestEnv;
-use montrs_core::EnvConfig;
+## 5. When a user should reach for this package
+- When writing unit tests for a `Loader` or `Action`.
+- When building an integration test that requires a mock database or environment.
+- When creating end-to-end user journey tests using a browser.
 
-let env = TestEnv::new();
-env.set("DATABASE_URL", "sqlite::memory:");
-assert_eq!(env.get_var("DATABASE_URL").unwrap(), "sqlite::memory:");
-```
+## 6. Deeper Documentation
+- [Testing Philosophy](../../docs/testing/index.md)
+- [Using the TestRuntime](../../docs/testing/index.md#test-runtime)
+- [E2E with MontrsDriver](../../docs/testing/index.md#e2e-testing)
+- [Table-Driven Testing](../../docs/testing/index.md#table-driven-tests)
 
-## Integration Testing Usage
-
-```rust
-use montrs_test::integration::{Fixture, run_fixture_test};
-use async_trait::async_trait;
-
-struct DatabaseFixture;
-
-#[async_trait]
-impl Fixture for DatabaseFixture {
-    type Context = String; // Example context
-
-    async fn setup(&self) -> anyhow::Result<Self::Context> {
-        Ok("connected".to_string())
-    }
-
-    async fn teardown(&self, _ctx: &mut Self::Context) -> anyhow::Result<()> {
-        // Cleanup logic
-        Ok(())
-    }
-}
-
-#[tokio::test]
-async fn test_example() -> anyhow::Result<()> {
-    run_fixture_test(DatabaseFixture, |ctx| async move {
-        assert_eq!(ctx, "connected");
-        Ok(())
-    }).await
-}
-```
-
-## Unit Testing Usage
-
-### Fluent Assertions
-
-```rust
-use montrs_test::unit::expect;
-
-#[test]
-fn test_assertions() {
-    expect(1 + 1).to_equal(2);
-    expect(vec![1, 2]).to_contain(&1);
-    expect(true).to_be_true();
-}
-```
-
-### Benchmarking
-
-```rust
-use montrs_test::unit::bench;
-
-#[tokio::test]
-async fn test_perf() {
-    bench("my_op", 1000, || async {
-        // ...
-    }).await;
-}
-```
+## 7. Notes for Agents
+- **Deterministic Assertions**: Use `expect(...)` for fluent, human-readable assertions in generated tests.
+- **Test Generation**: Refer to the `Plate` and `AppSpec` metadata to understand what inputs and outputs need to be tested.
+- **Error Handling**: Look for `TestError` with `AgentError` metadata if a test fixture or driver fails.
+- **Isolaton**: Always use `TestEnv` and `run_fixture_test` to ensure that tests do not leak state to the host system.
 
 ## E2E Testing Usage
 

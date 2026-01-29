@@ -15,6 +15,7 @@ thiserror.workspace = true
 async-trait.workspace = true
 anyhow.workspace = true
 tracing.workspace = true
+montrs-core = { path = "../core" }
 
 [features]
 default = []

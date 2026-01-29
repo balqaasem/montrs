@@ -1,6 +1,6 @@
 //! Test command implementation for MontRS.
 
-//! This module handles the execution of unit and integration tests. It wraps `cargo test`
+//! This plate handles the execution of unit and integration tests. It wraps `cargo test`
 //! but adds MontRS-specific capabilities like custom reporting (JSON/JUnit) and
 //! automated environment setup.
 

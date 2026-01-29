@@ -53,5 +53,32 @@ pub async fn run_cargo_leptos(cmd: &str, args: &[String], config: &MontrsConfig)
     let cli = cargo_leptos::config::Cli::try_parse_from(args_list)
         .map_err(|e| anyhow!("Failed to parse cargo-leptos arguments: {}", e))?;
 
-    cargo_leptos::run(cli).await.map_err(|e| anyhow!("{:?}", e))
+    match cargo_leptos::run(cli).await {
+        Ok(_) => {
+            // Agent: Auto-resolve errors on success
+            if let Ok(cwd) = std::env::current_dir() {
+                let agent_manager = montrs_agent::AgentManager::new(cwd);
+                let diff = agent_manager.generate_diff();
+                let _ = agent_manager.auto_resolve_active_errors("Build/Command succeeded".to_string(), diff);
+            }
+            Ok(())
+        }
+        Err(e) => {
+            if let Ok(cwd) = std::env::current_dir() {
+                let agent_manager = montrs_agent::AgentManager::new(cwd);
+                let error_msg = format!("{:?}", e);
+                
+                // Try to parse structured errors
+                let parsed_errors = montrs_agent::error_parser::parse_rustc_errors(&error_msg);
+                if parsed_errors.is_empty() {
+                    let _ = agent_manager.report_error(error_msg);
+                } else {
+                    for err in parsed_errors {
+                        let _ = agent_manager.report_project_error(err);
+                    }
+                }
+            }
+            Err(anyhow!("{:?}", e))
+        }
+    }
 }

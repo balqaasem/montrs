@@ -1,10 +1,10 @@
-//! End-to-End (E2E) testing module for MontRS.
+//! End-to-End (E2E) testing plate for MontRS.
 
-//! This module provides a wrapper around `playwright-rs` to facilitate writing
+//! This plate provides a wrapper around `playwright-rs` to facilitate writing
 //! E2E tests for MontRS applications. It includes configuration management,
 //! test driver orchestration, and helper assertions.
 //!
-//! The E2E module is built around the [`MontrsDriver`] struct, which manages the
+//! The E2E plate is built around the [`MontrsDriver`] struct, which manages the
 //! Playwright browser instance, context, and page. It abstracts away the
 //! complexities of managing browser lifecycles in tests.
 //!

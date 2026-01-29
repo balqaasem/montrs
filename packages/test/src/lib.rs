@@ -1,5 +1,7 @@
 //! # montrs-test
 //!
+//! // @agent-tool: name="test_run" desc="Runs unit, integration, and end-to-end tests for the MontRS project."
+//!
 //! Utilities for deterministic, robust testing of MontRS applications.
 //!
 //! This crate provides the foundational infrastructure needed to write unit, integration,
@@ -35,3 +37,71 @@ pub mod e2e;
 
 pub use integration::{Fixture, TestRuntime, TestEnv, run_fixture_test};
 pub use unit::{expect, Spy, Mock, simple_bench};
+
+use montrs_core::AgentError;
+use thiserror::Error;
+
+/// Errors that can occur during testing.
+#[derive(Error, Debug)]
+pub enum TestError {
+    #[error("Fixture setup failed: {0}")]
+    Setup(String),
+    #[error("Fixture teardown failed: {0}")]
+    Teardown(String),
+    #[error("E2E driver error: {0}")]
+    E2e(String),
+    #[error("Expectation failed: {0}")]
+    Expectation(String),
+    #[error("IO error during testing: {0}")]
+    Io(#[from] std::io::Error),
+}
+
+impl AgentError for TestError {
+    fn error_code(&self) -> &'static str {
+        match self {
+            TestError::Setup(_) => "TEST_SETUP",
+            TestError::Teardown(_) => "TEST_TEARDOWN",
+            TestError::E2e(_) => "TEST_E2E",
+            TestError::Expectation(_) => "TEST_EXPECTATION",
+            TestError::Io(_) => "TEST_IO",
+        }
+    }
+
+    fn explanation(&self) -> String {
+        match self {
+            TestError::Setup(e) => format!("A test fixture failed to set up: {}.", e),
+            TestError::Teardown(e) => format!("A test fixture failed to tear down: {}.", e),
+            TestError::E2e(e) => format!("An error occurred in the E2E driver (Playwright): {}.", e),
+            TestError::Expectation(e) => format!("A test expectation was not met: {}.", e),
+            TestError::Io(e) => format!("An I/O error occurred during the test execution: {}.", e),
+        }
+    }
+
+    fn suggested_fixes(&self) -> Vec<String> {
+        match self {
+            TestError::Setup(_) => vec![
+                "Check the setup method of your fixture for errors.".to_string(),
+                "Ensure that any required external services (e.g., databases) are available.".to_string(),
+            ],
+            TestError::Teardown(_) => vec![
+                "Check the teardown method of your fixture for errors.".to_string(),
+                "Ensure that resources are being properly released.".to_string(),
+            ],
+            TestError::E2e(_) => vec![
+                "Verify that Playwright is correctly installed and configured.".to_string(),
+                "Check if the browser can be launched and the target URL is accessible.".to_string(),
+            ],
+            TestError::Expectation(_) => vec![
+                "Review the test logic and the actual vs. expected values.".to_string(),
+                "Debug the code being tested to find the cause of the discrepancy.".to_string(),
+            ],
+            TestError::Io(_) => vec![
+                "Check if the file system is accessible and you have the necessary permissions.".to_string(),
+            ],
+        }
+    }
+
+    fn subsystem(&self) -> &'static str {
+        "test"
+    }
+}

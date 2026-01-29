@@ -1,33 +1,43 @@
-# MontRS: A Deterministic Rust Web Framework
+# MontRS Documentation Index
 
-MontRS is a Rust-native, trait-driven web framework for teams that value compile-time correctness, explicit boundaries, and deterministic execution.
+Welcome to the MontRS documentation. This folder contains deep-dive guides for both application developers and framework contributors, with a focus on our agent-first philosophy.
 
-## Core Features
+## 🎯 Audience Paths
 
-- **Fine-grained Reactivity**: Leptos-inspired signals for atomic state management.
-- **Remix-style Routing**: File-based routing with explicit loaders and actions.
-- **Trait-driven Modularity**: Compose your application using independent modules (pallets).
-- **Deterministic Test Runtime**: Boot your entire application spec in-process for fast, reliable tests.
-- **SQL-first ORM**: Minimal abstraction over SQL with Drizzle-like ergonomics.
+### For Application Developers
+- [First 30 Minutes](getting-started/first-30-minutes.md) - **Start here!** Your first onboarding experience.
+- [Introduction](getting-started/introduction.md) - Build your first MontRS app.
+- [The Golden Path](getting-started/golden-path.md) - Idiomatic MontRS development.
+- [Common Mistakes](guides/common-mistakes.md) - Avoid frequent pitfalls.
+- [Router](core/router.md) & [Plates](core/plates.md) - Understanding the Loader/Action pattern.
+- [Schema & Validation](core/schema.md) - Type-safe data handling.
+- [ORM Layer](orm/index.md) - Working with databases.
+- [ORM Backends](orm/backends.md) - Supported databases.
+- [Testing](testing/index.md) - Writing deterministic tests.
+- [Benchmarking](testing/benchmarking.md) - Measuring performance.
+- [Deployment](community/deployment.md) - Shipping to production.
 
-## Quick Start
+### For Framework Contributors
+- [Architecture Overview](architecture/overview.md) - The "Shape" of MontRS.
+- [AppSpec & Discovery](agent/appspec.md) - How the framework maps itself.
+- [Package Boundaries](architecture/packages.md) - Responsibility of each crate.
+- [Invariants & Philosophy](architecture/philosophy.md) - The rules we don't break.
+- [Agent-first design](agent/agent-first.md) - Principles of machine-readability.
+- [CLI Internals](tooling/cli.md) - Orchestration and task runners.
+- [Custom Tasks](tooling/tasks.md) - Automating workflows.
+- [Contributing Guide](community/contributing.md) - How to build MontRS.
 
-### Install CLI
-```bash
-cargo install --path packages/cli
-```
+### For Agents
+- [Agent Condensed Onboarding](agent/onboarding.md) - **Recommended for agents.**
+- [Agent Integration Guide](agent/agent-first.md) - How to use MontRS as a tool.
+- [Spec Snapshot](agent/spec.md) - Understanding `agent.json`.
+- [Error Handling Spec](core/errors.md) - Versioned error files and diffs.
+- [Metadata Standards](agent/metadata.md) - How we annotate code for you.
 
-### Create a project
-```bash
-montrs new my-app
-cd my-app
-montrs serve
-```
+---
 
-## Documentation
+## 🏗️ Core Concepts
 
-- [Core Architecture](packages/core/README.md)
-- [Schema & Validation](packages/schema/README.md)
-- [ORM Layer](packages/orm/README.md)
-- [Testing Tools](packages/test/README.md)
-- [CLI Tools](packages/cli/README.md)
+- **Determinism**: Every part of MontRS is designed to be predictable and testable in isolation.
+- **Model-First**: We prioritize machine-readable metadata to enable agent-assisted development.
+- **Trait-Driven**: Interfaces are defined by traits, allowing for modular and swappable components.
