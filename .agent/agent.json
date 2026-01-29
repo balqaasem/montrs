@@ -56,7 +56,7 @@
       "description": null
     },
     {
-      "path": "docs\\modules.md",
+      "path": "docs\\plates.md",
       "description": null
     },
     {
@@ -213,7 +213,7 @@
     },
     {
       "path": "packages\\cli\\src\\config\\mod.rs",
-      "description": "Configuration module for MontRS."
+      "description": "Configuration plate for MontRS."
     },
     {
       "path": "packages\\cli\\src\\config\\tailwind.rs",
@@ -409,11 +409,11 @@
     },
     {
       "path": "packages\\test\\src\\e2e.rs",
-      "description": "End-to-End (E2E) testing module for MontRS."
+      "description": "End-to-End (E2E) testing plate for MontRS."
     },
     {
       "path": "packages\\test\\src\\integration.rs",
-      "description": "Integration testing module for MontRS."
+      "description": "Integration testing plate for MontRS."
     },
     {
       "path": "packages\\test\\src\\lib.rs",
@@ -576,9 +576,9 @@
       "description": null
     }
   ],
-  "modules": [
+  "plates": [
     {
-      "name": "TodoModule",
+      "name": "TodoPlate",
       "description": "todo-example: A comprehensive example demonstrating MontRS features.",
       "metadata": {}
     }
@@ -600,7 +600,7 @@
     }
   ],
   "documentation_snippets": {
-    "architecture": "\n# MontRS Architecture Guide\nMontRS is a trait-driven, deterministic web framework built on Leptos 0.8.\n\n## Core Concepts\n- **AppSpec**: The single source of truth for the application blueprint.\n- **Module**: A unit of composition (Auth, Blog, etc.) that registers routes and providers.\n- **Loaders**: Read-only, idempotent data fetching.\n- **Actions**: State-changing mutations.\n\n## How to build a module\n1. Implement the `Module` trait.\n2. Define your `Loader` and `Action` implementations.\n3. Register them in `register_routes`.\n",
+    "architecture": "\n# MontRS Architecture Guide\nMontRS is a trait-driven, deterministic web framework built on Leptos 0.8.\n\n## Core Concepts\n- **AppSpec**: The single source of truth for the application blueprint.\n- **Plate**: A unit of composition (Auth, Blog, etc.) that registers routes and providers.\n- **Loaders**: Read-only, idempotent data fetching.\n- **Actions**: State-changing mutations.\n\n## How to build a plate\n1. Implement the `Plate` trait.\n2. Define your `Loader` and `Action` implementations.\n3. Register them in `register_routes`.\n",
     "debugging": "\n# Debugging MontRS\nMontRS provides an `errorfile.txt` in the `.llm` folder when a build or test fails.\nAI models should use this file to understand the context of the error and propose fixes.\n"
   }
 }

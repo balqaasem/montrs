@@ -9,12 +9,12 @@ pub mod guides;
 pub mod error_parser;
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
-pub struct LlmSnapshot {
+pub struct AgentSnapshot {
     pub project_name: String,
     pub timestamp: DateTime<Utc>,
     pub framework_version: String,
     pub structure: Vec<FileEntry>,
-    pub modules: Vec<ModuleSummary>,
+    pub plates: Vec<PlateSummary>,
     pub routes: Vec<RouteSummary>,
     pub documentation_snippets: HashMap<String, String>,
 }
@@ -26,7 +26,7 @@ pub struct FileEntry {
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
-pub struct ModuleSummary {
+pub struct PlateSummary {
     pub name: String,
     pub description: String,
     pub metadata: HashMap<String, String>,
@@ -73,36 +73,36 @@ pub struct ProjectError {
     pub message: String,
     pub code_context: String,
     pub level: String, // Error, Warning
-    pub ai_metadata: Option<AiErrorMetadata>,
+    pub agent_metadata: Option<AgentErrorMetadata>,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
-pub struct AiErrorMetadata {
+pub struct AgentErrorMetadata {
     pub error_code: String,
     pub explanation: String,
     pub suggested_fixes: Vec<String>,
     pub rustc_error: Option<String>,
 }
 
-pub struct LlmManager {
+pub struct AgentManager {
     root_path: PathBuf,
 }
 
-impl LlmManager {
+impl AgentManager {
     pub fn new(root: impl Into<PathBuf>) -> Self {
         Self { root_path: root.into() }
     }
 
-    pub fn llm_dir(&self) -> PathBuf {
-        self.root_path.join(".llm")
+    pub fn agent_dir(&self) -> PathBuf {
+        self.root_path.join(".agent")
     }
 
     pub fn errorfiles_dir(&self) -> PathBuf {
-        self.llm_dir().join("errorfiles")
+        self.agent_dir().join("errorfiles")
     }
 
     pub fn ensure_dir(&self) -> Result<()> {
-        let dir = self.llm_dir();
+        let dir = self.agent_dir();
         if !dir.exists() {
             fs::create_dir_all(&dir)?;
         }
@@ -113,7 +113,7 @@ impl LlmManager {
         Ok(())
     }
 
-    pub fn write_snapshot(&self, snapshot: &LlmSnapshot, format: &str) -> Result<()> {
+    pub fn write_snapshot(&self, snapshot: &AgentSnapshot, format: &str) -> Result<()> {
         self.ensure_dir()?;
         let content = match format {
             "yaml" => serde_yaml::to_string(snapshot)?,
@@ -121,7 +121,7 @@ impl LlmManager {
             _ => serde_json::to_string_pretty(snapshot)?,
         };
         let ext = if format == "yaml" { "yaml" } else if format == "txt" { "txt" } else { "json" };
-        fs::write(self.llm_dir().join(format!("llm.{}", ext)), content)?;
+        fs::write(self.agent_dir().join(format!("agent.{}", ext)), content)?;
         Ok(())
     }
 
@@ -137,6 +137,7 @@ impl LlmManager {
         Ok(())
     }
 
+    /// Reports a new error to the agent, creating or updating errorfile.json.
     pub fn report_project_error(&self, error: ProjectError) -> Result<String> {
         // Check if a similar active error already exists
         if let Ok(active_errors) = self.list_active_errors() {
@@ -195,7 +196,7 @@ impl LlmManager {
             message,
             code_context: "".to_string(),
             level: "Error".to_string(),
-            ai_metadata: None,
+            agent_metadata: None,
         })?;
         Ok(())
     }
@@ -263,7 +264,7 @@ impl LlmManager {
     }
 
     pub fn generate_tools_spec(&self) -> Result<serde_json::Value> {
-        println!("AI-First: Generating tools spec...");
+        println!("Agent: Generating tools spec...");
         let mut tools = vec![
             serde_json::json!({
                 "name": "montrs_build",
@@ -311,7 +312,7 @@ impl LlmManager {
                         let readme_path = path.join("README.md");
                         if readme_path.exists() {
                             if let Ok(content) = fs::read_to_string(&readme_path) {
-                                if content.contains("AI Usage Guide") || content.contains("Key Features") || content.contains("Key Components") || content.contains("AI-First") {
+                                if content.contains("Agent Usage Guide") || content.contains("Key Features") || content.contains("Key Components") || content.contains("Agent") {
                                     tools.push(serde_json::json!({
                                         "name": format!("montrs_pkg_{}", pkg_name),
                                         "description": format!("Capability provided by package {}. Refer to its README for details.", pkg_name),
@@ -321,7 +322,7 @@ impl LlmManager {
                             }
                         }
 
-                        // 2. Scan source for explicit @ai-tool markers
+                        // 2. Scan source for explicit @agent-tool markers
                         let src_dir = path.join("src");
                         if src_dir.exists() {
                             let walker = walkdir::WalkDir::new(&src_dir).into_iter();
@@ -329,9 +330,9 @@ impl LlmManager {
                                 if entry.path().is_file() && entry.path().extension().and_then(|s| s.to_str()) == Some("rs") {
                                     if let Ok(content) = fs::read_to_string(entry.path()) {
                                         for line in content.lines() {
-                                            if line.contains("@ai-tool") {
-                                                // Simple extraction: // @ai-tool: name="tool_name" desc="description"
-                                                if let Some(tool_meta) = self.parse_ai_tool_marker(line) {
+                                            if line.contains("@agent-tool:") {
+                                                // Simple extraction: // @agent-tool: name="tool_name" desc="description"
+                                                if let Some(tool_meta) = self.parse_agent_tool_marker(line) {
                                                     // Avoid duplicates
                                                     let name = tool_meta["name"].as_str().unwrap_or_default();
                                                     if !tools.iter().any(|t| t["name"] == name) {
@@ -357,8 +358,8 @@ impl LlmManager {
                     if entry.path().is_file() && entry.path().extension().and_then(|s| s.to_str()) == Some("rs") {
                         if let Ok(content) = fs::read_to_string(entry.path()) {
                             for line in content.lines() {
-                                if line.contains("@ai-tool") {
-                                    if let Some(tool_meta) = self.parse_ai_tool_marker(line) {
+                                if line.contains("@agent-tool:") {
+                                    if let Some(tool_meta) = self.parse_agent_tool_marker(line) {
                                         let name = tool_meta["name"].as_str().unwrap_or_default();
                                         if !tools.iter().any(|t| t["name"] == name) {
                                             tools.push(tool_meta);
@@ -375,9 +376,9 @@ impl LlmManager {
         Ok(serde_json::json!({ "tools": tools }))
     }
 
-    fn parse_ai_tool_marker(&self, line: &str) -> Option<serde_json::Value> {
-        // Expected format: @ai-tool: name="name" desc="description"
-        let re = regex::Regex::new(r#"@ai-tool:\s+name="(?P<name>[^"]+)"\s+desc="(?P<desc>[^"]+)""#).ok()?;
+    fn parse_agent_tool_marker(&self, line: &str) -> Option<serde_json::Value> {
+        // Expected format: @agent-tool: name="name" desc="description"
+        let re = regex::Regex::new(r#"@agent-tool:\s+name="(?P<name>[^"]+)"\s+desc="(?P<desc>[^"]+)""#).ok()?;
         let caps = re.captures(line)?;
         
         Some(serde_json::json!({
@@ -401,8 +402,8 @@ impl LlmManager {
         None
     }
 
-    fn discover_modules_heuristically(&self) -> (Vec<ModuleSummary>, Vec<RouteSummary>) {
-        let mut modules = Vec::new();
+    fn discover_plates_heuristically(&self) -> (Vec<PlateSummary>, Vec<RouteSummary>) {
+        let mut plates = Vec::new();
         let mut routes = Vec::new();
 
         // Scan root src, packages/*/src, and templates/*/src
@@ -416,12 +417,12 @@ impl LlmManager {
                         if entry.path().is_dir() {
                             let src = entry.path().join("src");
                             if src.exists() {
-                                println!("AI-First: Scanning for modules in {:?}", src);
+                                println!("Agent: Scanning for plates in {:?}", src);
                                 scan_dirs.push(src);
                             }
                             let tests = entry.path().join("tests");
                             if tests.exists() {
-                                println!("AI-First: Scanning for modules in {:?}", tests);
+                                println!("Agent: Scanning for plates in {:?}", tests);
                                 scan_dirs.push(tests);
                             }
                         }
@@ -430,7 +431,7 @@ impl LlmManager {
             }
         }
 
-        let module_re = regex::Regex::new(r"impl\s+Module(?:<[^>]+>)?\s+for\s+(\w+)").unwrap();
+        let plate_re = regex::Regex::new(r"impl\s+Plate(?:<[^>]+>)?\s+for\s+(\w+)").unwrap();
         let loader_re = regex::Regex::new(r"impl\s+Loader(?:<[^>]+>)?\s+for\s+(\w+)").unwrap();
         let action_re = regex::Regex::new(r"impl\s+Action(?:<[^>]+>)?\s+for\s+(\w+)").unwrap();
 
@@ -440,15 +441,15 @@ impl LlmManager {
             for entry in walker.filter_map(|e| e.ok()) {
                 if entry.path().is_file() && entry.path().extension().and_then(|s| s.to_str()) == Some("rs") {
                     if let Ok(content) = fs::read_to_string(entry.path()) {
-                        println!("AI-First: Checking file {:?}", entry.path());
-                        // Discover Modules
-                        for caps in module_re.captures_iter(&content) {
+                        println!("Agent: Checking file {:?}", entry.path());
+                        // Discover Plates
+                        for caps in plate_re.captures_iter(&content) {
                             let name = caps[1].to_string();
-                            println!("AI-First: Found module implementation: {}", name);
-                            if !modules.iter().any(|m: &ModuleSummary| m.name == name) {
-                                modules.push(ModuleSummary {
+                            println!("Agent: Found plate implementation: {}", name);
+                            if !plates.iter().any(|m: &PlateSummary| m.name == name) {
+                                plates.push(PlateSummary {
                                     name,
-                                    description: self.get_file_description(entry.path()).unwrap_or_else(|| "Discovered module".to_string()),
+                                    description: self.get_file_description(entry.path()).unwrap_or_else(|| "Discovered plate".to_string()),
                                     metadata: HashMap::new(),
                                 });
                             }
@@ -457,7 +458,7 @@ impl LlmManager {
                         // Discover Loaders
                         for caps in loader_re.captures_iter(&content) {
                             let name = caps[1].to_string();
-                            println!("AI-First: Found loader implementation: {}", name);
+                            println!("Agent: Found loader implementation: {}", name);
                             routes.push(RouteSummary {
                                 path: format!("(impl) {}", name),
                                 kind: "Loader".to_string(),
@@ -470,7 +471,7 @@ impl LlmManager {
                         // Discover Actions
                         for caps in action_re.captures_iter(&content) {
                             let name = caps[1].to_string();
-                            println!("AI-First: Found action implementation: {}", name);
+                            println!("Agent: Found action implementation: {}", name);
                             routes.push(RouteSummary {
                                 path: format!("(impl) {}", name),
                                 kind: "Action".to_string(),
@@ -484,30 +485,30 @@ impl LlmManager {
             }
         }
 
-        (modules, routes)
+        (plates, routes)
     }
 
     pub fn write_tools_spec(&self) -> Result<()> {
         let tools = self.generate_tools_spec()?;
         let content = serde_json::to_string_pretty(&tools)?;
-        let path = self.llm_dir().join("tools.json");
+        let path = self.agent_dir().join("tools.json");
         fs::write(path, content)?;
         Ok(())
     }
 
     /// Generates a comprehensive snapshot of the codebase.
-    pub fn generate_snapshot(&self, project_name: String) -> Result<LlmSnapshot> {
+    pub fn generate_snapshot(&self, project_name: String) -> Result<AgentSnapshot> {
         self.generate_snapshot_with_spec(project_name, None)
     }
 
-    pub fn generate_snapshot_with_spec(&self, project_name: String, spec: Option<montrs_core::AppSpecExport>) -> Result<LlmSnapshot> {
+    pub fn generate_snapshot_with_spec(&self, project_name: String, spec: Option<montrs_core::AppSpecExport>) -> Result<AgentSnapshot> {
         let mut structure = Vec::new();
         let walker = ignore::WalkBuilder::new(&self.root_path)
             .hidden(false)
             .git_ignore(true)
             .filter_entry(|entry| {
                 let name = entry.file_name().to_string_lossy();
-                name != ".git" && name != "target" && name != ".llm"
+                name != ".git" && name != "target" && name != ".agent"
             })
             .build();
 
@@ -536,14 +537,14 @@ impl LlmManager {
         documentation_snippets.insert("architecture".to_string(), guides::ARCHITECTURE_GUIDE.to_string());
         documentation_snippets.insert("debugging".to_string(), guides::DEBUGGING_GUIDE.to_string());
 
-        let (modules, routes) = if let Some(s) = spec {
-            let mut modules = Vec::new();
+        let (plates, routes) = if let Some(s) = spec {
+            let mut plates = Vec::new();
             let mut routes = Vec::new();
 
-            for module_spec in s.modules {
-                modules.push(ModuleSummary {
-                    name: module_spec.name,
-                    description: module_spec.description,
+            for plate_spec in s.plates {
+                plates.push(PlateSummary {
+                    name: plate_spec.name,
+                    description: plate_spec.description,
                     metadata: HashMap::new(),
                 });
             }
@@ -566,17 +567,17 @@ impl LlmManager {
                     output_schema: action.output_schema,
                 });
             }
-            (modules, routes)
+            (plates, routes)
         } else {
-            self.discover_modules_heuristically()
+            self.discover_plates_heuristically()
         };
 
-        Ok(LlmSnapshot {
+        Ok(AgentSnapshot {
             project_name,
             timestamp: Utc::now(),
-            framework_version: env!("CARGO_PKG_VERSION").to_string(),
+            framework_version: "0.1.0".to_string(),
             structure,
-            modules,
+            plates,
             routes,
             documentation_snippets,
         })

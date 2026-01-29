@@ -1,6 +1,6 @@
 //! Weight utilities for resource accounting and performance modeling.
 //!
-//! Inspired by Substrate's weight system, this module provides tools to turn
+//! Inspired by Substrate's weight system, this plate provides tools to turn
 //! benchmark results into actionable application logic.
 
 /// Represents the computational cost of an operation.

@@ -1,6 +1,6 @@
-# MontRS AI Messaging Design System
+# MontRS Agent Messaging Design System
 
-This document defines the structured way MontRS articulates information, documentation, and errors to AI models.
+This document defines the structured way MontRS articulates information, documentation, and errors to agents.
 
 ## 1. Tone and Articulation
 
@@ -8,14 +8,14 @@ This document defines the structured way MontRS articulates information, documen
 - **Professional & Helpful**: Concise instructions, clear warnings.
 - **Action-Oriented**: Focus on what the user needs to do next.
 
-### AI-Facing Articulation (The "Model-First" Layer)
+### Agent-Facing Articulation (The "Model-First" Layer)
 - **Deterministic**: Use stable identifiers (error codes, trait names).
 - **Context-Rich**: Always include surrounding context (code snippets, file paths, line numbers).
 - **Remediation-Focused**: Provide "suggested_fixes" that are machine-actionable.
 
 ## 2. Metadata Structure
 
-All framework components (Modules, Loaders, Actions) must expose metadata via the following schema:
+All framework components (Plates, Loaders, Actions) must expose metadata via the following schema:
 
 | Field | Type | Description |
 |-------|------|-------------|
@@ -24,9 +24,9 @@ All framework components (Modules, Loaders, Actions) must expose metadata via th
 | `output_schema`| JSON | (Optional) Validated schema for output data. |
 | `tags` | Array | Categorical tags (e.g., "auth", "db", "ui"). |
 
-## 3. Error Articulation (AiError)
+## 3. Error Articulation (AgentError)
 
-Errors are the primary communication channel during failure. Every `AiError` must follow this structure:
+Errors are the primary communication channel during failure. Every `AgentError` must follow this structure:
 
 ```json
 {
@@ -43,10 +43,10 @@ Errors are the primary communication channel during failure. Every `AiError` mus
 
 ## 4. Documentation Mapping
 
-Documentation is curated into the `.llm/llm.json` snapshot using these priorities:
+Documentation is curated into the `.agent/agent.json` snapshot using these priorities:
 1. **Explicit Metadata**: Values returned by `metadata()` methods.
 2. **Doc Comments**: Triple-slash `///` comments on public items.
-3. **AI Guides**: Markdown files in `/docs/ai-guide.md`.
+3. **Agent Guides**: Markdown files in `/docs/agent-guide.md`.
 4. **READMEs**: Key sections (Key Features, Usage).
 
 ## 5. Learning from Resolution
@@ -56,4 +56,4 @@ When an error is resolved, the CLI generates a diff. This diff is structured as:
 - **Fix**: The commit/changes that resolved the error.
 - **Lesson**: A summary of why the fix worked.
 
-AI models should prioritize these "Resolution Diffs" as the most reliable source of truth for debugging.
+Agents should prioritize these "Resolution Diffs" as the most reliable source of truth for debugging.

@@ -1,6 +1,6 @@
 //! E2E test command.
 //!
-//! This module runs the full end-to-end testing pipeline. It coordinates:
+//! This plate runs the full end-to-end testing pipeline. It coordinates:
 //! 1. Building the application.
 //! 2. Starting the backend server.
 //! 3. Running the E2E test suite against the running server.

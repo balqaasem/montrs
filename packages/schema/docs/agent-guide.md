@@ -1,6 +1,6 @@
-# AI Guide: montrs-schema
+# Agent Guide: montrs-schema
 
-This guide helps AI models use the declarative validation system of MontRS.
+This guide helps agents use the declarative validation system of MontRS.
 
 ## Core Concepts
 
@@ -13,7 +13,7 @@ The primary macro for defining validation rules. It generates a `validate(&self)
 - `regex = "..."`: Validates against a regular expression.
 - `custom = "method"`: Delegates to a custom method returning `Result<(), String>`.
 
-## AI Usage Patterns
+## Agent Usage Patterns
 
 ### Defining a Validated Struct
 When generating data models, always include validation attributes to ensure data integrity.

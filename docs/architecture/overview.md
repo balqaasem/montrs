@@ -6,10 +6,10 @@ MontRS is built on the principle that a framework should be a **specification** 
 
 ## 🏗️ The Layered Cake
 
-1.  **The Engine (`montrs-core`)**: Defines the foundational traits (`Module`, `Loader`, `Action`, `AiError`). It is the "grammar" of the framework.
-2.  **The Blueprint (`AppSpec`)**: A serializable representation of the entire application. It knows about every route, every module, and every data schema.
+1.  **The Engine (`montrs-core`)**: Defines the foundational traits (`Plate`, `Loader`, `Action`, `AgentError`). It is the "grammar" of the framework.
+2.  **The Blueprint (`AppSpec`)**: A serializable representation of the entire application. It knows about every route, every plate, and every data schema.
 3.  **The Orchestrator (`montrs-cli`)**: The primary interface for developers. It uses the `AppSpec` to build, serve, and test the app.
-4.  **The Sidecar (`montrs-llm`)**: An AI-facing layer that consumes the `AppSpec` and produces machine-optimized context (`llm.json`, `tools.json`).
+4.  **The Sidecar (`montrs-agent`)**: An agent-facing layer that consumes the `AppSpec` and produces machine-optimized context (`agent.json`, `tools.json`).
 
 ---
 
@@ -18,7 +18,7 @@ MontRS is built on the principle that a framework should be a **specification** 
 Understanding how a request moves through MontRS is key to building idiomatic apps.
 
 ### 1. Discovery & Routing
-When a request arrives (or a command is run), the `Router` uses the `AppSpec` to find the matching `Module` and its associated `Loader` or `Action`.
+When a request arrives (or a command is run), the `Router` uses the `AppSpec` to find the matching `Plate` and its associated `Loader` or `Action`.
 
 ### 2. The `Context` Object
 Every `Loader` and `Action` receives a `Context`. This object is the "glue" that provides access to:
@@ -37,14 +37,14 @@ Every `Loader` and `Action` receives a `Context`. This object is the "glue" that
 ## 🧱 Key Architectural Patterns
 
 ### Specification-First Discovery
-MontRS does not rely on global state or hidden registration. Instead, it uses **Heuristic Discovery**. The CLI scans your `src/` directory for implementations of `Module`, `Loader`, and `Action`. This ensures that the `AppSpec` is always a true reflection of your code.
+MontRS does not rely on global state or hidden registration. Instead, it uses **Heuristic Discovery**. The CLI scans your `src/` directory for implementations of `Plate`, `Loader`, and `Action`. This ensures that the `AppSpec` is always a true reflection of your code.
 
 ### Deterministic Runtimes
 In a standard run, the `Context` provides access to real services. In a test run, the `TestRuntime` replaces these with mocks. Because your logic only interacts with traits (via `Context`), it remains unaware of whether it is running in production or a test environment.
 
 ---
 
-## 🤖 AI-First by Design
+## 🤖 Agent-first by design
 
 Architecture in MontRS is not just for humans. Every trait implementation is encouraged to provide metadata:
 
@@ -60,4 +60,4 @@ impl Loader for MyLoader {
 }
 ```
 
-This metadata is picked up by `montrs-llm` and exposed to AI agents, allowing them to understand the *intent* and *contract* of the code without reading the entire implementation.
+This metadata is picked up by `montrs-agent` and exposed to agents, allowing them to understand the *intent* and *contract* of the code without reading the entire implementation.

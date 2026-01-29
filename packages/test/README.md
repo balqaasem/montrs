@@ -2,7 +2,7 @@
 
 Deterministic testing utilities for the MontRS ecosystem.
 
-**Target Audiences:** Application Developers, Framework Contributors, AI Agents.
+**Target Audiences:** Application Developers, Framework Contributors, Agents.
 
 ## 1. What this package is
 `montrs-test` provides the infrastructure for writing robust unit, integration, and end-to-end tests. It emphasizes determinism, allowing developers to boot their entire application spec in-process for fast and reliable verification.
@@ -31,10 +31,10 @@ It is the **validation layer**. It uses the `AppSpec` from `montrs-core` to spin
 - [E2E with MontrsDriver](../../docs/testing/index.md#e2e-testing)
 - [Table-Driven Testing](../../docs/testing/index.md#table-driven-tests)
 
-## 7. Notes for AI Agents
+## 7. Notes for Agents
 - **Deterministic Assertions**: Use `expect(...)` for fluent, human-readable assertions in generated tests.
-- **Test Generation**: Refer to the `Module` and `AppSpec` metadata to understand what inputs and outputs need to be tested.
-- **Error Handling**: Look for `TestError` with `AiError` metadata if a test fixture or driver fails.
+- **Test Generation**: Refer to the `Plate` and `AppSpec` metadata to understand what inputs and outputs need to be tested.
+- **Error Handling**: Look for `TestError` with `AgentError` metadata if a test fixture or driver fails.
 - **Isolaton**: Always use `TestEnv` and `run_fixture_test` to ensure that tests do not leak state to the host system.
 
 ## E2E Testing Usage

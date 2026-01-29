@@ -1,6 +1,6 @@
-// @ai-tool: name="code_format" desc="Formats Rust and view! code according to MontRS standards."
+// @agent-tool: name="code_format" desc="Formats Rust and view! code according to MontRS standards."
 
-use montrs_core::AiError;
+use montrs_core::AgentError;
 use std::path::Path;
 use thiserror::Error;
 
@@ -20,7 +20,7 @@ pub enum FormatError {
     Macro(String),
 }
 
-impl AiError for FormatError {
+impl AgentError for FormatError {
     fn error_code(&self) -> &'static str {
         match self {
             FormatError::Parse(_) => "FMT_PARSE",

@@ -1,5 +1,5 @@
 //! montrs-core/src/router.rs: Explicit routing primitives inspired by Remix.
-//! This module defines Loaders for data fetching and Actions for data mutation,
+//! This file defines Loaders for data fetching and Actions for data mutation,
 //! ensuring clear boundaries between reads and writes.
 
 use crate::AppConfig;
@@ -86,7 +86,7 @@ pub struct Router<C: AppConfig> {
     actions: HashMap<String, Box<dyn Action<C>>>,
 }
 
-/// A machine-readable specification of the router, useful for AI models and documentation.
+/// A machine-readable specification of the router, useful for agents and documentation.
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct RouterSpec {
     pub loaders: HashMap<String, LoaderMetadata>,

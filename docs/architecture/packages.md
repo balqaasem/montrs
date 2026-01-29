@@ -5,7 +5,7 @@ MontRS is organized as a modular workspace. Each package has a specific responsi
 ---
 
 ## 📦 `montrs-core`
-- **Responsibility**: Foundational traits (`Module`, `Loader`, `Action`), routing engine, and `AppSpec` definition.
+- **Responsibility**: Foundational traits (`Plate`, `Loader`, `Action`), routing engine, and `AppSpec` definition.
 - **Key Components**: `Router`, `Context`, `AppSpec`.
 - **Boundary**: It is strictly IO-agnostic. It defines the "Grammar" of how MontRS apps are built.
 - **When to modify**: When you need to change how routing works or add new fundamental capabilities to the framework.
@@ -13,14 +13,14 @@ MontRS is organized as a modular workspace. Each package has a specific responsi
 ## 📦 `montrs-cli`
 - **Responsibility**: Scaffolding (`new`), orchestration (`build`, `serve`), and task management.
 - **Key Components**: `Config`, `TaskRunner`, `ProjectScaffolder`.
-- **Boundary**: It is the "Orchestrator." It depends on `core` and `llm` to understand the project state but does not contain business logic.
+- **Boundary**: It is the "Orchestrator." It depends on `core` and `agent` to understand the project state but does not contain business logic.
 - **When to modify**: When adding new CLI commands or improving the developer experience (DX).
 
-## 📦 `montrs-llm`
-- **Responsibility**: AI-first logic, snapshot generation (`llm.json`), and versioned error tracking.
-- **Key Components**: `LlmManager`, `ErrorRecord`, `ToolScanner`.
+## 📦 `montrs-agent`
+- **Responsibility**: Agent-first logic, snapshot generation (`agent.json`), and versioned error tracking.
+- **Key Components**: `AgentManager`, `ErrorRecord`, `ToolScanner`.
 - **Boundary**: Acts as a "Sidecar." It scans the codebase (using `core` metadata) to produce machine-optimized context.
-- **When to modify**: When improving AI discoverability or changing the `llm.json` schema.
+- **When to modify**: When improving agent discoverability or changing the `agent.json` schema.
 
 ## 📦 `montrs-orm`
 - **Responsibility**: Database abstraction, SQL execution, and row mapping.
@@ -48,5 +48,5 @@ MontRS follows a **Dependency Inversion** pattern. `montrs-core` defines the tra
 
 1.  **CLI** reads **Config** and **Core** to understand the app.
 2.  **Core** uses **Schema** to validate data at the boundaries.
-3.  **Modules** use **ORM** to persist data.
-4.  **LLM** scans everything to produce the **Spec Snapshot**.
+3.  **Plates** use **ORM** to persist data.
+4.  **Agent** scans everything to produce the **Spec Snapshot**.

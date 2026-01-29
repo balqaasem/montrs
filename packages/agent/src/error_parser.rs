@@ -1,4 +1,4 @@
-use crate::{ProjectError, AiErrorMetadata};
+use crate::{ProjectError, AgentErrorMetadata};
 use regex::Regex;
 use std::sync::OnceLock;
 
@@ -24,7 +24,7 @@ pub fn parse_rustc_errors(output: &str) -> Vec<ProjectError> {
             message: message.clone(),
             code_context: "".to_string(), // In a real implementation, we'd read the file here
             level: "Error".to_string(),
-            ai_metadata: Some(AiErrorMetadata {
+            agent_metadata: Some(AgentErrorMetadata {
                 error_code: code.clone(),
                 explanation: format!("Rust compiler error {}: {}", code, message),
                 suggested_fixes: Vec::new(),

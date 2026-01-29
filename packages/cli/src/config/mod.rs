@@ -1,6 +1,6 @@
-//! Configuration module for MontRS.
+//! Configuration plate for MontRS.
 
-//! This module defines the structure of the `montrs.toml` configuration file
+//! This plate defines the structure of the `montrs.toml` configuration file
 //! and handles loading/parsing logic. It serves as the central source of truth
 //! for project settings, build options, and server configuration.
 

@@ -1,5 +1,5 @@
 //! montrs-core/src/features.rs: Dynamic feature flags and user segmentation.
-//! This module allows for runtime feature toggling and segment-based
+//! This file allows for runtime feature toggling and segment-based
 //! targeting to support A/B testing and phased rollouts.
 
 use serde::{Deserialize, Serialize};

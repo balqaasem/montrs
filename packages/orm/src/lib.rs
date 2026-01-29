@@ -2,10 +2,10 @@
 //! This crate defines the DbBackend trait and provides implementations for
 //! SQLite and PostgreSQL, enabling unified database access.
 //!
-//! // @ai-tool: name="db_query" desc="Executes a SQL query on the configured database backend."
+//! // @agent-tool: name="db_query" desc="Executes a SQL query on the configured database backend."
 
 use async_trait::async_trait;
-use montrs_core::AiError;
+use montrs_core::AgentError;
 #[cfg(feature = "postgres")]
 use deadpool_postgres::{Config, Pool, Runtime};
 #[cfg(feature = "sqlite")]
@@ -25,7 +25,7 @@ pub enum DbError {
     Migration(String),
 }
 
-impl AiError for DbError {
+impl AgentError for DbError {
     fn error_code(&self) -> &'static str {
         match self {
             DbError::Connection(_) => "DB_CONNECTION",

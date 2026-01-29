@@ -1,4 +1,4 @@
-use crate::AiError;
+use crate::AgentError;
 use std::fmt;
 
 /// Errors that can occur during schema validation.
@@ -45,7 +45,7 @@ impl fmt::Display for ValidationError {
 
 impl std::error::Error for ValidationError {}
 
-impl AiError for ValidationError {
+impl AgentError for ValidationError {
     fn error_code(&self) -> &'static str {
         match self {
             ValidationError::MinLength { .. } => "VAL_MIN_LENGTH",
@@ -91,7 +91,7 @@ pub trait Validate {
     /// Validates the struct and returns a list of all validation errors found.
     fn validate(&self) -> Result<(), Vec<ValidationError>>;
 
-    /// Returns the validation rules for this type, useful for AI models to understand constraints.
+    /// Returns the validation rules for this type, useful for agents to understand constraints.
     fn rules(&self) -> Vec<String> {
         Vec::new()
     }

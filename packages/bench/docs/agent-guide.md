@@ -1,6 +1,6 @@
-# AI Guide: montrs-bench
+# Agent Guide: montrs-bench
 
-This guide helps AI models measure and optimize performance in MontRS.
+This guide helps agents measure and optimize performance in MontRS.
 
 ## Core Concepts
 
@@ -15,7 +15,7 @@ The orchestrator that runs benchmarks and generates reports.
 ### 3. Statistics
 Provides Mean, Median, P95, P99, etc. Use these to identify performance regressions.
 
-## AI Usage Patterns
+## Agent Usage Patterns
 
 ### Defining a Benchmark
 ```rust

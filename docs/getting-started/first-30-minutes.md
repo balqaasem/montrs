@@ -10,7 +10,7 @@ MontRS is a Rust-native, trait-driven web framework built for teams that value *
 
 **MontRS is great for:**
 - Complex web applications with deep data requirements.
-- Systems that need to be "AI-First" (easily understood by LLMs).
+- Systems that need to be "Agent-First" (easily understood by agents).
 - Projects where testing and reliability are non-negotiable.
 
 **MontRS intentionally avoids:**
@@ -27,11 +27,11 @@ MontRS is a Rust-native, trait-driven web framework built for teams that value *
 To build effectively with MontRS, you only need to understand four core concepts:
 
 1.  **Signals**: Fine-grained reactivity. Instead of re-rendering everything, MontRS updates only the specific parts of the UI that change when a "Signal" value is updated.
-2.  **Modules**: The unit of organization. Your app is a collection of independent modules that register their own routes and logic.
+2.  **Plates**: The unit of organization. Your app is a collection of independent plates (think tectonic plates) that register their own routes and logic.
 3.  **Routes (Loaders & Actions)**: The boundaries of your app.
     -   **Loaders** are for reading data (GET).
     -   **Actions** are for writing/mutating data (POST/PUT/DELETE).
-4.  **AppSpec**: A machine-readable "blueprint" of your entire app. It's how MontRS (and AI agents) knows exactly what your app can do without running it.
+4.  **AppSpec**: A machine-readable "blueprint" of your entire app. It's how MontRS (and agents) knows exactly what your app can do without running it.
 
 ---
 
@@ -49,12 +49,12 @@ cd my-app
 ```
 
 ### The Generated Structure
--   `src/main.rs`: The entry point where your app and modules are initialized.
--   `src/modules/`: This is where your business logic lives.
+-   `src/main.rs`: The entry point where your app and plates are initialized.
+-   `src/plates/`: This is where your business logic lives.
 -   `montrs.toml`: Your project configuration.
--   `.llm/`: (Auto-generated) Contains the `llm.json` specification for AI context.
+-   `.agent/`: (Auto-generated) Contains the `agent.json` specification for agent context.
 
-Typically, you'll spend 90% of your time in `src/modules/`.
+Typically, you'll spend 90% of your time in `src/plates/`.
 
 ---
 
@@ -111,7 +111,7 @@ view! {
 }
 ```
 
-**Why this way?** By separating the *Read* (Loader), the *Write* (Action), and the *UI* (Signal), your code remains easy to test and AI agents can understand exactly how to interact with your counter.
+**Why this way?** By separating the *Read* (Loader), the *Write* (Action), and the *UI* (Signal), your code remains easy to test and agents can understand exactly how to interact with your counter.
 
 ---
 
@@ -143,7 +143,7 @@ Because MontRS is deterministic, testing is straightforward. The `TestRuntime` a
 ```rust
 #[tokio::test]
 async fn test_increment() {
-    let runtime = TestRuntime::new(MyModule);
+    let runtime = TestRuntime::new(MyPlate);
     let result = runtime.call_action("/increment", json!({ "count": 5 })).await;
     assert_eq!(result["count"], 6);
 }
@@ -159,7 +159,7 @@ You've just scratched the surface of MontRS. Here is where to dive deeper:
 
 -   **[Core Architecture](architecture.md)**: Understand the "Shape" of the engine.
 -   **[The Golden Path](golden-path.md)**: Deep dive into idiomatic patterns.
--   **[Routing & Modules](router.md)**: Master the Loader/Action pattern.
--   **[AI Integration](ai-first.md)**: Learn how to let AI build for you.
+-   **[Routing & Plates](router.md)**: Master the Loader/Action pattern.
+-   **[Agent-First Development](../agent/agent-first.md)**: Learn how to let agents build for you.
 
-You're now ready to build. Typically, developers start by exploring the `src/modules` folder in their new project. **Happy coding!**
+You're now ready to build. Typically, developers start by exploring the `src/plates` folder in their new project. **Happy coding!**

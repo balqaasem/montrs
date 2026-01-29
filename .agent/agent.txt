@@ -56,7 +56,7 @@ LlmSnapshot {
             description: None,
         },
         FileEntry {
-            path: "docs\\modules.md",
+            path: "docs\\plates.md",
             description: None,
         },
         FileEntry {
@@ -572,10 +572,10 @@ LlmSnapshot {
             description: None,
         },
     ],
-    modules: [],
+    plates: [],
     routes: [],
     documentation_snippets: {
         "debugging": "\n# Debugging MontRS\nMontRS provides an `errorfile.txt` in the `.llm` folder when a build or test fails.\nAI models should use this file to understand the context of the error and propose fixes.\n",
-        "architecture": "\n# MontRS Architecture Guide\nMontRS is a trait-driven, deterministic web framework built on Leptos 0.8.\n\n## Core Concepts\n- **AppSpec**: The single source of truth for the application blueprint.\n- **Module**: A unit of composition (Auth, Blog, etc.) that registers routes and providers.\n- **Loaders**: Read-only, idempotent data fetching.\n- **Actions**: State-changing mutations.\n\n## How to build a module\n1. Implement the `Module` trait.\n2. Define your `Loader` and `Action` implementations.\n3. Register them in `register_routes`.\n",
+        "architecture": "\n# MontRS Architecture Guide\nMontRS is a trait-driven, deterministic web framework built on Leptos 0.8.\n\n## Core Concepts\n- **AppSpec**: The single source of truth for the application blueprint.\n- **Plate**: A unit of composition (Auth, Blog, etc.) that registers routes and providers.\n- **Loaders**: Read-only, idempotent data fetching.\n- **Actions**: State-changing mutations.\n\n## How to build a plate\n1. Implement the `Plate` trait.\n2. Define your `Loader` and `Action` implementations.\n3. Register them in `register_routes`.\n",
     },
 }

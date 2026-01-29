@@ -27,9 +27,9 @@ A typical MontRS project looks like this:
 
 - `src/`: Your application source code.
   - `main.rs`: Entry point.
-  - `modules/`: Your business logic organized into modules.
+  - `plates/`: Your business logic organized into plates.
 - `montrs.toml`: Framework and task configuration.
-- `.llm/`: (Auto-generated) AI-readable project specifications.
+- `.agent/`: (Auto-generated) agent-readable project specifications.
 
 ## 🏃 Running the App
 
@@ -41,9 +41,9 @@ montrs serve
 
 Your app will be available at `http://localhost:3000`.
 
-## 🤖 AI-First Development
+## 🤖 Agent-first development
 
-MontRS is designed to work with AI. Every time you run a CLI command, it updates `.llm/llm.json`. This file gives your AI coding partner a perfect understanding of your project's routes, schemas, and state.
+MontRS is designed to work with agents. Every time you run a CLI command, it updates `.agent/agent.json`. This file gives your agent coding partner a perfect understanding of your project's routes, schemas, and state.
 
 ## 🛠️ Troubleshooting
 
@@ -53,13 +53,14 @@ Ensure that your Cargo binary directory is in your `PATH`. On most systems, this
 ### 2. Compilation Errors in `view!` Macros
 The `view!` macro is very strict about HTML syntax. If you get a cryptic error, try running `montrs fmt` to see if it can identify a malformed tag or missing closing brace.
 
-### 3. `.llm` Folder Not Found
-The `.llm` folder is created the first time you run `montrs serve`, `montrs build`, or `montrs spec`. If it's missing, try running `montrs spec` manually.
+### 3. `.agent` Folder Not Found
+
+The `.agent` folder is created the first time you run `montrs serve`, `montrs build`, or `montrs spec`. If it's missing, try running `montrs spec` manually.
 
 ---
 
 ## 📚 Next Steps
 
 - [The Golden Path](golden-path.md): Learn the best practices for building with MontRS.
-- [Router & Modules](router.md): Deep dive into our data-first architecture.
+- [Router & Plates](router.md): Deep dive into our data-first architecture.
 - [Testing](testing.md): Write your first deterministic test.

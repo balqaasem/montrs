@@ -33,9 +33,9 @@ ctx.db().transaction(|tx| async move {
 }).await?;
 ```
 
-## 🤖 AI and Async Code
+## 🤖 Agents and Async Code
 
-When an AI agent generates database code for MontRS, it should always:
+When an agent generates database code for MontRS, it should always:
 1. Use `.await` on all `fetch` and `execute` calls.
-2. Handle `Result` types using the `?` operator to leverage the framework's `AiError` integration.
+2. Handle `Result` types using the `?` operator to leverage the framework's `AgentError` integration.
 3. Keep database logic within `Loader` or `Action` implementations to ensure proper context access.

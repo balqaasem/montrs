@@ -50,9 +50,9 @@ async fn create_user(ctx: Context, input: CreateUserInput) -> Result<User> {
 }
 ```
 
-## 🤖 AI and the ORM
+## 🤖 Agents and the ORM
 
-For AI agents, the ORM layer is where the **Data Model** lives.
--   **Schema Inference**: By looking at structs implementing `FromRow`, an AI can understand the database schema.
--   **SQL Generation**: Since we use standard SQL, AI models can easily generate queries to fetch or modify data.
--   **Error Resolution**: `DbError` implements `AiError`, providing specific codes for constraint violations (e.g., unique key conflict), allowing the AI to suggest schema or data fixes.
+For agents, the ORM layer is where the **Data Model** lives.
+-   **Schema Inference**: By looking at structs implementing `FromRow`, an agent can understand the database schema.
+-   **SQL Generation**: Since we use standard SQL, models can easily generate queries to fetch or modify data.
+-   **Error Resolution**: `DbError` implements `AgentError`, providing specific codes for constraint violations (e.g., unique key conflict), allowing the agent to suggest schema or data fixes.

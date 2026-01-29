@@ -1,6 +1,6 @@
 //! Production-grade unit testing utilities for MontRS.
 //!
-//! This module provides a rich set of testing primitives inspired by modern
+//! This plate provides a rich set of testing primitives inspired by modern
 //! testing frameworks like Jest. It focuses on Developer Experience (DevX)
 //! by providing fluent assertions, mocking/spying utilities, and benchmarking tools.
 //!

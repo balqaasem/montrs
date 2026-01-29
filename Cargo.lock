@@ -3785,6 +3785,26 @@ dependencies = [
 ]
 
 [[package]]
+name = "montrs-agent"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "chrono",
+ "ignore",
+ "montrs-core",
+ "regex",
+ "serde",
+ "serde_json",
+ "serde_yaml",
+ "tempfile",
+ "thiserror 1.0.69",
+ "tokio",
+ "toml 0.8.23",
+ "uuid",
+ "walkdir",
+]
+
+[[package]]
 name = "montrs-bench"
 version = "0.1.0"
 dependencies = [
@@ -3821,10 +3841,10 @@ dependencies = [
  "fs_extra",
  "ignore",
  "indicatif 0.17.11",
+ "montrs-agent",
  "montrs-bench",
  "montrs-core",
  "montrs-fmt",
- "montrs-llm",
  "quick-xml",
  "reqwest 0.12.28",
  "serde",
@@ -3878,26 +3898,6 @@ dependencies = [
  "thiserror 1.0.69",
  "toml 0.8.23",
  "tracing",
- "walkdir",
-]
-
-[[package]]
-name = "montrs-llm"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "chrono",
- "ignore",
- "montrs-core",
- "regex",
- "serde",
- "serde_json",
- "serde_yaml",
- "tempfile",
- "thiserror 1.0.69",
- "tokio",
- "toml 0.8.23",
- "uuid",
  "walkdir",
 ]
 

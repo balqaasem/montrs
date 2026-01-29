@@ -27,9 +27,9 @@ montrs run db-migrate
 - **Array Tasks**: A sequence of tasks or commands run in order.
 - **Environment Variables**: Tasks inherit the environment defined in `montrs.toml`.
 
-## 🤖 AI and Tasks
+## 🤖 Agents and Tasks
 
-AI agents can discover available tasks by reading the `montrs.toml` file or checking the `tools` section of `llm.json`. This allows an AI to perform complex operations like:
+Agents can discover available tasks by reading the `montrs.toml` file or checking the `tools` section of `agent.json`. This allows an agent to perform complex operations like:
 - "Run the database migrations before starting the server."
 - "Execute the pre-commit checks to ensure the code is valid."
 

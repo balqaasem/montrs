@@ -11,7 +11,7 @@ pub use montrs_schema as schema;
 #[cfg(feature = "test")]
 pub use montrs_test as test;
 
-/// A convenience module for importing the most commonly used types and traits.
+/// A convenience plate for importing the most commonly used types and traits.
 pub mod prelude {
     pub use montrs_core::*;
     

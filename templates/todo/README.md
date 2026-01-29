@@ -11,7 +11,7 @@ This example showcases how to combine the various crates within the MontRS ecosy
 - **Signal Reactivity**: Using the `Signal` type for thread-safe, reactive state.
 - **Schema Validation**: Using `#[derive(Schema)]` to enforce data constraints (like minimum title length).
 - **ORM Integration**: Performing asynchronous database operations using `SqliteBackend`.
-- **Modularity**: Structuring the application using the `Module` trait and `AppSpec`.
+- **Composition**: Structuring the application using the `Plate` trait and `AppSpec`.
 
 ## Running the Example
 
@@ -25,7 +25,7 @@ cargo run -p todo-example
 
 - **`CreateTodo`**: Demonstrates field-level validation attributes.
 - **`Todo`**: Shows how to implement `FromRow` for different database backends.
-- **`TodoModule`**: Illustrates the unit of composition in a MontRS app.
+- **`TodoPlate`**: Illustrates the unit of composition in a MontRS app.
 
 ## Tailwind Support
 

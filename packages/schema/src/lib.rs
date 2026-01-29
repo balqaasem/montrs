@@ -6,7 +6,7 @@ extern crate proc_macro;
 use proc_macro::TokenStream;
 use quote::quote;
 use syn::{Data, DeriveInput, Fields, LitInt, parse_macro_input};
-use montrs_core::AiError;
+use montrs_core::AgentError;
 use thiserror::Error;
 
 /// Errors that can occur during schema derivation or validation setup.
@@ -22,7 +22,7 @@ pub enum SchemaError {
     UnsupportedAttribute(String),
 }
 
-impl AiError for SchemaError {
+impl AgentError for SchemaError {
     fn error_code(&self) -> &'static str {
         match self {
             SchemaError::InvalidStructType(_) => "SCHEMA_INVALID_STRUCT_TYPE",

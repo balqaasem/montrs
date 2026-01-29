@@ -6,7 +6,7 @@ members = [
     "packages/cli",
     "packages/core",
     "packages/fmt",
-    "packages/llm",
+    "packages/agent",
     "packages/montrs",
     "packages/orm",
     "packages/schema",

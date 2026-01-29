@@ -1,4 +1,4 @@
-use montrs_core::AiError;
+use montrs_core::AgentError;
 use thiserror::Error;
 
 #[derive(Error, Debug)]
@@ -13,7 +13,7 @@ pub enum CliError {
     Build(String),
 }
 
-impl AiError for CliError {
+impl AgentError for CliError {
     fn error_code(&self) -> &'static str {
         match self {
             CliError::Config(_) => "CLI_CONFIG",

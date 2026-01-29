@@ -2,7 +2,7 @@
 
 The comment-preserving formatter for MontRS projects.
 
-**Target Audiences:** Application Developers, Framework Contributors, AI Agents.
+**Target Audiences:** Application Developers, Framework Contributors, Agents.
 
 ## 1. What this package is
 `montrs-fmt` is a specialized code formatter designed for the MontRS ecosystem. It extends `prettyplease` with support for preserving non-doc comments and intelligently formatting `view!` macros.
@@ -31,8 +31,8 @@ It is integrated into the CLI as the `montrs fmt` command. It ensures that all p
 - [Configuration Reference](../../docs/tooling/fmt.md#configuration-reference) - Full list of available `[fmt]` settings.
 - [Span-Gap Algorithm](../../docs/tooling/fmt.md#internal-architecture-the-span-gap-algorithm) - For framework contributors.
 
-## 7. Notes for AI Agents
+## 7. Notes for Agents
 - **Formatting Constraints**: When generating code for MontRS, follow the rules defined in `montrs.toml` under the `[fmt]` section.
 - **Comment Importance**: Always include comments in generated code; `montrs-fmt` will preserve them.
-- **Error Handling**: Look for `FormatError` with `AiError` metadata if a formatting operation fails.
+- **Error Handling**: Look for `FormatError` with `AgentError` metadata if a formatting operation fails.
 - **Idempotency**: Formatting a file twice with the same configuration should result in no changes the second time.

@@ -46,6 +46,6 @@ APP_SECRET=...
 PORT=3000
 ```
 
-## 🤖 AI and Deployment
+## 🤖 Agents and Deployment
 
-AI agents can help generate CI/CD pipelines (e.g., GitHub Actions) by reading the `AppSpec` to understand the project's dependencies and build requirements.
+Agents can help generate CI/CD pipelines (e.g., GitHub Actions) by reading the `AppSpec` to understand the project's dependencies and build requirements.

@@ -6,8 +6,8 @@ MontRS is a Rust-native, trait-driven framework for building cross-platform appl
 
 MontRS exists because building complex applications requires more than just a UI library. It requires a **predictable architecture**.
 - **Determinism**: The same input should always produce the same output, whether in production or testing.
-- **Trait-Driven Boundaries**: Features are encapsulated in Modules with explicit interfaces.
-- **AI-First**: Built-in metadata and structured snapshots make MontRS applications natively understandable by AI agents.
+- **Trait-Driven Boundaries**: Features are encapsulated in Plates with explicit interfaces.
+- **Agent-first**: Built-in metadata and structured snapshots make MontRS applications natively understandable by agents.
 
 ---
 
@@ -17,7 +17,7 @@ The "Golden Path" is the recommended workflow for building robust MontRS applica
 
 1.  **Scaffold**: Start with `montrs new <app-name>` to get a pre-configured workspace.
 2.  **Define**: Use `#[derive(Schema)]` to define your data models and validation rules.
-3.  **Implement**: Build features as `Module`s. Define `Loader`s for fetching data and `Action`s for mutations.
+3.  **Implement**: Build features as `Plate`s. Define `Loader`s for fetching data and `Action`s for mutations.
 4.  **Verify**: Use the `TestRuntime` for in-process, deterministic testing of your entire application spec.
 5.  **Ship**: Deploy to your target (Web, Server, or Desktop) using `montrs build`.
 
@@ -43,9 +43,9 @@ struct Greeting {
     name: String,
 }
 
-struct HelloModule;
+struct HelloPlate;
 
-impl Module for HelloModule {
+impl Plate for HelloPlate {
     fn register_routes(&self, router: &mut Router) {
         router.add_loader("/hello", HelloLoader);
     }
@@ -76,12 +76,12 @@ impl Loader for HelloLoader {
 - [Package Boundaries](docs/architecture/packages.md): Responsibility of each crate.
 - [Invariants & Philosophy](docs/architecture/philosophy.md): The rules we don't break.
 
-### 3. AI Agents
+### 3. Agents
 *Machine-readable context for models.*
-- [AI Condensed Onboarding](docs/ai/onboarding.md): **Start here!** Rules and invariants for AI agents.
-- [AI Usage Guide](packages/llm/README.md): How to use `llm.json` and `tools.json`.
-- [Spec Snapshot](docs/ai/spec.md): Understanding the machine-readable project state.
-- **Metadata Markers**: Look for `@ai-tool` and `AiError` implementations in the source.
+- [Agent-first design](docs/agent/agent-first.md): Principles of machine-readability.
+- [Agent Usage Guide](packages/agent/README.md): How to use `agent.json` and `tools.json`.
+- [Spec Snapshot](docs/agent/spec.md): Understanding the machine-readable project state.
+- **Metadata Markers**: Look for `@agent-tool` and `AgentError` implementations in the source.
 
 ---
 
@@ -89,9 +89,9 @@ impl Loader for HelloLoader {
 
 | Package | Purpose |
 | :--- | :--- |
-| [core](packages/core/README.md) | The architectural engine (Modules, Routing, AppSpec). |
+| [core](packages/core/README.md) | The architectural engine (Plates, Routing, AppSpec). |
 | [cli](packages/cli/README.md) | Orchestration, scaffolding, and build tools. |
-| [llm](packages/llm/README.md) | AI-first logic, snapshotting, and error tracking. |
+| [agent](packages/agent/README.md) | Agent-first logic, snapshotting, and error tracking. |
 | [orm](packages/orm/README.md) | SQL-centric database abstraction. |
 | [schema](packages/schema/README.md) | Compile-time validation and data modeling. |
 | [test](packages/test/README.md) | Deterministic test runtime and E2E tools. |

@@ -1,8 +1,8 @@
 //! montrs-core/src/env.rs: Typed environment variable management.
-//! This module provides traits and implementations for accessing environment
+//! This file provides traits and implementations for accessing environment
 //! variables in a type-safe and mockable manner.
 
-use crate::AiError;
+use crate::AgentError;
 use std::error::Error;
 use std::fmt;
 
@@ -24,7 +24,7 @@ impl fmt::Display for EnvError {
 
 impl Error for EnvError {}
 
-impl AiError for EnvError {
+impl AgentError for EnvError {
     fn error_code(&self) -> &'static str {
         match self {
             EnvError::MissingKey(_) => "ENV_MISSING_KEY",

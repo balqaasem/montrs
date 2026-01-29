@@ -141,7 +141,7 @@ preserve_blank_lines = true
 
 ## 8. Alignment with MontRS v0.1 PRD
 
-`montrs-fmt` fulfills the requirement for "Tooling & scaffold" mentioned in Section 10 of the MontRS PRD. It ensures that the generated templates and user-authored modules maintain a consistent, readable, and professional standard. By supporting comments everywhere, it upholds the "No hidden magic" and "Explicit boundaries" philosophy, as developers can clearly document their logic boundaries within the reactive UI layer.
+`montrs-fmt` fulfills the requirement for "Tooling & scaffold" mentioned in Section 10 of the MontRS PRD. It ensures that the generated templates and user-authored plates maintain a consistent, readable, and professional standard. By supporting comments everywhere, it upholds the "No hidden magic" and "Explicit boundaries" philosophy, as developers can clearly document their logic boundaries within the reactive UI layer.
 
 ---
 
@@ -149,7 +149,7 @@ preserve_blank_lines = true
 
 - **Tailwind CSS Support**: Automatically sorting Tailwind classes within `class="..."` attributes, integrated with the `montrs-cli` tailwind config.
 - **Doc-test Formatting**: Extending the formatter to handle Rust code blocks inside Markdown doc comments.
-- **Plugin System**: Allowing other MontRS modules to register their own macros for specialized formatting (e.g., a `css!` or `sql!` macro).
+- **Plugin System**: Allowing other MontRS plates to register their own macros for specialized formatting (e.g., a `css!` or `sql!` macro).
 
 ## 10. Conclusion
 

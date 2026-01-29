@@ -80,12 +80,12 @@ impl Report {
 
         for name in keys {
             let result = &self.results[name];
-            // Sanitize name for use as a module/constant
+            // Sanitize name for use as a plate/constant
             let safe_name = name
                 .replace(|c: char| !c.is_alphanumeric(), "_")
                 .to_uppercase();
 
-            // We export a struct-like module or just constants
+            // We export a struct-like plate or just constants
             writeln!(file, "/// Weight for {}", name)?;
             writeln!(file, "pub mod {} {{", safe_name.to_lowercase())?;
             

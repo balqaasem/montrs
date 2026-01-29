@@ -2,7 +2,7 @@
 
 A trait-driven, async-first ORM layer for MontRS.
 
-**Target Audiences:** Application Developers, Framework Contributors, AI Agents.
+**Target Audiences:** Application Developers, Framework Contributors, Agents.
 
 ## 1. What this package is
 `montrs-orm` provides a unified, SQL-centric interface for interacting with different database backends (SQLite, PostgreSQL). It abstracts driver-specific details while maintaining high-performance async access.
@@ -18,7 +18,7 @@ A trait-driven, async-first ORM layer for MontRS.
 - **Auto-Caching**: It does not implement implicit query caching.
 
 ## 4. How it fits into the MontRS system
-It provides the **persistence layer** for `Module`s. It implements the traits defined in `montrs-core` for data access.
+It provides the **persistence layer** for `Plate`s. It implements the traits defined in `montrs-core` for data access.
 
 ## 5. When a user should reach for this package
 - When building a feature that requires persistent data storage.
@@ -30,8 +30,8 @@ It provides the **persistence layer** for `Module`s. It implements the traits de
 - [Backend Support Guide](../../docs/orm/backends.md)
 - [Async Patterns in ORM](../../docs/orm/async.md)
 
-## 7. Notes for AI Agents
+## 7. Notes for Agents
 - **SQL Preference**: Prefer writing raw SQL queries using the provided backend execute methods over complex abstractions.
 - **Schema Discovery**: Read the struct definitions that implement `FromRow` to understand the database schema.
-- **Error Mapping**: This package implements `AiError` for `DbError`, providing specific codes for constraint violations, connection failures, etc.
+- **Error Mapping**: This package implements `AgentError` for `DbError`, providing specific codes for constraint violations, connection failures, etc.
 - **Constraints**: Assume all database operations are `async` and must be awaited within an `Action` or `Loader`.

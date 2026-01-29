@@ -1,5 +1,5 @@
 //! montrs-core/src/limiter.rs: Rate limiting primitives.
-//! This module provides a generic Limiter trait and a concrete implementation
+//! This file provides a generic Limiter trait and a concrete implementation
 //! using the governor crate for sophisticated rate limiting strategies.
 
 use governor::{Quota, RateLimiter, clock::DefaultClock, state::InMemoryState, state::NotKeyed};
@@ -11,7 +11,7 @@ pub trait Limiter: Send + Sync + 'static {
     /// Returns true if the request is allowed, false otherwise.
     fn check(&self) -> bool;
 
-    /// Returns a description of the rate limiting strategy, useful for AI models.
+    /// Returns a description of the rate limiting strategy, useful for agents.
     fn description(&self) -> &'static str {
         "A generic rate limiter."
     }

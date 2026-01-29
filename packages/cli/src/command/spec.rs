@@ -1,11 +1,11 @@
-use montrs_llm::LlmManager;
+use montrs_agent::AgentManager;
 use anyhow::Result;
 
 pub async fn run(include_docs: bool, format: String) -> Result<()> {
     let cwd = std::env::current_dir()?;
-    let manager = LlmManager::new(&cwd);
+    let manager = AgentManager::new(&cwd);
     
-    // AI-First: Ensure tools.json is updated when running spec
+    // Agent: Ensure tools.json is updated when running spec
     if let Err(e) = manager.write_tools_spec() {
         eprintln!("Warning: Failed to update tools spec: {}", e);
     }
@@ -26,7 +26,7 @@ pub async fn run(include_docs: bool, format: String) -> Result<()> {
     }
 
     if include_docs {
-        // LlmManager already includes some documentation, but we can add more if needed
+        // AgentManager already includes some documentation, but we can add more if needed
     }
 
     let output = match format.as_str() {

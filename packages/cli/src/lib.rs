@@ -181,12 +181,12 @@ pub enum Commands {
     },
     /// Upgrade the MontRS CLI to the latest version.
     Upgrade,
-    /// Generate an AI-readable specification and snapshot of the project.
+    /// Generate an agent-readable specification and snapshot of the project.
     Spec {
         /// Include documentation in the snapshot.
         #[arg(long)]
         include_docs: bool,
-        /// Output format (json, yaml).
+        /// Output format (json, yaml, txt).
         #[arg(long, default_value = "json")]
         format: String,
     },
@@ -267,38 +267,38 @@ pub async fn run(cli: MontrsCli) -> anyhow::Result<()> {
 pub fn main_entry() {
     let args: Vec<String> = std::env::args().collect();
 
-    // AI-First: Autogenerate .llm folder on every CLI interaction (even before parsing)
+    // Agent: Autogenerate .agent folder on every CLI interaction (even before parsing)
     if let Ok(cwd) = std::env::current_dir() {
-        let llm_manager = montrs_llm::LlmManager::new(&cwd);
+        let agent_manager = montrs_agent::AgentManager::new(&cwd);
         let app_name = std::fs::read_to_string("montrs.toml")
             .ok()
             .and_then(|c| toml::from_str::<toml::Value>(&c).ok())
             .and_then(|v| v.get("project").and_then(|p| p.get("name")).and_then(|n| n.as_str()).map(|s| s.to_string()))
             .unwrap_or_else(|| "app".to_string());
 
-        // Initialize .llm if it doesn't exist
-        if !llm_manager.llm_dir().exists() {
-            if let Err(e) = llm_manager.ensure_dir() {
-                eprintln!("Warning: Failed to create .llm directory: {}", e);
+        // Initialize .agent if it doesn't exist
+        if !agent_manager.agent_dir().exists() {
+            if let Err(e) = agent_manager.ensure_dir() {
+                eprintln!("Warning: Failed to create .agent directory: {}", e);
             }
         }
 
-        // AI-First: Update tools and snapshot if we are in an existing project
+        // Agent: Update tools and snapshot if we are in an existing project
         if args.len() > 1 && args[1] != "new" {
-            if let Err(e) = llm_manager.write_tools_spec() {
+            if let Err(e) = agent_manager.write_tools_spec() {
                 eprintln!("Warning: Failed to update tools spec: {}", e);
             }
             
-            match llm_manager.generate_snapshot(app_name) {
+            match agent_manager.generate_snapshot(app_name) {
                 Ok(snapshot) => {
-                    if let Err(e) = llm_manager.write_snapshot(&snapshot, "json") {
-                        eprintln!("AI-First: Failed to write JSON snapshot: {}", e);
+                    if let Err(e) = agent_manager.write_snapshot(&snapshot, "json") {
+                        eprintln!("Agent: Failed to write JSON snapshot: {}", e);
                     }
-                    if let Err(e) = llm_manager.write_snapshot(&snapshot, "txt") {
-                        eprintln!("AI-First: Failed to write TXT snapshot: {}", e);
+                    if let Err(e) = agent_manager.write_snapshot(&snapshot, "txt") {
+                        eprintln!("Agent: Failed to write TXT snapshot: {}", e);
                     }
                 }
-                Err(e) => eprintln!("AI-First: Failed to generate LLM snapshot: {}", e),
+                Err(e) => eprintln!("Agent: Failed to generate agent snapshot: {}", e),
             }
         }
     }
@@ -319,21 +319,21 @@ pub fn main_entry() {
         use console::style;
         eprintln!("{} Error: {:?}", style("✘").red().bold(), e);
         
-        // AI-First: Report error to .llm/errorfile.json
+        // Agent: Report error to .agent/errorfile.json
         if let Ok(cwd) = std::env::current_dir() {
-            let llm_manager = montrs_llm::LlmManager::new(&cwd);
-            // Try to downcast to AiError if possible (this is simplified for now)
-            let _ = llm_manager.report_error(format!("{:?}", e));
+            let agent_manager = montrs_agent::AgentManager::new(&cwd);
+            // Try to downcast to AgentError if possible (this is simplified for now)
+            let _ = agent_manager.report_error(format!("{:?}", e));
         }
         
         std::process::exit(1);
     } else {
-        // AI-First: On success, check if we resolved any active errors
+        // Agent: On success, check if we resolved any active errors
         if let Ok(cwd) = std::env::current_dir() {
-            let llm_manager = montrs_llm::LlmManager::new(&cwd);
-            let diff = llm_manager.generate_diff();
-            if let Err(err) = llm_manager.auto_resolve_active_errors("Build/Command succeeded".to_string(), diff) {
-                eprintln!("AI-First: Failed to resolve active errors: {}", err);
+            let agent_manager = montrs_agent::AgentManager::new(&cwd);
+            let diff = agent_manager.generate_diff();
+            if let Err(err) = agent_manager.auto_resolve_active_errors("Build/Command succeeded".to_string(), diff) {
+                eprintln!("Agent: Failed to resolve active errors: {}", err);
             }
         }
     }

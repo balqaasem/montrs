@@ -1,6 +1,6 @@
 //! Professional-grade benchmarking utilities for MontRS.
 //!
-//! // @ai-tool: name="bench_run" desc="Runs performance benchmarks for the project or specific targets."
+//! // @agent-tool: name="bench_run" desc="Runs performance benchmarks for the project or specific targets."
 //!
 //! This crate provides tools for measuring performance, gathering system statistics,
 //! and generating detailed reports.
@@ -19,7 +19,7 @@ pub use report::Report;
 pub use runner::{BenchRunner, Benchmark};
 pub use weights::Weight;
 
-use montrs_core::AiError;
+use montrs_core::AgentError;
 use std::future::Future;
 use thiserror::Error;
 
@@ -38,7 +38,7 @@ pub enum BenchError {
     Serialization(#[from] serde_json::Error),
 }
 
-impl AiError for BenchError {
+impl AgentError for BenchError {
     fn error_code(&self) -> &'static str {
         match self {
             BenchError::Setup(_) => "BENCH_SETUP",

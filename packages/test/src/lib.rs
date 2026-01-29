@@ -1,6 +1,6 @@
 //! # montrs-test
 //!
-//! // @ai-tool: name="test_run" desc="Runs unit, integration, and end-to-end tests for the MontRS project."
+//! // @agent-tool: name="test_run" desc="Runs unit, integration, and end-to-end tests for the MontRS project."
 //!
 //! Utilities for deterministic, robust testing of MontRS applications.
 //!
@@ -38,7 +38,7 @@ pub mod e2e;
 pub use integration::{Fixture, TestRuntime, TestEnv, run_fixture_test};
 pub use unit::{expect, Spy, Mock, simple_bench};
 
-use montrs_core::AiError;
+use montrs_core::AgentError;
 use thiserror::Error;
 
 /// Errors that can occur during testing.
@@ -56,7 +56,7 @@ pub enum TestError {
     Io(#[from] std::io::Error),
 }
 
-impl AiError for TestError {
+impl AgentError for TestError {
     fn error_code(&self) -> &'static str {
         match self {
             TestError::Setup(_) => "TEST_SETUP",

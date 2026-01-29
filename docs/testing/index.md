@@ -160,7 +160,7 @@ MontRS provides a high-level E2E testing framework powered by Playwright (via th
 
 ### Architecture
 
-The E2E module is built around the `MontrsDriver`, a wrapper around the Playwright browser automation library. It handles:
+The E2E plate is built around the `MontrsDriver`, a wrapper around the Playwright browser automation library. It handles:
 - **Browser Lifecycle**: Automatically launching and closing browser instances (Chromium, Firefox, WebKit).
 - **Configuration**: Auto-detecting settings from `montrs.toml` or environment variables (`MONTRS_SITE_URL`, `LEPTOS_SITE_ADDR`).
 - **Orchestration**: When run via `montrs e2e`, it manages the full lifecycle of your application server (startup, readiness check, test execution, shutdown).

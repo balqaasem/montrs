@@ -1,6 +1,6 @@
-# AI Guide: montrs-test
+# Agent Guide: montrs-test
 
-This guide helps AI models write and run tests in MontRS.
+This guide helps agents write and run tests in MontRS.
 
 ## Core Concepts
 
@@ -16,12 +16,12 @@ Define setup and teardown logic for complex integration tests.
 
 ### 3. E2E Testing
 Uses Playwright for browser automation. 
-- **AI Recommendation**: Use `MontrsDriver` to interact with the UI during E2E tests.
+- **Agent Recommendation**: Use `MontrsDriver` to interact with the UI during E2E tests.
 
 ### 4. Assertions
-Use `expect(value).to_be(expected)` for fluent, AI-readable assertions.
+Use `expect(value).to_be(expected)` for fluent, agent-readable assertions.
 
-## AI Usage Patterns
+## Agent Usage Patterns
 
 ### Generating Tests
 When asked to add tests for a new feature:
@@ -30,4 +30,4 @@ When asked to add tests for a new feature:
 3. Use `run_fixture_test` if resources like databases are needed.
 
 ### Debugging Failures
-If a test fails with `TEST_EXPECTATION`, compare the actual and expected values provided in the `AiError`.
+If a test fails with `TEST_EXPECTATION`, compare the actual and expected values provided in the `AgentError`.

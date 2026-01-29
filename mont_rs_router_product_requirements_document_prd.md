@@ -29,8 +29,8 @@ This router is not a port of an existing framework. Instead, it is a **purpose-b
 The router is designed to be:
 
 - **Developer-friendly** (predictable, discoverable, ergonomic)
-- **AI-friendly** (static route graph, typed metadata, machine-readable)
-- **Integration-friendly** (clean boundaries with modules, AppSpec, ORM)
+- **Agent-friendly** (static route graph, typed metadata, machine-readable)
+- **Integration-friendly** (clean boundaries with plates, AppSpec, ORM)
 - **Cross-platform** (single route graph, multiple adapters)
 
 ---
@@ -44,7 +44,7 @@ The router is designed to be:
 3. Enable **hybrid SSR + CSR by default** on web
 4. Ensure routing is **fully deterministic and testable**
 5. Support **nested routes and layouts** without runtime ambiguity
-6. Produce a **static route graph** usable by tooling and AI
+6. Produce a **static route graph** usable by tooling and Agent
 
 ### 2.2 Non-Goals
 
@@ -109,7 +109,7 @@ It is used for:
 - Validation
 - SSR planning
 - Code generation
-- AI tooling
+- Agent tooling
 - TestRuntime execution
 
 ---
@@ -145,7 +145,7 @@ pub trait RouteLoader<P> {
 Rules:
 
 - Loaders must not mutate state
-- Loaders may access modules via context
+- Loaders may access plates via context
 - Loaders are deterministic given inputs
 
 ---
@@ -163,7 +163,7 @@ pub trait RouteAction<P> {
 Rules:
 
 - All mutations happen in actions
-- Actions integrate with ORM and modules
+- Actions integrate with ORM and plates
 - Actions are auditable and testable
 
 ---
@@ -191,7 +191,7 @@ This syntax:
 
 - Avoids runtime configuration
 - Enables static introspection
-- Is AI- and tooling-friendly
+- Is Agent-friendly and tooling-friendly
 
 ---
 
@@ -288,7 +288,7 @@ Errors are typed and matchable.
 
 Routes may declare:
 
-- Required modules
+- Required plates
 - Feature flags
 - Target constraints
 
@@ -308,13 +308,13 @@ Developers may:
 
 ---
 
-## 12. Tooling & AI Support
+## 12. Tooling & Agent Support
 
 The static route graph enables:
 
 - Route visualization
 - Automated docs
-- AI code generation
+- Agent code generation
 - Static analysis
 
 ---

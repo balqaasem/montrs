@@ -55,26 +55,26 @@ pub async fn run_cargo_leptos(cmd: &str, args: &[String], config: &MontrsConfig)
 
     match cargo_leptos::run(cli).await {
         Ok(_) => {
-            // AI-First: Auto-resolve errors on success
+            // Agent: Auto-resolve errors on success
             if let Ok(cwd) = std::env::current_dir() {
-                let llm_manager = montrs_llm::LlmManager::new(cwd);
-                let diff = llm_manager.generate_diff();
-                let _ = llm_manager.auto_resolve_active_errors("Build/Command succeeded".to_string(), diff);
+                let agent_manager = montrs_agent::AgentManager::new(cwd);
+                let diff = agent_manager.generate_diff();
+                let _ = agent_manager.auto_resolve_active_errors("Build/Command succeeded".to_string(), diff);
             }
             Ok(())
         }
         Err(e) => {
             if let Ok(cwd) = std::env::current_dir() {
-                let llm_manager = montrs_llm::LlmManager::new(cwd);
+                let agent_manager = montrs_agent::AgentManager::new(cwd);
                 let error_msg = format!("{:?}", e);
                 
                 // Try to parse structured errors
-                let parsed_errors = montrs_llm::error_parser::parse_rustc_errors(&error_msg);
+                let parsed_errors = montrs_agent::error_parser::parse_rustc_errors(&error_msg);
                 if parsed_errors.is_empty() {
-                    let _ = llm_manager.report_error(error_msg);
+                    let _ = agent_manager.report_error(error_msg);
                 } else {
                     for err in parsed_errors {
-                        let _ = llm_manager.report_project_error(err);
+                        let _ = agent_manager.report_project_error(err);
                     }
                 }
             }

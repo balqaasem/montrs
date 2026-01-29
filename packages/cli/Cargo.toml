@@ -42,7 +42,7 @@ clap_complete = "4.5.65"
 ignore = "0.4"
 walkdir = "2.5"
 montrs-core = { path = "../core" }
-montrs-llm = { path = "../llm" }
+montrs-agent = { path = "../agent" }
 montrs-bench = { path = "../bench" }
 montrs-fmt = { path = "../fmt" }
 colored = "2.1"

@@ -4,7 +4,7 @@ MontRS uses a "Data-First" routing model inspired by Remix. Routes are not just 
 
 ## 🛣️ The Router
 
-The `Router` is responsible for matching incoming requests to the appropriate `Module`. It handles:
+The `Router` is responsible for matching incoming requests to the appropriate `Plate`. It handles:
 - **Static Routes**: `/about`, `/contact`.
 - **Dynamic Routes**: `/users/:id`, `/posts/:slug`.
 - **Catch-all Routes**: `/*path`.
@@ -49,10 +49,10 @@ impl Action for CreateUserAction {
 
 ## 🧩 Composition: Nesting Routes
 
-Routes are typically registered within a `Module`. You can also nest routers to create complex API structures:
+Routes are typically registered within a `Plate`. You can also nest routers to create complex API structures:
 
 ```rust
-impl Module for ApiModule {
+impl Plate for ApiPlate {
     fn register_routes(&self, router: &mut Router) {
         router.nest("/v1", |v1| {
             v1.add_loader("/status", StatusLoader);
@@ -70,20 +70,20 @@ impl Module for ApiModule {
 
 ## 🔍 Best Practices
 
-1.  **Thin Routes**: Keep your `Loader` and `Action` implementations focused on data transformation and validation. Business logic should live in service functions or modules.
-2.  **Explicit Types**: Always specify the input and output types for your routes to enable better AI discovery and type safety.
+1.  **Thin Routes**: Keep your `Loader` and `Action` implementations focused on data transformation and validation. Business logic should live in service functions or plates.
+2.  **Explicit Types**: Always specify the input and output types for your routes to enable better agent discovery and type safety.
 3.  **Path Parameters**: Use descriptive names for path parameters (e.g., `:user_id` instead of `:id`) to avoid ambiguity in nested routes.
 
 ---
 
-## 🤖 AI-First Routing
+## 🤖 Agent-First Routing
 
-By defining routes as structs implementing traits, MontRS allows AI models to "see" the interface of every endpoint through the `AppSpec`.
+By defining routes as structs implementing traits, MontRS allows agents to "see" the interface of every endpoint through the `AppSpec`.
 
-### Common AI Failure Modes
+### Common Agent Failure Modes
 - **Anti-Pattern**: Putting database queries directly inside the `register_routes` closure.
   - *Fix*: Always implement a `Loader` or `Action` struct.
 - **Anti-Pattern**: Hardcoding paths in multiple places.
   - *Fix*: Define route paths as constants if they are used in both the backend and frontend.
 - **Anti-Pattern**: Using `Value` for everything.
-  - *Fix*: Use concrete structs that implement `Schema` to give the AI (and the compiler) more information.
+  - *Fix*: Use concrete structs that implement `Schema` to give the agent (and the compiler) more information.
