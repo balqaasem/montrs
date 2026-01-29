@@ -68,9 +68,9 @@ impl Loader for HelloLoader {
 - [First 30 Minutes](docs/getting-started/first-30-minutes.md): **Start here!** Your first onboarding experience.
 - [Introduction](docs/getting-started/introduction.md): Your first 10 minutes.
 - [The Golden Path](docs/getting-started/golden-path.md): How to build the right way.
-- [Common Pitfalls](docs/guides/pitfalls.md): What to avoid.
-
-### 2. Framework Contributors
+- [Common Mistakes](docs/guides/common-mistakes.md): Avoid frequent pitfalls and architectural anti-patterns.
+  
+  ### 2. Framework Contributors
 *People working **on** MontRS itself.*
 - [Architecture Overview](docs/architecture/overview.md): How the engine works.
 - [Package Boundaries](docs/architecture/packages.md): Responsibility of each crate.

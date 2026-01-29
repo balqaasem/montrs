@@ -8,6 +8,7 @@ Welcome to the MontRS documentation. This folder contains deep-dive guides for b
 - [First 30 Minutes](getting-started/first-30-minutes.md) - **Start here!** Your first onboarding experience.
 - [Introduction](getting-started/introduction.md) - Build your first MontRS app.
 - [The Golden Path](getting-started/golden-path.md) - Idiomatic MontRS development.
+- [Common Mistakes](guides/common-mistakes.md) - Avoid frequent pitfalls.
 - [Router](core/router.md) & [Plates](core/plates.md) - Understanding the Loader/Action pattern.
 - [Schema & Validation](core/schema.md) - Type-safe data handling.
 - [ORM Layer](orm/index.md) - Working with databases.
