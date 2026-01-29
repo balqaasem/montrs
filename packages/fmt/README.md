@@ -1,59 +1,38 @@
 # montrs-fmt
 
-A powerful, non-doc comment preserving formatter for MontRS projects. It wraps `prettyplease` and provides custom formatting for `view!` macros.
+The comment-preserving formatter for MontRS projects.
 
-## Key Features
+**Target Audiences:** Application Developers, Framework Contributors, AI Agents.
 
-- **Non-Doc Comment Preservation**: Unlike standard `prettyplease` or `syn` based formatters, `montrs-fmt` preserves your line and block comments even within code blocks.
-- **Macro Formatting**: Intelligent formatting for `view!` macros using a custom RSTML printer.
-- **The Cascade of Truth**: Hierarchical configuration system for flexible settings.
-- **AI-Native Metadata**: Structured error reporting and formatting hints for LLMs.
+## 1. What this package is
+`montrs-fmt` is a specialized code formatter designed for the MontRS ecosystem. It extends `prettyplease` with support for preserving non-doc comments and intelligently formatting `view!` macros.
 
-## The Cascade of Truth
+## 2. What problems it solves
+- **Comment Loss**: Standard `syn`-based formatters often strip comments; `montrs-fmt` preserves them, ensuring that developer intent is maintained.
+- **Macro Mess**: Standard `rustfmt` struggles with the complex HTML-in-Rust syntax of `view!`. This package provides a dedicated RSTML printer for clean macro formatting.
+- **Config Fatigue**: Implements the "Cascade of Truth," a hierarchical configuration system that unifies project settings.
 
-`montrs-fmt` uses a hierarchical configuration system we call the **Cascade of Truth**. This ensures flexibility while maintaining a single source of truth for your project.
+## 3. What it intentionally does NOT do
+- **General Purpose Rust Formatting**: It is optimized for MontRS patterns and `view!` macros, not as a 100% replacement for `rustfmt` in non-MontRS projects.
+- **Linting**: It does not perform static analysis or suggest code improvements (use `clippy` for that).
+- **Auto-Fixing Logic**: It only changes whitespace and code layout, never the logical structure of the code.
 
-The configuration is resolved in the following order (highest priority first):
+## 4. How it fits into the MontRS system
+It is integrated into the CLI as the `montrs fmt` command. It ensures that all projects in the workspace maintain a consistent style.
 
-1.  **Command Line Arguments**: Flags like `--check` or `--verbose` passed directly to `montrs fmt`.
-2.  **`montrs-fmt.toml`**: A standalone configuration file in the project root. This is useful for IDE extensions or CI pipelines that only need formatting settings.
-3.  **`montrs.toml` ([fmt] section)**: Formatting settings defined within the main MontRS project configuration file. This is the recommended way to keep your project configuration unified.
-4.  **Default Settings**: If no configuration is found, `montrs-fmt` falls back to its sensible defaults.
+## 5. When a user should reach for this package
+- When their `view!` macros are becoming unreadable.
+- When they want to enforce a specific coding style across their team.
+- When they need to verify formatting in CI (`montrs fmt --check`).
 
-### Why this approach?
+## 6. Deeper Documentation
+- [The Cascade of Truth](../../docs/fmt.md#the-cascade-of-truth) - Understanding how configuration is resolved.
+- [View Macro Formatting](../../docs/fmt.md#view-macro-formatting) - Detailed rules and examples for `view!` blocks.
+- [Configuration Reference](../../docs/fmt.md#configuration-reference) - Full list of available `[fmt]` settings.
+- [Span-Gap Algorithm](../../docs/fmt.md#internal-architecture-the-span-gap-algorithm) - For framework contributors.
 
--   **Unified Experience**: Most users prefer having all project settings in one place (`montrs.toml`).
--   **Tooling Compatibility**: Standalone tools and IDE plugins often look for tool-specific config files (`montrs-fmt.toml`). By supporting both, we satisfy both needs.
--   **Explicit Overrides**: Command line arguments allow for quick, one-off overrides (e.g., checking formatting in CI).
-
-## Features
-
--   **Non-Doc Comment Preservation**: Unlike standard `prettyplease` or `syn` based formatters, `montrs-fmt` preserves your line and block comments even within code blocks.
--   **Macro Formatting**: Intelligent formatting for `view!` macros using a custom RSTML printer.
--   **Configurable**: Support for `max_width`, `tab_spaces`, `indentation_style`, and more.
-
-## Usage
-
-### Via MontRS CLI (Recommended)
-
-```bash
-montrs fmt
-```
-
-### Options
-
--   `--check`: Verifies if files are formatted without modifying them.
--   `--path <PATH>`: Specify a file or directory to format (defaults to `.`).
--   `--verbose`: Show detailed output.
-
-## Configuration Example (`montrs.toml`)
-
-```toml
-[fmt]
-max_width = 120
-tab_spaces = 2
-indentation_style = "Spaces"
-
-[fmt.view]
-closing_tag_style = "SelfClosing"
-```
+## 7. Notes for AI Agents
+- **Formatting Constraints**: When generating code for MontRS, follow the rules defined in `montrs.toml` under the `[fmt]` section.
+- **Comment Importance**: Always include comments in generated code; `montrs-fmt` will preserve them.
+- **Error Handling**: Look for `FormatError` with `AiError` metadata if a formatting operation fails.
+- **Idempotency**: Formatting a file twice with the same configuration should result in no changes the second time.

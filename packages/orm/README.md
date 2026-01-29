@@ -1,23 +1,37 @@
 # montrs-orm
 
-A trait-driven, async-first ORM layer for the MontRS framework.
+A trait-driven, async-first ORM layer for MontRS.
 
-## Overview
+**Target Audiences:** Application Developers, Framework Contributors, AI Agents.
 
-`montrs-orm` provides a unified interface for interacting with different database backends. It abstracts away the differences between database drivers while maintaining performance and type safety.
+## 1. What this package is
+`montrs-orm` provides a unified, SQL-centric interface for interacting with different database backends (SQLite, PostgreSQL). It abstracts driver-specific details while maintaining high-performance async access.
 
-## Key Features
+## 2. What problems it solves
+- **Backend Lock-in**: Allows switching between SQLite (local dev) and PostgreSQL (production) with minimal code changes.
+- **Boilerplate**: Automates row-to-struct mapping and connection pool management.
+- **Type Safety**: Ensures that database queries and results are verified at compile-time or through structured traits.
 
-- **Multi-Backend support**: SQLite and PostgreSQL.
-- **Async API**: All database operations are `async` from the ground up.
-- **Type-Safe Mapping**: `FromRow` trait for Rust structs.
-- **AI-Native Querying**: Metadata hooks for LLMs to understand schema and relationships.
+## 3. What it intentionally does NOT do
+- **Query DSL**: It does not force a complex, non-SQL DSL (like Diesel). It prefers clean SQL or simple builder patterns.
+- **Migration Management**: It does not handle complex schema migrations (use external tools like `sqlx-cli` or `sea-orm-cli` as recommended in our docs).
+- **Auto-Caching**: It does not implement implicit query caching.
 
-## Usage
+## 4. How it fits into the MontRS system
+It provides the **persistence layer** for `Module`s. It implements the traits defined in `montrs-core` for data access.
 
-```rust
-use montrs_orm::{DbBackend, SqliteBackend};
+## 5. When a user should reach for this package
+- When building a feature that requires persistent data storage.
+- When implementing a custom database backend or driver.
+- When defining data models that need to be persisted in a relational database.
 
-let db = SqliteBackend::new(":memory:")?;
-db.execute("CREATE TABLE users (id INTEGER, name TEXT)", &[]).await?;
-```
+## 6. Deeper Documentation
+- [ORM Architecture](../../docs/orm.md)
+- [Backend Support Guide](../../docs/orm-backends.md)
+- [Async Patterns in ORM](../../docs/orm-async.md)
+
+## 7. Notes for AI Agents
+- **SQL Preference**: Prefer writing raw SQL queries using the provided backend execute methods over complex abstractions.
+- **Schema Discovery**: Read the struct definitions that implement `FromRow` to understand the database schema.
+- **Error Mapping**: This package implements `AiError` for `DbError`, providing specific codes for constraint violations, connection failures, etc.
+- **Constraints**: Assume all database operations are `async` and must be awaited within an `Action` or `Loader`.

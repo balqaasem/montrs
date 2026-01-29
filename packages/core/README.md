@@ -1,32 +1,37 @@
 # montrs-core
 
-The core architectural engine for MontRS. This package provides the foundational traits and structs that define how a MontRS application is structured, initialized, and executed.
+The architectural engine of the MontRS framework.
 
-## Overview
+**Target Audiences:** Application Developers, Framework Contributors, AI Agents.
 
-`montrs-core` defines the "Shape" of a MontRS application. It provides the abstractions for Modules, Routing (Loaders/Actions), Validation, Environment Management, and Feature Flags. It is designed to be highly modular and portable across different targets (Server, WASM, Edge, etc.).
+## 1. What this package is
+`montrs-core` provides the foundational traits and data structures that define the "Shape" of a MontRS application. It is the minimal runtime required to build a deterministic, modular system.
 
-## Key Components
+## 2. What problems it solves
+- **Architectural Fragmentation**: Provides a unified way to define modules, routes, and configuration.
+- **Testing Complexity**: Enables deterministic execution and mocking through trait-driven interfaces.
+- **AI Discoverability**: Implements the base metadata hooks that allow AI agents to understand the codebase.
 
-- **Module Trait**: The unit of composition. Every logical feature in a MontRS app is a module.
-- **Router (Loaders & Actions)**: The unified routing system. Loaders handle data fetching, and Actions handle state mutations.
-- **AppConfig Trait**: Defines the global configuration and error types for the application.
-- **AiError Trait**: A foundational trait for providing structured, machine-readable metadata for errors.
-- **Validate Trait**: A schema validation system with AI-discoverable rules.
+## 3. What it intentionally does NOT do
+- **Rendering**: It does not handle UI rendering (that's handled by Leptos/UI packages).
+- **IO Operations**: It defines interfaces for DBs and Files but does not implement the drivers (see `montrs-orm`).
+- **Build Logic**: It has no knowledge of how the app is compiled (see `montrs-cli`).
 
-## AI-First Features
+## 4. How it fits into the MontRS system
+This is the **root dependency**. Every other package in the ecosystem depends on `montrs-core`. It acts as the "contract" between different parts of the framework.
 
-`montrs-core` is the source of truth for AI-readable metadata:
-- **Trait Metadata**: `Module`, `Loader`, and `Action` all provide `description()` and `metadata()` methods.
-- **Error Metadata**: The `AiError` trait ensures every error in the system can be explained to an AI model with codes, context, and remediation hints.
-- **Schema Discovery**: `Validate` and `Router` components expose their schemas (input/output) for AI-assisted code generation.
+## 5. When a user should reach for this package
+- When defining a new `Module`, `Loader`, or `Action`.
+- When implementing a custom `AppConfig` or `AiError`.
+- When building a new integration package for MontRS.
 
-## Integration
+## 6. Deeper Documentation
+- [Architecture Overview](../../docs/architecture.md)
+- [Module Lifecycle](../../docs/modules.md)
+- [Routing System](../../docs/router.md)
 
-All other MontRS packages depend on `montrs-core` for basic types and traits. When building a MontRS app, you primarily interact with the traits defined here.
-
-## Metadata
-
-- **Subsystem**: `core`
-- **AI-Native**: Yes
-- **Version**: 0.1.0
+## 7. Notes for AI Agents
+- **Core Contract**: All significant framework behaviors are defined via traits in this package.
+- **Metadata Hook**: Use the `.description()` and `.metadata()` methods on any `Module`, `Loader`, or `Action` to understand its purpose.
+- **Error Handling**: Look for `AiError` implementations to get structured debugging context.
+- **Deterministic**: Assume all core components are deterministic unless explicitly documented otherwise.

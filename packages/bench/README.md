@@ -1,97 +1,37 @@
 # montrs-bench
 
-Professional-grade benchmarking utilities for the MontRS ecosystem.
+Professional-grade benchmarking utilities for MontRS.
 
-## Key Features
+**Target Audiences:** Application Developers, Framework Contributors, AI Agents.
 
-- **High-Resolution Timing**: Uses `std::time::Instant` for precise measurements.
-- **Statistical Analysis**: Calculates Mean, Median, StdDev, P95, P99, and Ops/Sec.
-- **System Profiling**: Captures OS, CPU, RAM, and Rust version for context.
-- **Reporting**: Supports colored CLI output and detailed JSON export.
+## 1. What this package is
+`montrs-bench` is a benchmarking suite designed to measure the performance of Rust code, particularly async operations within the MontRS ecosystem. It provides high-resolution timing, statistical analysis, and system profiling.
 
-## Overview
+## 2. What problems it solves
+- **Performance Blindness**: Provides clear, statistical evidence (P95, P99, Ops/Sec) for code performance.
+- **Environment Variance**: Profiles the system (CPU, RAM, OS) to ensure that benchmarks are reproducible and comparable across different machines.
+- **Boilerplate**: Simplifies the setup/teardown logic for complex benchmarks through the `BenchCase` trait.
 
-`montrs-bench` provides a robust foundation for measuring the performance of MontRS applications and libraries. It includes:
+## 3. What it intentionally does NOT do
+- **Flamegraphs/Profiling**: It does not replace low-level profilers like `perf` or `instruments`. It focuses on timing and statistics.
+- **Load Testing**: It is designed for micro-benchmarks and component benchmarks, not for distributed load testing of a production server.
+- **Automatic Optimization**: It identifies bottlenecks but does not suggest or apply code changes to fix them.
 
-- **High-Resolution Timing**: Uses `std::time::Instant` for precise measurements.
-- **Statistical Analysis**: Calculates Mean, Median, StdDev, P95, P99, and Ops/Sec.
-- **System Profiling**: Captures OS, CPU, RAM, and Rust version for context.
-- **Reporting**: Supports colored CLI output and detailed JSON export.
+## 4. How it fits into the MontRS system
+It is the engine behind the `montrs bench` command. It allows developers to verify that their modules and actions meet performance requirements.
 
-## Usage
+## 5. When a user should reach for this package
+- When optimizing a hot path in their application.
+- When comparing the performance of different implementations (e.g., two different ORM queries).
+- When validating the performance of a new MontRS module before submission.
 
-### Simple Benchmarks
+## 6. Deeper Documentation
+- [Benchmarking Best Practices](../../docs/benchmarking.md)
+- [Interpreting Statistics](../../docs/benchmarking.md#statistics)
+- [Writing Advanced Benchmarks](../../docs/benchmarking.md#advanced-usage)
 
-```rust
-use montrs_bench::{BenchRunner, SimpleBench};
-
-#[tokio::main]
-async fn main() -> anyhow::Result<()> {
-    // Automatically parse args and env vars
-    let mut runner = BenchRunner::from_args();
-
-    runner.add(SimpleBench::new("vector_sort", || async {
-        let mut v = vec![5, 2, 8, 1, 9];
-        v.sort();
-        Ok(())
-    }));
-
-    runner.run().await
-}
-```
-
-### Advanced Benchmarks
-
-Implement the `BenchCase` trait for setup/teardown logic:
-
-```rust
-use montrs_bench::BenchCase;
-use async_trait::async_trait;
-
-struct MyBench;
-
-#[async_trait]
-impl BenchCase for MyBench {
-    fn name(&self) -> &str { "complex_bench" }
-    
-    async fn setup(&self) -> anyhow::Result<()> {
-        // Prepare resources
-        Ok(())
-    }
-
-    async fn run(&self) -> anyhow::Result<()> {
-        // Measure this
-        Ok(())
-    }
-}
-```
-
-## Configuration
-
-`montrs-bench` supports configuration via command-line arguments and environment variables.
-
-### Priority Order
-1. Command-line arguments (e.g., `--warmup 20`)
-2. Environment variables (e.g., `MONTRS_BENCH_WARMUP=20`)
-3. Default values
-
-### Options
-
-| Argument | Env Var | Default | Description |
-|----------|---------|---------|-------------|
-| `--warmup <N>` | `MONTRS_BENCH_WARMUP` | 10 | Number of warm-up iterations |
-| `--iterations <N>` | `MONTRS_BENCH_ITERATIONS` | 100 | Number of measurement iterations |
-| `--timeout <S>` | `MONTRS_BENCH_TIMEOUT` | 5 | Max duration in seconds |
-| `--filter <STR>` | `MONTRS_BENCH_FILTER` | None | Run only matching benchmarks |
-| `--json-output <PATH>` | `MONTRS_BENCH_JSON_OUTPUT` | None | Save results to JSON file |
-
-### Example
-
-```bash
-# Run with custom warmup and iterations
-cargo run --release --bin my_bench -- --warmup 20 --iterations 500
-```
-
-## Integration with MontRS
-
-This crate is used by `montrs bench` to execute performance tests across the framework.
+## 7. Notes for AI Agents
+- **Native Mode**: The CLI supports `montrs bench --simple <FILE>` which uses this package to run quick, zero-config benchmarks.
+- **Output Parsing**: Prefer the JSON export (`--json-output`) for machine-readable performance data.
+- **Error Handling**: Look for `BenchError` with `AiError` metadata if a benchmark fails to initialize or run.
+- **Context Awareness**: Always consider the system profile (CPU/RAM) included in the report when evaluating performance numbers.

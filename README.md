@@ -1,89 +1,103 @@
-<!-- MontRS: The Rust-native, trait-driven deterministic web framework. -->
+# MontRS: The Deterministic Full-Stack Rust Framework
 
-# MontRS
-
-**MontRS** is a Full-Stack Framework for Cross-Platform Rust Applications (A Leptos Framework). **MontRS** is Rust-native, trait-driven, composable, modular and deterministic. Testing and mocking is a lot easier with MontRS.
+MontRS is a Rust-native, trait-driven framework for building cross-platform applications. It provides a unified, deterministic environment for web, desktop, and mobile, powered by the performance of Leptos and the safety of Rust's type system.
 
 ## Philosophy
 
-- **Compile-time correctness**: Type-driven design; traits and typed configs everywhere.
-- **Leptos Core**: Powered by Leptos for high-performance reactive UI.
-- **Modular Architecture**:
-    - [Core](packages/core/README.md): Runtime, Module traits, and AppSpec.
-    - [Schema](packages/schema/README.md): Validation and Schema macros.
-    - [ORM](packages/orm/README.md): SQL-centric ORM with SQLite and Postgres support.
-    - [Test](packages/test/README.md): Deterministic testing suite (Unit, Integration, E2E).
-    - [Bench](packages/bench/README.md): Professional-grade benchmarking tools.
-    - [CLI](packages/cli/README.md) for orchestration.
+MontRS exists because building complex applications requires more than just a UI library. It requires a **predictable architecture**.
+- **Determinism**: The same input should always produce the same output, whether in production or testing.
+- **Trait-Driven Boundaries**: Features are encapsulated in Modules with explicit interfaces.
+- **AI-First**: Built-in metadata and structured snapshots make MontRS applications natively understandable by AI agents.
 
-## Prerequisites
+---
 
-Before installing MontRS, ensure you have the following installed:
+## 🎯 The Golden Path
 
-- **Rust**: Latest stable version (install via [rustup](https://rustup.rs/)).
+The "Golden Path" is the recommended workflow for building robust MontRS applications:
 
-- **OpenSSL**: Development headers are required for building dependencies.
-    - **Linux**: `sudo apt install libssl-dev pkg-config` (Ubuntu/Debian) or `sudo dnf install openssl-devel` (Fedora).
-    - **macOS**: `brew install openssl`.
+1.  **Scaffold**: Start with `montrs new <app-name>` to get a pre-configured workspace.
+2.  **Define**: Use `#[derive(Schema)]` to define your data models and validation rules.
+3.  **Implement**: Build features as `Module`s. Define `Loader`s for fetching data and `Action`s for mutations.
+4.  **Verify**: Use the `TestRuntime` for in-process, deterministic testing of your entire application spec.
+5.  **Ship**: Deploy to your target (Web, Server, or Desktop) using `montrs build`.
 
-- **Perl (Windows only)**: Required for building `openssl-sys` (vendored).
-    - Install via winget: `winget install StrawberryPerl.StrawberryPerl`
+---
 
-## Getting Started
+## 🧠 How to Think in MontRS
 
-### Install the CLI
+- **Everything is a Trait**: If you want to change behavior (ORM, Auth, Rendering), you implement a trait.
+- **Loaders are for Reading, Actions are for Writing**: This clear separation simplifies state management and debugging.
+- **The AppSpec is Truth**: Your entire application is defined by a serializable `AppSpec`, making it portable and inspectable.
+- **No Magic**: We prefer explicit registration over reflection or global state.
 
-#### Recommended
-To install the latest version of the framework including the CLI, use:
+---
 
-```bash
-cargo install --locked montrs
+## 🚀 Minimal Example
+
+```rust
+use montrs::prelude::*;
+
+#[derive(Schema, Serialize, Deserialize)]
+struct Greeting {
+    #[schema(min_len = 3)]
+    name: String,
+}
+
+struct HelloModule;
+
+impl Module for HelloModule {
+    fn register_routes(&self, router: &mut Router) {
+        router.add_loader("/hello", HelloLoader);
+    }
+}
+
+#[async_trait]
+impl Loader for HelloLoader {
+    async fn call(&self, _ctx: Context) -> Result<Value> {
+        Ok(json!({ "message": "Hello from MontRS!" }))
+    }
+}
 ```
 
-#### CLI Package
-To install only the CLI tool, use:
+---
 
-```bash
-cargo install --locked montrs-cli
-```
+## 👥 Documentation for Every Audience
 
-#### Local Path
-If you're working on the MontRS repository, you can install the CLI from the local path:
+### 1. Application Developers
+*People building apps **with** MontRS.*
+- [First 30 Minutes](docs/first-30-minutes.md): **Start here!** Your first onboarding experience.
+- [Getting Started](docs/getting-started.md): Your first 10 minutes.
+- [The Golden Path](docs/golden-path.md): How to build the right way.
+- [Common Pitfalls](docs/pitfalls.md): What to avoid.
 
-```bash
-cargo install --path packages/cli
-```
+### 2. Framework Contributors
+*People working **on** MontRS itself.*
+- [Architecture Overview](docs/architecture.md): How the engine works.
+- [Package Boundaries](docs/packages.md): Responsibility of each crate.
+- [Invariants & Philosophy](docs/philosophy.md): The rules we don't break.
 
-### Create a new app
-```bash
-montrs new my-app
-cd my-app
-montrs serve
-```
+### 3. AI Agents
+*Machine-readable context for models.*
+- [AI Condensed Onboarding](docs/ai-onboarding.md): **Start here!** Rules and invariants for AI agents.
+- [AI Usage Guide](packages/llm/README.md): How to use `llm.json` and `tools.json`.
+- [Spec Snapshot](docs/spec.md): Understanding the machine-readable project state.
+- **Metadata Markers**: Look for `@ai-tool` and `AiError` implementations in the source.
 
-### Benchmarking
-Run standard benchmarks or use the native mode for quick file/binary testing:
-```bash
-# Standard benchmark
-montrs bench
-
-# Native mode (no project overhead)
-montrs bench --simple ./my-script.rs
-montrs bench --simple ./my-binary
-```
+---
 
 ## 🛠 Project Structure
 
-- `packages/core`: Core meta-framework logic and Leptos integration.
-- `packages/schema`: Type-safe validation and schema definitions.
-- `packages/orm`: Flexible database backend traits and drivers.
-- `packages/test`: TestRuntime, E2E drivers, and unit testing utilities.
-- `packages/bench`: Performance benchmarking framework.
-- `packages/cli`: The official build and serve tool.
-- `templates/`: Project blueprints (including `todo` and `default`).
+| Package | Purpose |
+| :--- | :--- |
+| [core](packages/core/README.md) | The architectural engine (Modules, Routing, AppSpec). |
+| [cli](packages/cli/README.md) | Orchestration, scaffolding, and build tools. |
+| [llm](packages/llm/README.md) | AI-first logic, snapshotting, and error tracking. |
+| [orm](packages/orm/README.md) | SQL-centric database abstraction. |
+| [schema](packages/schema/README.md) | Compile-time validation and data modeling. |
+| [test](packages/test/README.md) | Deterministic test runtime and E2E tools. |
+
+---
 
 ## License
 
-MontRS is licensed under the [Apache-2.0 license](LICENSE-APACHE) or the [MIT license](LICENSE-MIT), at your option.
-
-Unless you explicitly state otherwise, any contribution intentionally submitted for inclusion in MontRS by you, as defined in the Apache License, shall be dual-licensed as above, without any additional terms or conditions.
+MontRS is dual-licensed under [Apache-2.0](LICENSE-APACHE) and [MIT](LICENSE-MIT).

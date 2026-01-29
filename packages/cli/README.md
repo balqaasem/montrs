@@ -1,90 +1,38 @@
 # montrs-cli
 
-The official build and orchestration tool for the MontRS framework.
+The orchestration hub for the MontRS framework.
 
-## Overview
+**Target Audiences:** Application Developers, Framework Contributors, AI Agents.
 
-`montrs-cli` is the primary orchestration hub for the MontRS framework. It provides high-level commands for scaffolding, building, and serving projects. It can be used as a standalone `montrs` command or as a cargo subcommand (`cargo montrs`).
+## 1. What this package is
+`montrs-cli` is the command-line interface for MontRS. It handles scaffolding, building, serving, and running custom tasks. It can be used as a standalone binary or as a cargo subcommand.
 
-## Key Features
+## 2. What problems it solves
+- **Scaffolding Friction**: Provides a `new` command with pre-built templates to get started in seconds.
+- **Build Complexity**: Orchestrates both frontend (WASM/JS) and backend (Rust) builds into a single command.
+- **Task Management**: Replaces complex `Makefile`s or shell scripts with a structured `montrs.toml` task runner.
 
-- **Standalone & Cargo Subcommand**: Use it directly as `montrs` or via `cargo montrs`.
-- **Sophisticated Scaffolding**: Create new projects from local templates via `montrs new`.
-- **Integrated Build System**: Orchestrates both frontend and server-side builds.
-- **Advanced Task Runner**: Define custom shell scripts with dependencies in `montrs.toml` and run them via `montrs run`.
-- **Unified Configuration**: Manage ports, addresses, and target directories for both frontend and backend in one place.
-- **Leptos Ready**: Automatically injects environment variables (`LEPTOS_SITE_ROOT`, etc.) for seamless server execution.
+## 3. What it intentionally does NOT do
+- **Project Logic**: It does not contain any of your application's business logic.
+- **Direct Compilation**: It calls `cargo`, `wasm-pack`, or other tools rather than compiling code itself.
+- **Configuration Parsing**: It delegates framework-level config parsing to `montrs-core`.
 
-## Installation
+## 4. How it fits into the MontRS system
+It is the **entry point** for developers. It coordinates the lifecycle of an application from creation to deployment.
 
-### Recommended (via Meta-crate)
+## 5. When a user should reach for this package
+- When creating a new project (`montrs new`).
+- When starting a development server (`montrs serve`).
+- When building for production (`montrs build`).
+- When generating an AI-ready specification (`montrs spec`).
 
-```bash
-cargo install montrs
-```
+## 6. Deeper Documentation
+- [CLI Command Reference](../../docs/cli.md)
+- [Project Configuration](../../docs/getting-started.md#configuration)
+- [Task Runner Guide](../../docs/tasks.md)
 
-### Direct CLI Installation
-
-```bash
-cargo install montrs-cli
-```
-
-### From Source
-
-```bash
-cargo install --path packages/cli
-```
-
-## Usage
-
-### Create a New Project
-```bash
-montrs new my-app
-```
-
-### Run Custom Tasks
-```bash
-montrs tasks        # List all tasks
-montrs run lint     # Run the 'lint' task
-```
-
-### Build for Production
-```bash
-montrs build
-```
-
-### Start Development Server
-```bash
-montrs serve
-```
-
-### Benchmarking
-Quickly measure execution speed and file size:
-```bash
-# Benchmark a project (standard cargo bench)
-montrs bench
-
-# Simple/Native benchmark for a single file/binary
-montrs bench --simple ./main.rs --iterations 500
-```
-
-## Configuration (`montrs.toml`)
-
-`montrs` honors a `montrs.toml` file in your project root for extensive configuration:
-
-```toml
-[project]
-name = "my-app"
-
-[build]
-target = "index.html"
-dist = "dist"
-
-[serve]
-port = 8080
-addr = "127.0.0.1"
-
-[tasks]
-lint = "cargo clippy"
-test-all = { command = "cargo test", dependencies = ["lint"] }
-```
+## 7. Notes for AI Agents
+- **Primary Tool**: Use `montrs spec` to get a machine-readable view of the current project state.
+- **Automation**: Most CLI commands update the `.llm/` directory automatically.
+- **Task Discovery**: Check `montrs.toml` for custom tasks that may be relevant to the current workflow.
+- **Determinism**: CLI operations are designed to be idempotent where possible.
