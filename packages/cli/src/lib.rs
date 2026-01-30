@@ -190,6 +190,28 @@ pub enum Commands {
         #[arg(long, default_value = "json")]
         format: String,
     },
+    /// Generate boilerplate for plates and routes.
+    Generate {
+        #[command(subcommand)]
+        subcommand: GenerateSubcommand,
+    },
+}
+
+#[derive(Subcommand, Debug)]
+pub enum GenerateSubcommand {
+    /// Generate a new plate.
+    Plate {
+        /// Name of the plate.
+        name: String,
+    },
+    /// Generate a new route.
+    Route {
+        /// Path pattern for the route (e.g., "/users/:id").
+        path: String,
+        /// The plate to add this route to.
+        #[arg(short, long)]
+        plate: String,
+    },
 }
 
 pub async fn run(cli: MontrsCli) -> anyhow::Result<()> {
@@ -260,6 +282,12 @@ pub async fn run(cli: MontrsCli) -> anyhow::Result<()> {
             command::spec::run(include_docs, format).await
         }
         Commands::Upgrade => command::upgrade::run().await,
+        Commands::Generate { subcommand } => match subcommand {
+            GenerateSubcommand::Plate { name } => command::generate::plate(name).await,
+            GenerateSubcommand::Route { path, plate } => {
+                command::generate::route(path, plate).await
+            }
+        },
     }
 }
 
