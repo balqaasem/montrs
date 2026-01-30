@@ -1,11 +1,13 @@
 pub mod bench;
 pub mod build;
 pub mod e2e;
+pub mod expand;
 pub mod fmt;
 pub mod generate;
 pub mod new;
 pub mod run;
 pub mod serve;
+pub mod sketch;
 pub mod spec;
 pub mod test;
 pub mod upgrade;

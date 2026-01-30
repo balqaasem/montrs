@@ -2,6 +2,7 @@ use anyhow::{Result, anyhow};
 use console::style;
 use std::fs;
 use std::path::Path;
+use montrs_utils::{to_pascal_case, to_snake_case};
 
 pub async fn plate(name: String) -> Result<()> {
     let name_pascal = to_pascal_case(&name);
@@ -66,7 +67,7 @@ pub async fn route(path: String, plate: String) -> Result<()> {
     let route_name_pascal = if route_name.is_empty() { "Index".to_string() } else { to_pascal_case(&route_name) };
     
     println!(
-        "{} Generating route {} for plate {}",
+        "{} Generated route {} for plate {}",
         style("🛣️").bold(),
         style(&path).yellow().bold(),
         style(&plate).cyan().bold()
@@ -150,33 +151,4 @@ impl<C: AppConfig> Route<C> for {route_name_pascal}Route {{
     Ok(())
 }
 
-fn to_pascal_case(s: &str) -> String {
-    let mut res = String::new();
-    let mut capitalize_next = true;
-    for c in s.chars() {
-        if c == '_' || c == '-' || c == ' ' {
-            capitalize_next = true;
-        } else if capitalize_next {
-            res.push(c.to_ascii_uppercase());
-            capitalize_next = false;
-        } else {
-            res.push(c);
-        }
-    }
-    res
-}
 
-fn to_snake_case(s: &str) -> String {
-    let mut res = String::new();
-    for (i, c) in s.chars().enumerate() {
-        if c.is_uppercase() {
-            if i > 0 {
-                res.push('_');
-            }
-            res.push(c.to_ascii_lowercase());
-        } else {
-            res.push(c);
-        }
-    }
-    res.replace('-', "_").replace(' ', "_")
-}

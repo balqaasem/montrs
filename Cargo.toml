@@ -11,6 +11,7 @@ members = [
     "packages/orm",
     "packages/schema",
     "packages/test",
+    "packages/utils",
 ]
 
 [workspace.package]

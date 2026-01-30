@@ -190,6 +190,19 @@ pub enum Commands {
         #[arg(long, default_value = "json")]
         format: String,
     },
+    /// Generate a single-file "sketch" of a MontRS component.
+    Sketch {
+        /// Name of the sketch file.
+        name: String,
+        /// Component type (plate, route, or app).
+        #[arg(short, long, default_value = "plate")]
+        kind: String,
+    },
+    /// Expand a sketch file into a full MontRS workspace structure.
+    Expand {
+        /// Path to the sketch file.
+        path: String,
+    },
     /// Generate boilerplate for plates and routes.
     Generate {
         #[command(subcommand)]
@@ -280,6 +293,12 @@ pub async fn run(cli: MontrsCli) -> anyhow::Result<()> {
         }
         Commands::Spec { include_docs, format } => {
             command::spec::run(include_docs, format).await
+        }
+        Commands::Sketch { name, kind } => {
+            command::sketch::run(name, kind).await
+        }
+        Commands::Expand { path } => {
+            command::expand::run(path).await
         }
         Commands::Upgrade => command::upgrade::run().await,
         Commands::Generate { subcommand } => match subcommand {

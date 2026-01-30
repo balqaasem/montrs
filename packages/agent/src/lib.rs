@@ -298,6 +298,29 @@ impl AgentManager {
                         "path": { "type": "string", "description": "Path to format (default: .)" }
                     }
                 }
+            }),
+            serde_json::json!({
+                "name": "montrs_sketch",
+                "description": "Generates a single-file 'sketch' of a MontRS component.",
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "name": { "type": "string", "description": "Name of the sketch file" },
+                        "kind": { "type": "string", "enum": ["plate", "route", "app"], "description": "Component type" }
+                    },
+                    "required": ["name"]
+                }
+            }),
+            serde_json::json!({
+                "name": "montrs_expand",
+                "description": "Expands a sketch file into a full MontRS workspace structure.",
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "path": { "type": "string", "description": "Path to the sketch file" }
+                    },
+                    "required": ["path"]
+                }
             })
         ];
 

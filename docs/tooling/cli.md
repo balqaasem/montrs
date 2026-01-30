@@ -91,6 +91,18 @@ Run custom tasks defined in `montrs.toml`.
 montrs run <task_name>
 ```
 
+### `sketch`
+Generate a single-file, explicit "sketch" of a MontRS component. This is the first step in the **Scaffolded Explicit** workflow.
+```bash
+montrs sketch <name> [--kind <plate|route|app>]
+```
+
+### `expand`
+Expand a `.sketch.rs` file into a full project structure with explicit imports and manual registration.
+```bash
+montrs expand <path_to_sketch>
+```
+
 ### `generate`
 Generate boilerplate for plates and routes. This is the preferred way to add new components to your application to maintain the **Productive Explicitness** principle.
 
