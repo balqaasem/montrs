@@ -26,6 +26,6 @@ Data entering or leaving the application must be validated. The `montrs-schema` 
 
 We design our tools and documentation not just for humans, but for agents. Structured metadata, versioned error files, and machine-readable snapshots are core features, not afterthoughts.
 
-## 7. Minimal Magic
+## 7. Productive Explicitness (No Magic)
 
-We avoid "magic" behaviors that are hard to trace. We prefer explicit registration and configuration over implicit discovery, ensuring that the developer (and the agent) always knows how the system is wired together.
+We avoid "magic" behaviors that are hard to trace. We prefer explicit registration and configuration over implicit discovery. However, explicitness should not mean "tedious." We use CLI scaffolding to generate the necessary boilerplate, ensuring that the developer (and the agent) always has a clear, readable source of truth while maintaining high iteration speed.
