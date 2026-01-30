@@ -26,11 +26,12 @@ A list of all registered `Plate` implementations found in the project. For each 
 - `description`: The string returned by `plate.description()`.
 
 ### 3. `routes`
-The most critical section for API development. Each route includes:
+The most critical section for application development. Each route is a unified unit containing:
 - `path`: The URL pattern (e.g., `/api/users/:id`).
-- `loader`: Metadata about the data-fetching component.
-- `action`: Metadata about the mutation component.
-- `input_schema` / `output_schema`: The expected data shapes.
+- `params`: Metadata about the required URL parameters.
+- `loader`: Metadata about the data-fetching logic (Input/Output).
+- `action`: Metadata about the mutation logic (Input/Output).
+- `metadata`: Key-value pairs describing the route's purpose for agents.
 
 ### 4. `tools`
 A curated list of CLI commands and framework capabilities that the agent can invoke as "tools."

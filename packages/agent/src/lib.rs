@@ -35,10 +35,12 @@ pub struct PlateSummary {
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct RouteSummary {
     pub path: String,
-    pub kind: String, // "Loader" or "Action"
     pub description: String,
-    pub input_schema: Option<serde_json::Value>,
-    pub output_schema: Option<serde_json::Value>,
+    pub params_schema: Option<serde_json::Value>,
+    pub loader_output_schema: Option<serde_json::Value>,
+    pub action_input_schema: Option<serde_json::Value>,
+    pub action_output_schema: Option<serde_json::Value>,
+    pub metadata: HashMap<String, String>,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -432,8 +434,7 @@ impl AgentManager {
         }
 
         let plate_re = regex::Regex::new(r"impl\s+Plate(?:<[^>]+>)?\s+for\s+(\w+)").unwrap();
-        let loader_re = regex::Regex::new(r"impl\s+Loader(?:<[^>]+>)?\s+for\s+(\w+)").unwrap();
-        let action_re = regex::Regex::new(r"impl\s+Action(?:<[^>]+>)?\s+for\s+(\w+)").unwrap();
+        let route_re = regex::Regex::new(r"impl\s+Route(?:<[^>]+>)?\s+for\s+(\w+)").unwrap();
 
         for src_dir in scan_dirs {
             if !src_dir.exists() { continue; }
@@ -455,29 +456,18 @@ impl AgentManager {
                             }
                         }
 
-                        // Discover Loaders
-                        for caps in loader_re.captures_iter(&content) {
+                        // Discover Routes
+                        for caps in route_re.captures_iter(&content) {
                             let name = caps[1].to_string();
-                            println!("Agent: Found loader implementation: {}", name);
+                            println!("Agent: Found route implementation: {}", name);
                             routes.push(RouteSummary {
                                 path: format!("(impl) {}", name),
-                                kind: "Loader".to_string(),
-                                description: format!("Heuristically discovered Loader: {}", name),
-                                input_schema: None,
-                                output_schema: None,
-                            });
-                        }
-
-                        // Discover Actions
-                        for caps in action_re.captures_iter(&content) {
-                            let name = caps[1].to_string();
-                            println!("Agent: Found action implementation: {}", name);
-                            routes.push(RouteSummary {
-                                path: format!("(impl) {}", name),
-                                kind: "Action".to_string(),
-                                description: format!("Heuristically discovered Action: {}", name),
-                                input_schema: None,
-                                output_schema: None,
+                                description: format!("Heuristically discovered Route: {}", name),
+                                params_schema: None,
+                                loader_output_schema: None,
+                                action_input_schema: None,
+                                action_output_schema: None,
+                                metadata: HashMap::new(),
                             });
                         }
                     }

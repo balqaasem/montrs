@@ -1,89 +1,108 @@
-# Routing in MontRS: Loaders and Actions
+# Routing in MontRS: The Unified Route Trait
 
-MontRS uses a "Data-First" routing model inspired by Remix. Routes are not just endpoints; they are discrete units of data fetching (`Loader`) and data mutation (`Action`).
+MontRS uses a "Unified Route" model that combines parameters, data fetching (`RouteLoader`), state changes (`RouteAction`), and visual representation (`RouteView`) into a single, type-safe unit.
 
-## 🛣️ The Router
+## 🛣️ The Unified Route Trait
 
-The `Router` is responsible for matching incoming requests to the appropriate `Plate`. It handles:
-- **Static Routes**: `/about`, `/contact`.
-- **Dynamic Routes**: `/users/:id`, `/posts/:slug`.
-- **Catch-all Routes**: `/*path`.
+Instead of disparate loaders and actions, MontRS defines a route as a struct implementing the `Route` trait. This provides a single source of truth for everything related to a specific URL path.
 
-## 📥 Loaders: Fetching Data
+```rust
+pub trait Route<C: AppConfig>: Send + Sync + 'static {
+    type Params: RouteParams;
+    type Loader: RouteLoader<Self::Params, C>;
+    type Action: RouteAction<Self::Params, C>;
+    type View: RouteView;
 
-A `Loader` is an async function that runs before a page or component is rendered. It is responsible for providing the necessary state.
+    fn path() -> &'static str;
+    fn loader(&self) -> Self::Loader;
+    fn action(&self) -> Self::Action;
+    fn view(&self) -> Self::View;
+}
+```
+
+## 📥 RouteParams: Type-Safe Parameters
+
+Every route defines its own parameter structure, which is automatically deserialized from the URL.
+
+```rust
+#[derive(Serialize, Deserialize)]
+pub struct UserParams {
+    pub id: String,
+}
+impl RouteParams for UserParams {}
+```
+
+## 📥 RouteLoader: Fetching Data
+
+A `RouteLoader` is responsible for fetching the data needed for a route. It is read-only and idempotent.
 
 ```rust
 #[async_trait]
-impl Loader for UserLoader {
-    async fn call(&self, ctx: Context) -> Result<Value> {
-        let id = ctx.param("id")?;
-        let user = db::get_user(id).await?;
-        Ok(json!(user))
+impl RouteLoader<UserParams, MyConfig> for UserLoader {
+    type Output = User;
+    async fn load(&self, ctx: RouteContext<'_, MyConfig>, params: UserParams) -> Result<Self::Output, RouteError> {
+        let user = ctx.db().get_user(&params.id).await?;
+        Ok(user)
     }
 }
 ```
 
-## 📤 Actions: Mutating Data
+## 📤 RouteAction: State Changes
 
-An `Action` handles non-GET requests (POST, PUT, DELETE). It typically involves validation and persistence.
+A `RouteAction` handles mutations (POST, PUT, DELETE). It explicitly defines its input and output types.
 
 ```rust
 #[async_trait]
-impl Action for CreateUserAction {
-    async fn call(&self, ctx: Context) -> Result<Value> {
-        let input: CreateUserInput = ctx.input()?; // Auto-validated via montrs-schema
-        let user = db::create_user(input).await?;
-        Ok(json!(user))
+impl RouteAction<UserParams, MyConfig> for UpdateUserAction {
+    type Input = UpdateUserInput;
+    type Output = User;
+    async fn act(&self, ctx: RouteContext<'_, MyConfig>, params: UserParams, input: Self::Input) -> Result<Self::Output, RouteError> {
+        let user = ctx.db().update_user(&params.id, input).await?;
+        Ok(user)
+    }
+}
+```
+
+## 🖼️ RouteView: Visual Representation
+
+The `RouteView` defines how the route is rendered, typically using Leptos components.
+
+```rust
+impl RouteView for UserView {
+    fn render(&self) -> impl IntoView {
+        view! { <UserPage /> }
+    }
+}
+```
+
+## 🧩 Registration in Plates
+
+Routes are registered within a `Plate` using the `Router`.
+
+```rust
+impl Plate<MyConfig> for UserPlate {
+    fn register_routes(&self, router: &mut Router<MyConfig>) {
+        router.register(UserDetailRoute);
+        router.register(UserListRoute);
     }
 }
 ```
 
 ## 🔄 The Request Lifecycle
 
-1.  **Match**: The `Router` finds the matching route.
-2.  **Authorize**: Middleware checks permissions.
-3.  **Validate**: If it's an `Action`, the input is validated against the schema.
-4.  **Execute**: The `Loader` or `Action` is called.
-5.  **Respond**: The result is serialized and returned.
-
-## 🧩 Composition: Nesting Routes
-
-Routes are typically registered within a `Plate`. You can also nest routers to create complex API structures:
-
-```rust
-impl Plate for ApiPlate {
-    fn register_routes(&self, router: &mut Router) {
-        router.nest("/v1", |v1| {
-            v1.add_loader("/status", StatusLoader);
-            v1.nest("/users", |users| {
-                users.add_loader("/", ListUsersLoader);
-                users.add_action("/", CreateUserAction);
-                users.add_loader("/:id", GetUserLoader);
-            });
-        });
-    }
-}
-```
-
----
-
-## 🔍 Best Practices
-
-1.  **Thin Routes**: Keep your `Loader` and `Action` implementations focused on data transformation and validation. Business logic should live in service functions or plates.
-2.  **Explicit Types**: Always specify the input and output types for your routes to enable better agent discovery and type safety.
-3.  **Path Parameters**: Use descriptive names for path parameters (e.g., `:user_id` instead of `:id`) to avoid ambiguity in nested routes.
-
----
+1.  **Match**: The `Router` finds the matching route based on the URL path.
+2.  **Parse**: `RouteParams` are extracted and validated from the URL.
+3.  **Execute**: 
+    - For GET: The `RouteLoader` is called.
+    - For Mutations: The `RouteAction` is called with the provided input.
+4.  **Render**: The `RouteView` is used to render the final UI (if applicable).
 
 ## 🤖 Agent-First Routing
 
-By defining routes as structs implementing traits, MontRS allows agents to "see" the interface of every endpoint through the `AppSpec`.
+The unified `Route` trait is designed specifically for agent discoverability. Because all parts of a route are linked through a single trait, an agent can:
+1.  **See the path** and parameters required.
+2.  **Understand the data** being fetched (Loader Output).
+3.  **Identify valid operations** (Action Input/Output).
+4.  **Explore the UI** (View).
 
-### Common Agent Failure Modes
-- **Anti-Pattern**: Putting database queries directly inside the `register_routes` closure.
-  - *Fix*: Always implement a `Loader` or `Action` struct.
-- **Anti-Pattern**: Hardcoding paths in multiple places.
-  - *Fix*: Define route paths as constants if they are used in both the backend and frontend.
-- **Anti-Pattern**: Using `Value` for everything.
-  - *Fix*: Use concrete structs that implement `Schema` to give the agent (and the compiler) more information.
+This metadata is automatically exposed through the `AppSpec`, allowing agents to navigate and interact with your application with high confidence.

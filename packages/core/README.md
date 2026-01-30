@@ -21,17 +21,18 @@ The architectural engine of the MontRS framework.
 This is the **root dependency**. Every other package in the ecosystem depends on `montrs-core`. It acts as the "contract" between different parts of the framework.
 
 ## 5. When a user should reach for this package
-- When defining a new `Plate`, `Loader`, or `Action`.
+- When defining a new `Plate` or `Route`.
 - When implementing a custom `AppConfig` or `AgentError`.
 - When building a new integration package for MontRS.
 
 ## 6. Deeper Documentation
 - [Architecture Overview](../../docs/architecture/overview.md)
 - [Plates](../../docs/core/plates.md) - The unit of composition.
-- [Routing System](../../docs/core/router.md)
+- [Routing System](../../docs/core/router.md) - The unified Route trait.
 
 ## 7. Notes for Agents
 - **Core Contract**: All significant framework behaviors are defined via traits in this package.
-- **Metadata Hook**: Use the `.description()` and `.metadata()` methods on any `Plate`, `Loader`, or `Action` to understand its purpose.
+- **Unified Route**: The `Route` trait combines params, loaders, actions, and views into a single, machine-readable unit.
+- **Metadata Hook**: Use the `.description()` and `.metadata()` methods on any `Plate` or `Route` to understand its purpose.
 - **Error Handling**: Look for `AgentError` implementations to get structured debugging context.
 - **Deterministic**: Assume all core components are deterministic unless explicitly documented otherwise.
