@@ -15,7 +15,10 @@ pub use env::{EnvConfig, EnvConfigExt, EnvError, FromEnv, TypedEnv};
 pub use features::{FeatureFlag, FeatureManager, Rule, Segment, UserContext};
 pub use leptos::prelude::*;
 pub use limiter::{GovernorLimiter, Limiter};
-pub use router::{Action, ActionCtx, Loader, LoaderCtx, Router};
+pub use router::{
+    ActionResponse, LoaderResponse, Route, RouteAction, RouteContext, RouteError, RouteLoader,
+    RouteParams, RouteView, Router,
+};
 pub use validation::{Validate, ValidationError};
 
 use async_trait::async_trait;

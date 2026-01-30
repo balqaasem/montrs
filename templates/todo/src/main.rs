@@ -3,7 +3,10 @@
 //! to build a simple but functional Todo management system.
 
 use leptos::prelude::*;
-use montrs_core::{AppConfig, AppSpec, Plate, PlateContext, Router, Target};
+use montrs_core::{
+    AppConfig, AppSpec, Plate, PlateContext, Route, RouteAction, RouteContext, RouteError,
+    RouteLoader, RouteParams, RouteView, Router, Target,
+};
 use montrs_orm::{DbBackend, FromRow, SqliteBackend};
 use montrs_schema::Schema;
 use serde::{Deserialize, Serialize};
@@ -68,7 +71,74 @@ impl montrs_core::EnvConfig for MyEnv {
     }
 }
 
-// 3. Define a Plate for Todo logic.
+// 3. Define the Route for the Todo Application.
+#[derive(Serialize, Deserialize)]
+pub struct TodoParams {}
+impl RouteParams for TodoParams {}
+
+pub struct TodoLoader;
+#[async_trait::async_trait]
+impl RouteLoader<TodoParams, MyConfig> for TodoLoader {
+    type Output = Vec<Todo>;
+    async fn load(
+        &self,
+        _ctx: RouteContext<'_, MyConfig>,
+        _params: TodoParams,
+    ) -> Result<Self::Output, RouteError> {
+        // In a real app, we'd fetch from the database.
+        Ok(vec![])
+    }
+}
+
+pub struct TodoAction;
+#[async_trait::async_trait]
+impl RouteAction<TodoParams, MyConfig> for TodoAction {
+    type Input = CreateTodo;
+    type Output = Todo;
+    async fn act(
+        &self,
+        _ctx: RouteContext<'_, MyConfig>,
+        _params: TodoParams,
+        _input: Self::Input,
+    ) -> Result<Self::Output, RouteError> {
+        // In a real app, we'd save to the database.
+        Ok(Todo {
+            id: 1,
+            title: "New Todo".to_string(),
+            completed: false,
+        })
+    }
+}
+
+pub struct TodoViewImpl;
+impl RouteView for TodoViewImpl {
+    fn render(&self) -> impl IntoView {
+        view! { <TodoApp /> }
+    }
+}
+
+pub struct TodoRoute;
+impl Route<MyConfig> for TodoRoute {
+    type Params = TodoParams;
+    type Loader = TodoLoader;
+    type Action = TodoAction;
+    type View = TodoViewImpl;
+
+    fn path() -> &'static str {
+        "/"
+    }
+    fn loader(&self) -> Self::Loader {
+        TodoLoader
+    }
+    fn action(&self) -> Self::Action {
+        TodoAction
+    }
+    fn view(&self) -> Self::View {
+        TodoViewImpl
+    }
+}
+
+// 4. Define a Plate for Todo logic.
 pub struct TodoPlate;
 
 #[async_trait::async_trait]
@@ -85,7 +155,8 @@ impl Plate<MyConfig> for TodoPlate {
         Ok(())
     }
 
-    fn register_routes(&self, _router: &mut Router<MyConfig>) {
+    fn register_routes(&self, router: &mut Router<MyConfig>) {
+        router.register(TodoRoute);
         println!("Routes registered for TodoPlate");
     }
 }
