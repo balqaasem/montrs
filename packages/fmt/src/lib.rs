@@ -67,6 +67,9 @@ pub fn format_file(path: impl AsRef<Path>, settings: &FormatterSettings) -> Resu
 
 /// Formats a Rust source string.
 pub fn format_source(source: &str, settings: &FormatterSettings) -> Result<String, FormatError> {
+    // 0. Normalize Scaffolded headers
+    let source = normalize_scaffold_headers(source);
+
     // 1. Extract comments
     let (source_rope, comments) = comments::extract_comments(source);
 
@@ -102,6 +105,24 @@ pub fn format_source(source: &str, settings: &FormatterSettings) -> Result<Strin
     Ok(final_source)
 }
 
+fn normalize_scaffold_headers(source: &str) -> String {
+    let mut lines: Vec<String> = source.lines().map(|s| s.to_string()).collect();
+    if lines.is_empty() {
+        return source.to_string();
+    }
+
+    // Standardize "MontRS Plate Sketch" and "MontRS Route Sketch" headers
+    for line in lines.iter_mut().take(3) {
+        if line.contains("MontRS") && (line.contains("Sketch") || line.contains("Blueprint")) {
+            if !line.starts_with("//!") {
+                *line = format!("//! {}", line.trim_start_matches(|c: char| !c.is_alphabetic()));
+            }
+        }
+    }
+
+    lines.join("\n")
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -133,5 +154,22 @@ mod tests {
         assert!(formatted.contains("<div class=\"test\">"));
         assert!(formatted.contains("<span>"));
         assert!(formatted.contains("\"Hello\""));
+    }
+
+    #[test]
+    fn test_normalize_headers() {
+        let source = "// MontRS Plate Sketch: Test\nfn main() {}";
+        let settings = FormatterSettings::default();
+        let formatted = format_source(source, &settings).unwrap();
+        assert!(formatted.contains("//! // MontRS Plate Sketch: Test"));
+    }
+
+    #[test]
+    fn test_agent_tool_preservation() {
+        let source = "// @agent-tool: name=\"test\"\nfn main() {}";
+        let settings = FormatterSettings::default();
+        let formatted = format_source(source, &settings).unwrap();
+        assert!(formatted.contains("@agent-tool"));
+        assert!(formatted.find("@agent-tool").unwrap() < formatted.find("fn main").unwrap());
     }
 }
