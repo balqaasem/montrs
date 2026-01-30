@@ -50,3 +50,14 @@ MontRS follows a **Dependency Inversion** pattern. `montrs-core` defines the tra
 2.  **Core** uses **Schema** to validate data at the boundaries.
 3.  **Plates** use **ORM** to persist data.
 4.  **Agent** scans everything to produce the **Spec Snapshot**.
+
+---
+
+## 🛠️ Adding New Packages
+
+If you are a contributor looking to add a new package to the MontRS workspace, you **must** follow the guidelines in the **[Packages Contribution Guide](../community/packages-contribution.md)**. 
+
+Key requirements include:
+- Defining clear boundaries.
+- Ensuring Agent-first compatibility.
+- Updating this document with the new package's responsibility.

@@ -18,7 +18,9 @@ Thank you for your interest in contributing to MontRS! This framework is built f
 
 ## 🏗️ Project Structure
 
-MontRS is a workspace with several packages:
+MontRS is a workspace with several packages. For a detailed breakdown of package boundaries and instructions on how to create new ones, see the **[Packages Contribution Guide](packages-contribution.md)**.
+
+The workspace includes:
 -   `packages/core`: The architectural engine.
 -   `packages/cli`: The command-line interface.
 -   `packages/agent`: The Agent-First sidecar.

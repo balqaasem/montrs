@@ -26,6 +26,7 @@ Welcome to the MontRS documentation. This folder contains deep-dive guides for b
 - [CLI Internals](tooling/cli.md) - Orchestration and task runners.
 - [Custom Tasks](tooling/tasks.md) - Automating workflows.
 - [Contributing Guide](community/contributing.md) - How to build MontRS.
+- [Packages Contribution](community/packages-contribution.md) - Guidelines for new framework packages.
 
 ### For Agents
 - [Agent Condensed Onboarding](agent/onboarding.md) - **Recommended for agents.**
