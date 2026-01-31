@@ -23,6 +23,8 @@ pub const BENCH_INVARIANTS: &str = include_str!("../../../packages/bench/docs/in
 pub const MONTRS_INVARIANTS: &str = include_str!("../../../packages/montrs/docs/invariants.md");
 
 pub const AGENT_INDEX: &str = include_str!("../../../docs/agent/index.md");
+pub const APP_DEVELOPER_PROMPT: &str = include_str!("../../../docs/agent/app-developer-prompt.md");
+pub const FRAMEWORK_CONTRIBUTOR_PROMPT: &str = include_str!("../../../docs/agent/framework-contributor-prompt.md");
 pub const FIXING_ERRORS_WORKFLOW: &str = include_str!("../../../docs/agent/workflows/fixing-errors.md");
 pub const ADDING_FEATURES_WORKFLOW: &str = include_str!("../../../docs/agent/workflows/adding-features.md");
 

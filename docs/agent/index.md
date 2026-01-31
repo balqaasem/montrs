@@ -50,6 +50,35 @@ Before performing any action, ensure you are grounded in these core principles:
 
 ---
 
+## 💡 Token Optimization & Efficiency
+
+To minimize context window usage and improve accuracy, follow these efficiency rules:
+
+- **Scoped Invariants**: Do NOT read all framework invariants by default. Only read the `invariants` field in `agent.json` for the specific package(s) you are currently modifying or interacting with.
+- **Incremental Context**: Start with the `agent_entry_point` and the relevant workflow guide. Only pull in full package documentation if the workflow guide or `agent.json` summary is insufficient.
+- **Targeted Discovery**: Use `montrs agent check` or `montrs agent list-errors` to narrow down the specific files and packages that require your attention.
+
+---
+
+## 🌍 Context Boundary: Framework vs. Application
+
+It is critical to distinguish between working **on** the MontRS framework and working **with** it to build an application. Confusing these two will lead to architectural violations.
+
+### 1. Working ON the Framework (Contributor Mode)
+- **Target**: The `montrs` repository itself (e.g., `packages/core`, `packages/cli`).
+- **Goal**: Modifying the engine, CLI, or core traits.
+- **Prompt**: Use the [Framework Contributor Prompt](framework-contributor-prompt.md).
+- **Rule**: Your changes affect *all* downstream users. Prioritize stability and zero-cost abstractions.
+
+### 2. Working WITH the Framework (App Developer Mode)
+- **Target**: A user project created via `montrs new`.
+- **Goal**: Building business logic, UI, and features using MontRS primitives.
+- **Prompt**: Use the [App Developer Prompt](app-developer-prompt.md).
+- **Rule**: Treat the framework as a stable API. 
+- **Consumer vs. Contributor**: If you are in a standalone app project, you are a "Consumer". You will not see the framework's source code in your file tree. Use the `agent.json` snapshot to discover framework invariants and documentation embedded by the CLI.
+
+---
+
 ## 🔌 Tooling & Integration
 
 - **[MCP Setup & Access](mcp-setup.md)**: How to connect your capabilities to the project.

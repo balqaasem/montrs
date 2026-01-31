@@ -734,9 +734,12 @@ impl AgentManager {
         documentation_snippets.insert("architecture".to_string(), guides::ARCHITECTURE_GUIDE.to_string());
         documentation_snippets.insert("debugging".to_string(), guides::DEBUGGING_GUIDE.to_string());
         
-        // Add embedded workflows
+        // Add embedded workflows and prompts
         documentation_snippets.insert("workflows/fixing-errors".to_string(), framework::FIXING_ERRORS_WORKFLOW.to_string());
         documentation_snippets.insert("workflows/adding-features".to_string(), framework::ADDING_FEATURES_WORKFLOW.to_string());
+        documentation_snippets.insert("agent/index".to_string(), framework::AGENT_INDEX.to_string());
+        documentation_snippets.insert("agent/app-developer-prompt".to_string(), framework::APP_DEVELOPER_PROMPT.to_string());
+        documentation_snippets.insert("agent/framework-contributor-prompt".to_string(), framework::FRAMEWORK_CONTRIBUTOR_PROMPT.to_string());
 
         // Scan global docs directory
         let docs_dir = self.root_path.join("docs");
