@@ -29,30 +29,6 @@ pub struct MontrsCli {
     #[arg(long)]
     pub hot_reload: bool,
 
-    /// Precompress static assets with gzip and brotli.
-    #[arg(short = 'P', long)]
-    pub precompress: bool,
-
-    /// Include debug information in Wasm output.
-    #[arg(long)]
-    pub wasm_debug: bool,
-
-    /// Minify javascript assets.
-    #[arg(long, default_value = "true")]
-    pub js_minify: bool,
-
-    /// Split WASM binary based on #[lazy] macros.
-    #[arg(long)]
-    pub split: bool,
-
-    /// Only build the frontend.
-    #[arg(long)]
-    pub frontend_only: bool,
-
-    /// Only build the server.
-    #[arg(long, conflicts_with = "frontend_only")]
-    pub server_only: bool,
-
     /// The features to use when compiling all targets.
     #[arg(long)]
     pub features: Vec<String>,
@@ -289,12 +265,6 @@ pub async fn run(cli: MontrsCli) -> anyhow::Result<()> {
     config.project.log = cli.log.clone();
     config.project.release = cli.release;
     config.project.hot_reload = cli.hot_reload;
-    config.project.precompress = cli.precompress;
-    config.project.wasm_debug = cli.wasm_debug;
-    config.project.js_minify = cli.js_minify;
-    config.project.split = cli.split;
-    config.project.frontend_only = cli.frontend_only;
-    config.project.server_only = cli.server_only;
     config.project.features = cli.features.clone();
 
     if cli.tailwind_toml {

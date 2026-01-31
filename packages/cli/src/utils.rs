@@ -9,28 +9,8 @@ pub async fn run_cargo_leptos(cmd: &str, args: &[String], config: &MontrsConfig)
     if config.project.release {
         args_list.push("--release".to_string());
     }
-    if config.project.precompress {
-        args_list.push("--precompress".to_string());
-    }
     if config.project.hot_reload {
         args_list.push("--hot-reload".to_string());
-    }
-    if config.project.wasm_debug {
-        args_list.push("--wasm-debug".to_string());
-    }
-    if config.project.js_minify {
-        args_list.push("--js-minify".to_string());
-    } else {
-        args_list.push("--js-minify=false".to_string());
-    }
-    if config.project.split {
-        args_list.push("--split".to_string());
-    }
-    if config.project.frontend_only {
-        args_list.push("--frontend-only".to_string());
-    }
-    if config.project.server_only {
-        args_list.push("--server-only".to_string());
     }
 
     for feature in &config.project.features {

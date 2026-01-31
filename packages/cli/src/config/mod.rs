@@ -54,18 +54,6 @@ pub struct ProjectConfig {
     #[serde(skip)]
     pub hot_reload: bool,
     #[serde(skip)]
-    pub precompress: bool,
-    #[serde(skip)]
-    pub wasm_debug: bool,
-    #[serde(skip)]
-    pub js_minify: bool,
-    #[serde(skip)]
-    pub split: bool,
-    #[serde(skip)]
-    pub frontend_only: bool,
-    #[serde(skip)]
-    pub server_only: bool,
-    #[serde(skip)]
     pub features: Vec<String>,
     #[serde(skip)]
     pub tailwind_style: Option<TailwindStyle>,
@@ -91,12 +79,6 @@ impl Default for ProjectConfig {
             log: Vec::new(),
             release: false,
             hot_reload: false,
-            precompress: false,
-            wasm_debug: false,
-            js_minify: true,
-            split: false,
-            frontend_only: false,
-            server_only: false,
             features: Vec::new(),
             tailwind_style: None,
         }
