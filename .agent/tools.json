@@ -89,7 +89,7 @@
       }
     },
     {
-      "description": "Capability provided by package agent. MUST follow invariants in agent/docs/invariants.md",
+      "description": "Capability provided by package agent. MUST follow invariants defined in agent.json under packages['agent'].invariants",
       "name": "montrs_pkg_agent",
       "parameters": {
         "properties": {},
@@ -113,7 +113,7 @@
       }
     },
     {
-      "description": "Capability provided by package bench. MUST follow invariants in bench/docs/invariants.md",
+      "description": "Capability provided by package bench. MUST follow invariants defined in agent.json under packages['bench'].invariants",
       "name": "montrs_pkg_bench",
       "parameters": {
         "properties": {},
@@ -129,7 +129,7 @@
       }
     },
     {
-      "description": "Capability provided by package cli. MUST follow invariants in cli/docs/invariants.md",
+      "description": "Capability provided by package cli. MUST follow invariants defined in agent.json under packages['cli'].invariants",
       "name": "montrs_pkg_cli",
       "parameters": {
         "properties": {},
@@ -137,7 +137,7 @@
       }
     },
     {
-      "description": "Capability provided by package core. MUST follow invariants in core/docs/invariants.md",
+      "description": "Capability provided by package core. MUST follow invariants defined in agent.json under packages['core'].invariants",
       "name": "montrs_pkg_core",
       "parameters": {
         "properties": {},
@@ -145,7 +145,7 @@
       }
     },
     {
-      "description": "Capability provided by package fmt. MUST follow invariants in fmt/docs/invariants.md",
+      "description": "Capability provided by package fmt. MUST follow invariants defined in agent.json under packages['fmt'].invariants",
       "name": "montrs_pkg_fmt",
       "parameters": {
         "properties": {},
@@ -161,7 +161,7 @@
       }
     },
     {
-      "description": "Capability provided by package montrs. MUST follow invariants in montrs/docs/invariants.md",
+      "description": "Capability provided by package montrs. MUST follow invariants defined in agent.json under packages['montrs'].invariants",
       "name": "montrs_pkg_montrs",
       "parameters": {
         "properties": {},
@@ -169,7 +169,7 @@
       }
     },
     {
-      "description": "Capability provided by package orm. MUST follow invariants in orm/docs/invariants.md",
+      "description": "Capability provided by package orm. MUST follow invariants defined in agent.json under packages['orm'].invariants",
       "name": "montrs_pkg_orm",
       "parameters": {
         "properties": {},
@@ -185,7 +185,7 @@
       }
     },
     {
-      "description": "Capability provided by package schema. MUST follow invariants in schema/docs/invariants.md",
+      "description": "Capability provided by package schema. MUST follow invariants defined in agent.json under packages['schema'].invariants",
       "name": "montrs_pkg_schema",
       "parameters": {
         "properties": {},
@@ -193,7 +193,7 @@
       }
     },
     {
-      "description": "Capability provided by package test. MUST follow invariants in test/docs/invariants.md",
+      "description": "Capability provided by package test. MUST follow invariants defined in agent.json under packages['test'].invariants",
       "name": "montrs_pkg_test",
       "parameters": {
         "properties": {},
@@ -209,7 +209,7 @@
       }
     },
     {
-      "description": "Capability provided by package utils. MUST follow invariants in utils/docs/invariants.md",
+      "description": "Capability provided by package utils. MUST follow invariants defined in agent.json under packages['utils'].invariants",
       "name": "montrs_pkg_utils",
       "parameters": {
         "properties": {},

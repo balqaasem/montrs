@@ -124,6 +124,11 @@ async fn handle_request(req: JsonRpcRequest) -> anyhow::Result<JsonRpcResponse> 
                         }
                     }),
                 },
+                Tool {
+                    name: "get_agent_entry_point".to_string(),
+                    description: "Get the unified entry point for agent operations, mapping tasks to guides.".to_string(),
+                    input_schema: json!({ "type": "object", "properties": {} }),
+                },
             ];
             Some(serde_json::to_value(ListToolsResult { tools })?)
         }
@@ -195,6 +200,17 @@ async fn handle_tool_call(params: CallToolParams) -> anyhow::Result<CallToolResu
             // Extract router info from snapshot
             Ok(CallToolResult {
                 content: vec![ToolContent::Text { text: output }],
+                is_error: false,
+            })
+        }
+        "get_agent_entry_point" => {
+            let cwd = std::env::current_dir()?;
+            let manager = montrs_agent::AgentManager::new(cwd);
+            // Try to get from project first, then fallback to embedded
+            let snapshot = manager.generate_snapshot("temp").unwrap_or_else(|_| manager.generate_framework_snapshot());
+            let entry_point = snapshot.agent_entry_point.unwrap_or_else(|| "No entry point found.".to_string());
+            Ok(CallToolResult {
+                content: vec![ToolContent::Text { text: entry_point }],
                 is_error: false,
             })
         }

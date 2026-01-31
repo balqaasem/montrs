@@ -7,6 +7,7 @@ use chrono::{DateTime, Utc};
 
 pub mod guides;
 pub mod error_parser;
+pub mod framework;
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct AgentSnapshot {
@@ -477,7 +478,7 @@ impl AgentManager {
                         let mut description = format!("Capability provided by package {}. Refer to its README for details.", pkg_name);
                         
                         if invariants_path.exists() {
-                            description = format!("Capability provided by package {}. MUST follow invariants in {}/docs/invariants.md", pkg_name, pkg_name);
+                            description = format!("Capability provided by package {}. MUST follow invariants defined in agent.json under packages['{}'].invariants", pkg_name, pkg_name);
                         } else if readme_path.exists() {
                             if let Ok(content) = fs::read_to_string(&readme_path) {
                                 if content.contains("Agent Usage Guide") || content.contains("Key Features") || content.contains("Key Components") || content.contains("Agent") {
@@ -663,6 +664,40 @@ impl AgentManager {
         self.generate_snapshot_with_spec(project_name, None)
     }
 
+    /// Generates a snapshot of the framework itself using embedded data.
+    /// Useful for global reference or when not in a MontRS project.
+    pub fn generate_framework_snapshot(&self) -> AgentSnapshot {
+        let mut documentation_snippets = HashMap::new();
+        documentation_snippets.insert("architecture".to_string(), guides::ARCHITECTURE_GUIDE.to_string());
+        documentation_snippets.insert("debugging".to_string(), guides::DEBUGGING_GUIDE.to_string());
+        documentation_snippets.insert("agent/index".to_string(), framework::AGENT_INDEX.to_string());
+        documentation_snippets.insert("workflows/fixing-errors".to_string(), framework::FIXING_ERRORS_WORKFLOW.to_string());
+        documentation_snippets.insert("workflows/adding-features".to_string(), framework::ADDING_FEATURES_WORKFLOW.to_string());
+
+        let framework_invariants = framework::get_framework_invariants();
+        let mut packages = Vec::new();
+        for (name, invariants) in framework_invariants {
+            packages.push(PackageSummary {
+                name: name.to_string(),
+                path: format!("packages/{}", name),
+                invariants: Some(invariants.to_string()),
+                description: Some(format!("MontRS {} package (embedded reference)", name)),
+            });
+        }
+
+        AgentSnapshot {
+            project_name: "MontRS Framework".to_string(),
+            timestamp: Utc::now(),
+            framework_version: "0.1.0".to_string(),
+            structure: Vec::new(),
+            plates: Vec::new(),
+            routes: Vec::new(),
+            packages,
+            agent_entry_point: Some(framework::AGENT_INDEX.to_string()),
+            documentation_snippets,
+        }
+    }
+
     pub fn generate_snapshot_with_spec(&self, project_name: &str, spec: Option<montrs_core::AppSpecExport>) -> Result<AgentSnapshot> {
         let mut structure = Vec::new();
         let walker = ignore::WalkBuilder::new(&self.root_path)
@@ -698,10 +733,34 @@ impl AgentManager {
         let mut documentation_snippets = HashMap::new();
         documentation_snippets.insert("architecture".to_string(), guides::ARCHITECTURE_GUIDE.to_string());
         documentation_snippets.insert("debugging".to_string(), guides::DEBUGGING_GUIDE.to_string());
+        
+        // Add embedded workflows
+        documentation_snippets.insert("workflows/fixing-errors".to_string(), framework::FIXING_ERRORS_WORKFLOW.to_string());
+        documentation_snippets.insert("workflows/adding-features".to_string(), framework::ADDING_FEATURES_WORKFLOW.to_string());
 
-        // Discover packages and their invariants
+        // Scan global docs directory
+        let docs_dir = self.root_path.join("docs");
+        if docs_dir.exists() {
+            let walker = walkdir::WalkDir::new(&docs_dir).into_iter();
+            for entry in walker.filter_map(|e| e.ok()) {
+                if entry.path().is_file() && entry.path().extension().and_then(|s| s.to_str()) == Some("md") {
+                    if let Ok(relative_path) = entry.path().strip_prefix(&docs_dir) {
+                        let key = relative_path.to_string_lossy().to_string();
+                        if let Ok(content) = fs::read_to_string(entry.path()) {
+                            documentation_snippets.insert(format!("docs/{}", key), content);
+                        }
+                    }
+                }
+            }
+        }
+
+        // Discover packages and their invariants/internal docs
         let mut packages = Vec::new();
         let packages_dir = self.root_path.join("packages");
+        
+        // Use embedded framework invariants as a base/fallback
+        let framework_invariants = framework::get_framework_invariants();
+
         if packages_dir.exists() {
             if let Ok(entries) = fs::read_dir(&packages_dir) {
                 for entry in entries.flatten() {
@@ -709,12 +768,29 @@ impl AgentManager {
                         let name = entry.file_name().to_string_lossy().to_string();
                         let relative_path = entry.path().strip_prefix(&self.root_path)?.to_string_lossy().to_string();
                         
-                        let invariants_path = entry.path().join("docs").join("invariants.md");
+                        let pkg_docs_dir = entry.path().join("docs");
+                        let invariants_path = pkg_docs_dir.join("invariants.md");
                         let invariants = if invariants_path.exists() {
                             fs::read_to_string(invariants_path).ok()
                         } else {
-                            None
+                            // Fallback to embedded framework invariant if it matches a core package
+                            framework_invariants.get(name.as_str()).map(|s| s.to_string())
                         };
+
+                        // Also scan for other package-specific docs
+                        if pkg_docs_dir.exists() {
+                            let walker = walkdir::WalkDir::new(&pkg_docs_dir).into_iter();
+                            for doc_entry in walker.filter_map(|e| e.ok()) {
+                                if doc_entry.path().is_file() && doc_entry.path().extension().and_then(|s| s.to_str()) == Some("md") {
+                                    if let Ok(rel_doc_path) = doc_entry.path().strip_prefix(&pkg_docs_dir) {
+                                        let key = rel_doc_path.to_string_lossy().to_string();
+                                        if let Ok(content) = fs::read_to_string(doc_entry.path()) {
+                                            documentation_snippets.insert(format!("packages/{}/docs/{}", name, key), content);
+                                        }
+                                    }
+                                }
+                            }
+                        }
 
                         packages.push(PackageSummary {
                             name,
@@ -732,7 +808,8 @@ impl AgentManager {
         let agent_entry_point = if entry_point_path.exists() {
             Some(fs::read_to_string(entry_point_path)?)
         } else {
-            None
+            // Fallback to embedded framework entry point
+            Some(framework::AGENT_INDEX.to_string())
         };
 
         let (plates, routes) = if let Some(s) = spec {
@@ -819,6 +896,18 @@ impl AgentManager {
                     }
                 }
             }
+        }
+
+        // 3. Check for package invariants and documentation
+        for pkg in &snapshot.packages {
+            if pkg.invariants.is_none() {
+                violations.push(format!("Package '{}' is missing invariants. All framework packages must define architectural rules.", pkg.name));
+            }
+        }
+
+        // 4. Check for unified entry point
+        if snapshot.agent_entry_point.is_none() {
+            violations.push("Project is missing a unified agent entry point (docs/agent/index.md).".to_string());
         }
 
         Ok(violations)
