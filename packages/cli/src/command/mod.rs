@@ -1,9 +1,11 @@
+pub mod agent;
 pub mod bench;
 pub mod build;
 pub mod e2e;
 pub mod expand;
 pub mod fmt;
 pub mod generate;
+pub mod mcp;
 pub mod new;
 pub mod run;
 pub mod serve;

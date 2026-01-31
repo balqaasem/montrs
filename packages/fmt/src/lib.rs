@@ -71,10 +71,10 @@ pub fn format_source(source: &str, settings: &FormatterSettings) -> Result<Strin
     let source = normalize_scaffold_headers(source);
 
     // 1. Extract comments
-    let (source_rope, comments) = comments::extract_comments(source);
+    let (source_rope, comments) = comments::extract_comments(&source);
 
     // 2. Parse the file into a syn::File
-    let file = syn::parse_file(source)?;
+    let file = syn::parse_file(&source)?;
 
     // 3. Collect and format view! macros
     let mut edits = Vec::new();

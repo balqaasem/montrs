@@ -107,7 +107,7 @@ pub fn reinsert_comments(formatted: &str, comments: Vec<Comment>) -> String {
     let mut result = String::new();
     
     // 1. Separate agent tools to ensure they are at the very top if they were at the start
-    let (mut agent_tools, other_comments): (Vec<Comment>, Vec<Comment>) = 
+    let (agent_tools, other_comments): (Vec<Comment>, Vec<Comment>) = 
         comments.into_iter().partition(|c| c.is_agent_tool);
 
     // 2. Add agent tools that were at the beginning of the file
@@ -122,7 +122,7 @@ pub fn reinsert_comments(formatted: &str, comments: Vec<Comment>) -> String {
 
     let formatted_lines: Vec<&str> = formatted.lines().collect();
     let mut current_comment_idx = 0;
-    let mut comments = other_comments;
+    let comments = other_comments;
     
     // 3. Re-insert remaining comments based on relative line numbers
     for (i, line) in formatted_lines.iter().enumerate() {

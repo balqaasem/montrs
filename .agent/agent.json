@@ -1,6 +1,6 @@
 {
   "project_name": "app",
-  "timestamp": "2026-01-29T05:00:02.853845700Z",
+  "timestamp": "2026-01-31T04:34:35.476738400Z",
   "framework_version": "0.1.0",
   "structure": [
     {
@@ -24,31 +24,83 @@
       "description": null
     },
     {
-      "path": "docs\\appspec.md",
+      "path": "Craft prompts my agent to do these copy 2.txt",
       "description": null
     },
     {
-      "path": "docs\\architecture.md",
+      "path": "docs\\agent\\agent-first.md",
       "description": null
     },
     {
-      "path": "docs\\benchmarking.md",
+      "path": "docs\\agent\\appspec.md",
       "description": null
     },
     {
-      "path": "docs\\cli.md",
+      "path": "docs\\agent\\metadata.md",
       "description": null
     },
     {
-      "path": "docs\\deployment.md",
+      "path": "docs\\agent\\onboarding.md",
       "description": null
     },
     {
-      "path": "docs\\fmt.md",
+      "path": "docs\\agent\\spec.md",
       "description": null
     },
     {
-      "path": "docs\\getting-started.md",
+      "path": "docs\\architecture\\overview.md",
+      "description": null
+    },
+    {
+      "path": "docs\\architecture\\packages.md",
+      "description": null
+    },
+    {
+      "path": "docs\\architecture\\philosophy.md",
+      "description": null
+    },
+    {
+      "path": "docs\\community\\contributing.md",
+      "description": null
+    },
+    {
+      "path": "docs\\community\\deployment.md",
+      "description": null
+    },
+    {
+      "path": "docs\\community\\packages-contribution.md",
+      "description": null
+    },
+    {
+      "path": "docs\\core\\errors.md",
+      "description": null
+    },
+    {
+      "path": "docs\\core\\plates.md",
+      "description": null
+    },
+    {
+      "path": "docs\\core\\router.md",
+      "description": null
+    },
+    {
+      "path": "docs\\core\\schema.md",
+      "description": null
+    },
+    {
+      "path": "docs\\getting-started\\first-30-minutes.md",
+      "description": null
+    },
+    {
+      "path": "docs\\getting-started\\golden-path.md",
+      "description": null
+    },
+    {
+      "path": "docs\\getting-started\\introduction.md",
+      "description": null
+    },
+    {
+      "path": "docs\\guides\\common-mistakes.md",
       "description": null
     },
     {
@@ -56,27 +108,35 @@
       "description": null
     },
     {
-      "path": "docs\\plates.md",
+      "path": "docs\\orm\\async.md",
       "description": null
     },
     {
-      "path": "docs\\orm.md",
+      "path": "docs\\orm\\backends.md",
       "description": null
     },
     {
-      "path": "docs\\router.md",
+      "path": "docs\\orm\\index.md",
       "description": null
     },
     {
-      "path": "docs\\schema.md",
+      "path": "docs\\testing\\benchmarking.md",
       "description": null
     },
     {
-      "path": "docs\\testing.md",
+      "path": "docs\\testing\\index.md",
       "description": null
     },
     {
-      "path": "fmt-prd.md",
+      "path": "docs\\tooling\\cli.md",
+      "description": null
+    },
+    {
+      "path": "docs\\tooling\\fmt.md",
+      "description": null
+    },
+    {
+      "path": "docs\\tooling\\tasks.md",
       "description": null
     },
     {
@@ -88,7 +148,39 @@
       "description": null
     },
     {
-      "path": "mont_rs_router_product_requirements_document_prd.md",
+      "path": "output.txt",
+      "description": null
+    },
+    {
+      "path": "packages\\agent\\Cargo.toml",
+      "description": null
+    },
+    {
+      "path": "packages\\agent\\docs\\agent-guide.md",
+      "description": null
+    },
+    {
+      "path": "packages\\agent\\docs\\design-system.md",
+      "description": null
+    },
+    {
+      "path": "packages\\agent\\README.md",
+      "description": null
+    },
+    {
+      "path": "packages\\agent\\src\\error_parser.rs",
+      "description": null
+    },
+    {
+      "path": "packages\\agent\\src\\guides.rs",
+      "description": null
+    },
+    {
+      "path": "packages\\agent\\src\\lib.rs",
+      "description": "Reports a new error to the agent, creating or updating errorfile.json."
+    },
+    {
+      "path": "packages\\agent\\tests\\agent_test.rs",
       "description": null
     },
     {
@@ -96,7 +188,7 @@
       "description": null
     },
     {
-      "path": "packages\\bench\\docs\\ai-guide.md",
+      "path": "packages\\bench\\docs\\agent-guide.md",
       "description": null
     },
     {
@@ -148,7 +240,19 @@
       "description": null
     },
     {
-      "path": "packages\\cli\\docs\\ai-guide.md",
+      "path": "packages\\cli\\docs\\agent-command-specs.md",
+      "description": null
+    },
+    {
+      "path": "packages\\cli\\docs\\agent-guide.md",
+      "description": null
+    },
+    {
+      "path": "packages\\cli\\docs\\mcp-server-design.md",
+      "description": null
+    },
+    {
+      "path": "packages\\cli\\docs\\optimization-report.md",
       "description": null
     },
     {
@@ -164,6 +268,10 @@
       "description": null
     },
     {
+      "path": "packages\\cli\\src\\command\\agent.rs",
+      "description": null
+    },
+    {
       "path": "packages\\cli\\src\\command\\bench.rs",
       "description": "Bench command handler."
     },
@@ -176,7 +284,19 @@
       "description": "E2E test command."
     },
     {
+      "path": "packages\\cli\\src\\command\\expand.rs",
+      "description": null
+    },
+    {
       "path": "packages\\cli\\src\\command\\fmt.rs",
+      "description": null
+    },
+    {
+      "path": "packages\\cli\\src\\command\\generate.rs",
+      "description": null
+    },
+    {
+      "path": "packages\\cli\\src\\command\\mcp.rs",
       "description": null
     },
     {
@@ -194,6 +314,10 @@
     {
       "path": "packages\\cli\\src\\command\\serve.rs",
       "description": null
+    },
+    {
+      "path": "packages\\cli\\src\\command\\sketch.rs",
+      "description": "This file contains an explicit, deterministic, single-file plate definition."
     },
     {
       "path": "packages\\cli\\src\\command\\spec.rs",
@@ -232,6 +356,14 @@
       "description": "Build artifacts in release mode, with optimizations."
     },
     {
+      "path": "packages\\cli\\src\\mcp\\mod.rs",
+      "description": null
+    },
+    {
+      "path": "packages\\cli\\src\\mcp\\protocol.rs",
+      "description": null
+    },
+    {
       "path": "packages\\cli\\src\\utils.rs",
       "description": null
     },
@@ -240,7 +372,7 @@
       "description": null
     },
     {
-      "path": "packages\\core\\docs\\ai-guide.md",
+      "path": "packages\\core\\docs\\agent-guide.md",
       "description": null
     },
     {
@@ -276,11 +408,15 @@
       "description": null
     },
     {
+      "path": "packages\\core\\tests\\router_test.rs",
+      "description": null
+    },
+    {
       "path": "packages\\fmt\\Cargo.toml",
       "description": null
     },
     {
-      "path": "packages\\fmt\\docs\\ai-guide.md",
+      "path": "packages\\fmt\\docs\\agent-guide.md",
       "description": null
     },
     {
@@ -312,38 +448,6 @@
       "description": null
     },
     {
-      "path": "packages\\llm\\Cargo.toml",
-      "description": null
-    },
-    {
-      "path": "packages\\llm\\docs\\ai-guide.md",
-      "description": null
-    },
-    {
-      "path": "packages\\llm\\docs\\design-system.md",
-      "description": null
-    },
-    {
-      "path": "packages\\llm\\README.md",
-      "description": null
-    },
-    {
-      "path": "packages\\llm\\src\\error_parser.rs",
-      "description": null
-    },
-    {
-      "path": "packages\\llm\\src\\guides.rs",
-      "description": null
-    },
-    {
-      "path": "packages\\llm\\src\\lib.rs",
-      "description": "Generates a comprehensive snapshot of the codebase."
-    },
-    {
-      "path": "packages\\llm\\tests\\llm_test.rs",
-      "description": null
-    },
-    {
       "path": "packages\\montrs\\Cargo.toml",
       "description": null
     },
@@ -364,7 +468,7 @@
       "description": null
     },
     {
-      "path": "packages\\orm\\docs\\ai-guide.md",
+      "path": "packages\\orm\\docs\\agent-guide.md",
       "description": null
     },
     {
@@ -380,7 +484,7 @@
       "description": null
     },
     {
-      "path": "packages\\schema\\docs\\ai-guide.md",
+      "path": "packages\\schema\\docs\\agent-guide.md",
       "description": null
     },
     {
@@ -400,7 +504,7 @@
       "description": null
     },
     {
-      "path": "packages\\test\\docs\\ai-guide.md",
+      "path": "packages\\test\\docs\\agent-guide.md",
       "description": null
     },
     {
@@ -422,6 +526,18 @@
     {
       "path": "packages\\test\\src\\unit.rs",
       "description": "Production-grade unit testing utilities for MontRS."
+    },
+    {
+      "path": "packages\\utils\\Cargo.toml",
+      "description": null
+    },
+    {
+      "path": "packages\\utils\\src\\lib.rs",
+      "description": "Reusable utilities for the MontRS framework."
+    },
+    {
+      "path": "prompt.md",
+      "description": null
     },
     {
       "path": "README.md",
@@ -572,7 +688,7 @@
       "description": null
     },
     {
-      "path": "The AI Specfication.md",
+      "path": "when-not-to-use.md",
       "description": null
     }
   ],
@@ -585,22 +701,32 @@
   ],
   "routes": [
     {
-      "path": "(impl) TestLoader",
-      "kind": "Loader",
-      "description": "Heuristically discovered Loader: TestLoader",
+      "path": "(impl) UserRoute",
+      "kind": "Route",
+      "description": "Heuristically discovered Route: UserRoute",
       "input_schema": null,
-      "output_schema": null
+      "output_schema": null,
+      "params_schema": null,
+      "loader_output_schema": null,
+      "action_input_schema": null,
+      "action_output_schema": null,
+      "metadata": {}
     },
     {
-      "path": "(impl) TestAction",
-      "kind": "Action",
-      "description": "Heuristically discovered Action: TestAction",
+      "path": "(impl) TodoRoute",
+      "kind": "Route",
+      "description": "Heuristically discovered Route: TodoRoute",
       "input_schema": null,
-      "output_schema": null
+      "output_schema": null,
+      "params_schema": null,
+      "loader_output_schema": null,
+      "action_input_schema": null,
+      "action_output_schema": null,
+      "metadata": {}
     }
   ],
   "documentation_snippets": {
-    "architecture": "\n# MontRS Architecture Guide\nMontRS is a trait-driven, deterministic web framework built on Leptos 0.8.\n\n## Core Concepts\n- **AppSpec**: The single source of truth for the application blueprint.\n- **Plate**: A unit of composition (Auth, Blog, etc.) that registers routes and providers.\n- **Loaders**: Read-only, idempotent data fetching.\n- **Actions**: State-changing mutations.\n\n## How to build a plate\n1. Implement the `Plate` trait.\n2. Define your `Loader` and `Action` implementations.\n3. Register them in `register_routes`.\n",
-    "debugging": "\n# Debugging MontRS\nMontRS provides an `errorfile.txt` in the `.llm` folder when a build or test fails.\nAI models should use this file to understand the context of the error and propose fixes.\n"
+    "debugging": "\n# Debugging MontRS\nMontRS provides an `errorfile.json` in the `.agent/errorfiles` folder when a build or test fails.\nAgents should use these files to understand the context of the error and propose fixes.\n",
+    "architecture": "\n# MontRS Architecture Guide\nMontRS is a trait-driven, deterministic web framework built on Leptos 0.8.\n\n## Core Concepts\n- **AppSpec**: The single source of truth for the application blueprint.\n- **Plate**: A unit of composition (Auth, Blog, etc.) that registers routes and providers.\n- **Loaders**: Read-only, idempotent data fetching.\n- **Actions**: State-changing mutations.\n\n## How to build a plate\n1. Implement the `Plate` trait.\n2. Define your `Loader` and `Action` implementations.\n3. Register them in `register_routes`.\n"
   }
 }

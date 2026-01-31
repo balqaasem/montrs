@@ -61,7 +61,7 @@ fn expand_plate(content: &str, path: &str) -> Result<()> {
     println!(
         "{} Expanded plate to: {}",
         style("✨").green().bold(),
-        style(&target_path).underline()
+        style(&target_path).underlined()
     );
     
     Ok(())

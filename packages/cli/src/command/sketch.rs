@@ -31,7 +31,7 @@ pub async fn run(name: String, kind: String) -> Result<()> {
     println!(
         "{} Created sketch at: {}",
         style("✨").green().bold(),
-        style(file_path.display()).underline()
+        style(file_path.display()).underlined()
     );
     println!(
         "\nThis is a 'Scaffolded Explicit' sketch. You can edit it freely.\nRun `montrs expand {}` to convert it into a full project structure.",
@@ -126,7 +126,7 @@ impl RouteView for {pascal}View {{
                 <p>"Explicitly scaffolded route view."</p>
             </div> 
         }}
-    }
+    }}
 }}
 
 // [REQUIRED] Unified Route Trait

@@ -35,7 +35,10 @@ pub struct PlateSummary {
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct RouteSummary {
     pub path: String,
+    pub kind: String,
     pub description: String,
+    pub input_schema: Option<serde_json::Value>,
+    pub output_schema: Option<serde_json::Value>,
     pub params_schema: Option<serde_json::Value>,
     pub loader_output_schema: Option<serde_json::Value>,
     pub action_input_schema: Option<serde_json::Value>,
@@ -69,6 +72,7 @@ pub struct ErrorVersion {
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct ProjectError {
+    pub package: Option<String>,
     pub file: String,
     pub line: u32,
     pub column: u32,
@@ -76,6 +80,24 @@ pub struct ProjectError {
     pub code_context: String,
     pub level: String, // Error, Warning
     pub agent_metadata: Option<AgentErrorMetadata>,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct ErrorTracking {
+    pub errors: Vec<ConsolidatedError>,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct ConsolidatedError {
+    pub id: String,
+    pub package: Option<String>,
+    pub file: String,
+    pub line: u32,
+    pub column: u32,
+    pub level: String,
+    pub message: String,
+    pub status: String,
+    pub timestamp: DateTime<Utc>,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -101,6 +123,10 @@ impl AgentManager {
 
     pub fn errorfiles_dir(&self) -> PathBuf {
         self.agent_dir().join("errorfiles")
+    }
+
+    pub fn tracking_file(&self) -> PathBuf {
+        self.agent_dir().join("error_tracking.json")
     }
 
     pub fn ensure_dir(&self) -> Result<()> {
@@ -136,11 +162,97 @@ impl AgentManager {
         
         let content = serde_json::to_string_pretty(record)?;
         fs::write(version_dir.join(format!("{}.json", record.id)), content)?;
+        
+        // Update consolidated tracking
+        self.update_consolidated_tracking(record)?;
+        
         Ok(())
     }
 
+    pub fn load_tracking(&self) -> Result<ErrorTracking> {
+        let path = self.tracking_file();
+        if path.exists() {
+            let content = fs::read_to_string(&path)?;
+            // Try new format first
+            if let Ok(tracking) = serde_json::from_str::<ErrorTracking>(&content) {
+                return Ok(tracking);
+            }
+            // Fallback to manual parsing if needed or try to adapt legacy
+            if let Ok(value) = serde_json::from_str::<serde_json::Value>(&content) {
+                if let Some(active_issues) = value.get("active_issues").and_then(|v| v.as_array()) {
+                    let mut errors = Vec::new();
+                    for issue in active_issues {
+                        if let (Some(id), Some(msg)) = (issue.get("id").and_then(|v| v.as_str()), issue.get("message").and_then(|v| v.as_str())) {
+                            let status = issue.get("status").and_then(|v| v.as_str()).unwrap_or("Pending").to_string();
+                            errors.push(ConsolidatedError {
+                                id: id.to_string(),
+                                package: issue.get("package").and_then(|v| v.as_str()).map(|s| s.to_string()),
+                                file: issue.get("file").and_then(|v| v.as_str()).unwrap_or("unknown").to_string(),
+                                line: issue.get("line").and_then(|v| v.as_u64()).unwrap_or(0) as u32,
+                                column: issue.get("column").and_then(|v| v.as_u64()).unwrap_or(0) as u32,
+                                level: issue.get("type").and_then(|v| v.as_str()).unwrap_or("Error").to_string(),
+                                message: msg.to_string(),
+                                status,
+                                timestamp: issue.get("timestamp")
+                                    .and_then(|v| v.as_str())
+                                    .and_then(|s| s.parse().ok())
+                                    .unwrap_or_else(Utc::now),
+                            });
+                        }
+                    }
+                    if !errors.is_empty() {
+                        return Ok(ErrorTracking { errors });
+                    }
+                }
+            }
+        }
+        Ok(ErrorTracking { errors: Vec::new() })
+    }
+
+    pub fn save_tracking(&self, tracking: &ErrorTracking) -> Result<()> {
+        self.ensure_dir()?;
+        let content = serde_json::to_string_pretty(tracking)?;
+        fs::write(self.tracking_file(), content)?;
+        Ok(())
+    }
+
+    fn update_consolidated_tracking(&self, record: &ErrorRecord) -> Result<()> {
+        let mut tracking = self.load_tracking().unwrap_or(ErrorTracking { errors: Vec::new() });
+        let status = match record.status {
+            ErrorStatus::Active => "Pending",
+            ErrorStatus::Resolved => "Fixed",
+        }.to_string();
+
+        let consolidated = ConsolidatedError {
+            id: record.id.clone(),
+            package: record.detail.package.clone(),
+            file: record.detail.file.clone(),
+            line: record.detail.line,
+            column: record.detail.column,
+            level: record.detail.level.clone(),
+            message: record.detail.message.clone(),
+            status,
+            timestamp: record.timestamp,
+        };
+
+        if let Some(pos) = tracking.errors.iter().position(|e| e.id == record.id) {
+            tracking.errors[pos] = consolidated;
+        } else {
+            tracking.errors.push(consolidated);
+        }
+
+        self.save_tracking(&tracking)
+    }
+
     /// Reports a new error to the agent, creating or updating errorfile.json.
-    pub fn report_project_error(&self, error: ProjectError) -> Result<String> {
+    pub fn report_project_error(&self, mut error: ProjectError) -> Result<String> {
+        // Try to determine package from file path if not provided
+        if error.package.is_none() && error.file != "unknown" {
+            if let Some(pkg) = self.determine_package(&error.file) {
+                error.package = Some(pkg);
+            }
+        }
+
         // Check if a similar active error already exists
         if let Ok(active_errors) = self.list_active_errors() {
             for existing in active_errors {
@@ -192,6 +304,7 @@ impl AgentManager {
 
     pub fn report_error(&self, message: String) -> Result<()> {
         self.report_project_error(ProjectError {
+            package: None,
             file: "unknown".to_string(),
             line: 0,
             column: 0,
@@ -201,6 +314,20 @@ impl AgentManager {
             agent_metadata: None,
         })?;
         Ok(())
+    }
+
+    fn determine_package(&self, file_path: &str) -> Option<String> {
+        let path = std::path::Path::new(file_path);
+        // Look for "packages/NAME" or "apps/NAME"
+        let components: Vec<_> = path.components().collect();
+        for i in 0..components.len() {
+            if let Some(c) = components[i].as_os_str().to_str() {
+                if (c == "packages" || c == "apps") && i + 1 < components.len() {
+                    return components[i+1].as_os_str().to_str().map(|s| s.to_string());
+                }
+            }
+        }
+        None
     }
 
     pub fn generate_diff(&self) -> Option<String> {
@@ -485,7 +612,10 @@ impl AgentManager {
                             println!("Agent: Found route implementation: {}", name);
                             routes.push(RouteSummary {
                                 path: format!("(impl) {}", name),
+                                kind: "Route".to_string(),
                                 description: format!("Heuristically discovered Route: {}", name),
+                                input_schema: None,
+                                output_schema: None,
                                 params_schema: None,
                                 loader_output_schema: None,
                                 action_input_schema: None,
@@ -510,11 +640,11 @@ impl AgentManager {
     }
 
     /// Generates a comprehensive snapshot of the codebase.
-    pub fn generate_snapshot(&self, project_name: String) -> Result<AgentSnapshot> {
+    pub fn generate_snapshot(&self, project_name: &str) -> Result<AgentSnapshot> {
         self.generate_snapshot_with_spec(project_name, None)
     }
 
-    pub fn generate_snapshot_with_spec(&self, project_name: String, spec: Option<montrs_core::AppSpecExport>) -> Result<AgentSnapshot> {
+    pub fn generate_snapshot_with_spec(&self, project_name: &str, spec: Option<montrs_core::AppSpecExport>) -> Result<AgentSnapshot> {
         let mut structure = Vec::new();
         let walker = ignore::WalkBuilder::new(&self.root_path)
             .hidden(false)
@@ -562,22 +692,18 @@ impl AgentManager {
                 });
             }
             
-            for (path, loader) in s.router.loaders {
+            for (path, meta) in s.router.routes {
                 routes.push(RouteSummary {
-                    path,
-                    kind: "Loader".to_string(),
-                    description: loader.description,
-                    input_schema: loader.input_schema,
-                    output_schema: loader.output_schema,
-                });
-            }
-            for (path, action) in s.router.actions {
-                routes.push(RouteSummary {
-                    path,
-                    kind: "Action".to_string(),
-                    description: action.description,
-                    input_schema: action.input_schema,
-                    output_schema: action.output_schema,
+                    path: path.clone(),
+                    kind: "Route".to_string(),
+                    description: meta.loader_description.clone(),
+                    input_schema: None,
+                    output_schema: None,
+                    params_schema: None,
+                    loader_output_schema: None,
+                    action_input_schema: None,
+                    action_output_schema: None,
+                    metadata: HashMap::new(),
                 });
             }
             (plates, routes)
@@ -586,7 +712,7 @@ impl AgentManager {
         };
 
         Ok(AgentSnapshot {
-            project_name,
+            project_name: project_name.to_string(),
             timestamp: Utc::now(),
             framework_version: "0.1.0".to_string(),
             structure,

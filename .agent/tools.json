@@ -48,6 +48,71 @@
       }
     },
     {
+      "description": "Generates a single-file 'sketch' of a MontRS component.",
+      "name": "montrs_sketch",
+      "parameters": {
+        "properties": {
+          "kind": {
+            "description": "Component type",
+            "enum": [
+              "plate",
+              "route",
+              "app"
+            ],
+            "type": "string"
+          },
+          "name": {
+            "description": "Name of the sketch file",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "type": "object"
+      }
+    },
+    {
+      "description": "Expands a sketch file into a full MontRS workspace structure.",
+      "name": "montrs_expand",
+      "parameters": {
+        "properties": {
+          "path": {
+            "description": "Path to the sketch file",
+            "type": "string"
+          }
+        },
+        "required": [
+          "path"
+        ],
+        "type": "object"
+      }
+    },
+    {
+      "description": "Capability provided by package agent. Refer to its README for details.",
+      "name": "montrs_pkg_agent",
+      "parameters": {
+        "properties": {},
+        "type": "object"
+      }
+    },
+    {
+      "description": "description",
+      "name": "tool_name",
+      "parameters": {
+        "properties": {},
+        "type": "object"
+      }
+    },
+    {
+      "description": "description",
+      "name": "name",
+      "parameters": {
+        "properties": {},
+        "type": "object"
+      }
+    },
+    {
       "description": "Capability provided by package bench. Refer to its README for details.",
       "name": "montrs_pkg_bench",
       "parameters": {
@@ -90,30 +155,6 @@
     {
       "description": "Formats Rust and view! code according to MontRS standards.",
       "name": "code_format",
-      "parameters": {
-        "properties": {},
-        "type": "object"
-      }
-    },
-    {
-      "description": "Capability provided by package llm. Refer to its README for details.",
-      "name": "montrs_pkg_llm",
-      "parameters": {
-        "properties": {},
-        "type": "object"
-      }
-    },
-    {
-      "description": "description",
-      "name": "tool_name",
-      "parameters": {
-        "properties": {},
-        "type": "object"
-      }
-    },
-    {
-      "description": "description",
-      "name": "name",
       "parameters": {
         "properties": {},
         "type": "object"

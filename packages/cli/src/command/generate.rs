@@ -27,7 +27,7 @@ impl<C: AppConfig> Plate<C> for {name_pascal}Plate {{
 
     async fn init(&self, _ctx: &mut PlateContext<C>) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {{
         Ok(())
-    }
+    }}
 
     fn register_routes(&self, _router: &mut Router<C>) {{
         // Register routes here:
@@ -51,7 +51,7 @@ impl<C: AppConfig> Plate<C> for {name_pascal}Plate {{
     println!(
         "{} Created plate at: {}",
         style("✨").green().bold(),
-        style(file_path.display()).underline()
+        style(file_path.display()).underlined()
     );
     println!(
         "Next steps:\n  1. Add `pub mod {};` to `src/plates/mod.rs`\n  2. Register the plate in `src/main.rs` using `.with_plate(Box::new({}Plate))`",
@@ -88,7 +88,7 @@ impl<C: AppConfig> RouteLoader<{route_name_pascal}Params, C> for {route_name_pas
     type Output = String;
     async fn load(&self, _ctx: RouteContext<'_, C>, _params: {route_name_pascal}Params) -> Result<Self::Output, RouteError> {{
         Ok("Hello from {route_name_pascal}Loader".to_string())
-    }
+    }}
 }}
 
 pub struct {route_name_pascal}Action;
@@ -98,14 +98,14 @@ impl<C: AppConfig> RouteAction<{route_name_pascal}Params, C> for {route_name_pas
     type Output = String;
     async fn act(&self, _ctx: RouteContext<'_, C>, _params: {route_name_pascal}Params, input: Self::Input) -> Result<Self::Output, RouteError> {{
         Ok(format!("Echo: {{}}", input))
-    }
+    }}
 }}
 
 pub struct {route_name_pascal}View;
 impl RouteView for {route_name_pascal}View {{
     fn render(&self) -> impl IntoView {{
         view! {{ <div>"View for {path}"</div> }}
-    }
+    }}
 }}
 
 pub struct {route_name_pascal}Route;
@@ -141,7 +141,7 @@ impl<C: AppConfig> Route<C> for {route_name_pascal}Route {{
     println!(
         "{} Created route at: {}",
         style("✨").green().bold(),
-        style(file_path.display()).underline()
+        style(file_path.display()).underlined()
     );
     println!(
         "Next steps:\n  1. Add `pub mod {};` to `src/plates/{}/mod.rs`\n  2. Register the route in `{}Plate::register_routes`",

@@ -2,6 +2,12 @@ use montrs_agent::AgentManager;
 use anyhow::Result;
 
 pub async fn run(include_docs: bool, format: String) -> Result<()> {
+    let output = run_to_string(include_docs, format).await?;
+    println!("{}", output);
+    Ok(())
+}
+
+pub async fn run_to_string(include_docs: bool, format: String) -> Result<String> {
     let cwd = std::env::current_dir()?;
     let manager = AgentManager::new(&cwd);
     
@@ -10,7 +16,7 @@ pub async fn run(include_docs: bool, format: String) -> Result<()> {
         eprintln!("Warning: Failed to update tools spec: {}", e);
     }
     
-    let mut snapshot = manager.generate_snapshot("unknown".to_string())?;
+    let mut snapshot = manager.generate_snapshot("unknown")?;
 
     // Try to load basic project info from Cargo.toml
     if let Ok(cargo_toml_content) = std::fs::read_to_string(cwd.join("Cargo.toml")) {
@@ -35,7 +41,5 @@ pub async fn run(include_docs: bool, format: String) -> Result<()> {
         _ => serde_json::to_string_pretty(&snapshot)?,
     };
 
-    println!("{}", output);
-
-    Ok(())
+    Ok(output)
 }

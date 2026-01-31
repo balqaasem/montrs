@@ -43,3 +43,36 @@ async fn test_error_reporting() {
     }
     assert!(found);
 }
+
+#[tokio::test]
+async fn test_consolidated_error_tracking() {
+    let dir = tempdir().unwrap();
+    let root = dir.path();
+    
+    // Create packages structure
+    let pkg_dir = root.join("packages/test-pkg");
+    fs::create_dir_all(&pkg_dir).unwrap();
+    let file_path = pkg_dir.join("src/lib.rs");
+    fs::create_dir_all(file_path.parent().unwrap()).unwrap();
+    fs::write(&file_path, "fn error() {}").unwrap();
+    
+    let manager = AgentManager::new(root);
+    let error_file = "packages/test-pkg/src/lib.rs";
+    
+    manager.report_project_error(montrs_agent::ProjectError {
+        package: None,
+        file: error_file.to_string(),
+        line: 10,
+        column: 5,
+        message: "Test error".to_string(),
+        code_context: "fn error() {}".to_string(),
+        level: "Error".to_string(),
+        agent_metadata: None,
+    }).unwrap();
+    
+    assert!(root.join(".agent/error_tracking.json").exists());
+    let tracking = manager.load_tracking().unwrap();
+    assert_eq!(tracking.errors.len(), 1);
+    assert_eq!(tracking.errors[0].package, Some("test-pkg".to_string()));
+    assert_eq!(tracking.errors[0].status, "Pending");
+}

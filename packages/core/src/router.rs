@@ -115,6 +115,7 @@ pub struct Router<C: AppConfig> {
 
 /// Internal trait to erase the associated types of a Route for storage in the Router.
 #[async_trait]
+#[allow(dead_code)]
 trait RouteInfo<C: AppConfig>: Send + Sync + 'static {
     fn path(&self) -> &'static str;
     async fn handle_load(&self, ctx: RouteContext<'_, C>, params: serde_json::Value) -> Result<serde_json::Value, RouteError>;
