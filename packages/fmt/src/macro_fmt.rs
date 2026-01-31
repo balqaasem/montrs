@@ -134,7 +134,14 @@ impl RstmlPrinter<'_> {
         C: rstml::node::CustomNode + ToTokens + std::fmt::Debug 
     {
         self.add_indent();
-        let name = el.name().to_string().to_lowercase(); // Standardize to lowercase
+        let original_name = el.name().to_string();
+        let name = if original_name.chars().next().map(|c| c.is_uppercase()).unwrap_or(false) {
+            // Component: Force PascalCase
+            montrs_utils::to_pascal_case(&original_name)
+        } else {
+            // HTML Tag: Force lowercase
+            original_name.to_lowercase()
+        };
         self.result.push('<');
         self.result.push_str(&name);
 

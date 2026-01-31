@@ -8,6 +8,7 @@
 - **Logical Purity**: The formatter MUST NOT change the logical structure or behavior of the code. It is strictly a whitespace and layout tool.
 - **Idempotency**: Formatting a file multiple times with the same configuration must result in zero changes after the first pass.
 - **The Cascade of Truth**: Configuration must follow the hierarchical resolution (Workspace -> Project -> File) defined in the "Cascade of Truth".
+- **Casing Enforcement**: The formatter MUST enforce `PascalCase` for Components and `kebab-case` for all attributes within `view!` macros to eliminate agent ambiguity.
 
 ## 3. Boundary Definitions
 - **In-Scope**: Rust code formatting, `view!` macro (RSTML) formatting, comment handling.
