@@ -21,6 +21,7 @@ Before adding a new package to the workspace, ensure it has a clearly defined **
 - Place the new package in the `packages/` directory.
 - Follow the naming convention: `montrs-<name>`.
 - Include a `README.md` within the package folder explaining its specific role.
+- Include a `docs/invariants.md` file defining local architectural rules.
 
 ### 2. Mandatory Documentation Updates
 When a new package is added, you **must** update the following global documentation:
@@ -62,6 +63,7 @@ Contributors are responsible for maintaining the "Agent Source of Truth":
 - [ ] Added to `Cargo.toml` workspace members.
 - [ ] Implements core metadata traits for agent-readiness.
 - [ ] Contains a local `README.md` with boundary definitions.
+- [ ] Contains `docs/invariants.md` with package-specific rules.
 - [ ] Updated **[packages.md](../architecture/packages.md)**.
 - [ ] Verified via `montrs spec` that the package is discoverable.
 - [ ] Added deterministic tests using `montrs-test`.

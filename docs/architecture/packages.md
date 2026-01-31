@@ -44,6 +44,8 @@ MontRS is organized as a modular workspace. Each package has a specific responsi
 
 ## How Packages Interact
 
+Every package in the workspace maintains its own **[Local Invariants](file:///packages/*/docs/invariants.md)**. These documents define the specific "rules of engagement" and architectural boundaries for that package, providing immediate context for both human contributors and AI agents.
+
 MontRS follows a **Dependency Inversion** pattern. `montrs-core` defines the traits, and other packages (like `orm` or `schema`) provide implementations or tools that work with those traits.
 
 1.  **CLI** reads **Config** and **Core** to understand the app.
