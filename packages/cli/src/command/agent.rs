@@ -5,7 +5,26 @@ pub async fn run(subcommand: AgentSubcommand) -> anyhow::Result<String> {
     match subcommand {
         AgentSubcommand::Check { path } => {
             output.push_str(&format!("Checking MontRS invariants at {}...\n", path));
-            // TODO: Implement structural validation
+            
+            let cwd = std::env::current_dir()?;
+            let manager = montrs_agent::AgentManager::new(cwd);
+            
+            // 1. Generate snapshot (heuristically if no spec is available in this context)
+            // In a real run, we'd ideally have the AppSpec, but for 'check' we can start with discovery.
+            let snapshot = manager.generate_snapshot("montrs-project")?;
+            
+            // 2. Check invariants
+            let violations = manager.check_invariants(&snapshot)?;
+            
+            if violations.is_empty() {
+                output.push_str("✅ No invariant violations found.\n");
+            } else {
+                output.push_str("❌ Invariant violations found:\n");
+                for violation in violations {
+                    output.push_str(&format!("  - {}\n", violation));
+                }
+            }
+            
             Ok(output)
         }
         AgentSubcommand::Doctor { package } => {

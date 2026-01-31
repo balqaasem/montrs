@@ -4,12 +4,19 @@ In MontRS, a **Plate** is the primary unit of composition. Applications are buil
 
 ## 🧩 What is a Plate?
 
-A `Plate` is a struct that implements the `Plate` trait. Its main job is to register routes (Loaders and Actions) with the `Router`.
+A `Plate` is a struct that implements the `Plate` trait. Its main job is to register routes (Loaders and Actions) with the `Router` and declare its architectural requirements.
 
 ```rust
 pub struct AuthPlate;
 
 impl Plate for AuthPlate {
+    fn name(&self) -> &'static str { "auth" }
+    
+    // Explicitly declare dependencies for architectural integrity
+    fn dependencies(&self) -> Vec<&'static str> {
+        vec!["db_plate"]
+    }
+
     fn register_routes(&self, router: &mut Router) {
         router.add_action("/login", LoginAction);
         router.add_action("/register", RegisterAction);
@@ -35,10 +42,14 @@ pub struct BlogPlate {
 }
 
 impl Plate for BlogPlate {
-    fn name(&self) -> &str { "BlogPlate" }
+    fn name(&self) -> &'static str { "BlogPlate" }
     
-    fn description(&self) -> Option<String> {
-        Some("A complete blogging system with posts and comments.".to_string())
+    fn description(&self) -> &'static str {
+        "A complete blogging system with posts and comments."
+    }
+
+    fn dependencies(&self) -> Vec<&'static str> {
+        vec!["db", "auth"] // Requires database and authentication
     }
 
     fn register_routes(&self, router: &mut Router) {
@@ -58,9 +69,10 @@ When a MontRS application starts, it follows these steps:
 
 1.  **Initialization**: The `App` instance is created, and core services (DB, Cache) are initialized.
 2.  **Plate Loading**: Every registered `Plate` is instantiated, often receiving service handles.
-3.  **Registration**: `register_routes` is called on each plate to build the global `Router`.
-4.  **Validation**: The `AppSpec` is generated and checked for route collisions or missing metadata.
-5.  **Runtime**: The server starts, and the `agent.json` spec is updated.
+3.  **Dependency Check**: `montrs agent check` (or internal validation) verifies that all plate dependencies are met and no cycles exist.
+4.  **Registration**: `register_routes` is called on each plate to build the global `Router`.
+5.  **Validation**: The `AppSpec` is generated and checked for route collisions or missing metadata.
+6.  **Runtime**: The server starts, and the `agent.json` spec is updated.
 
 ---
 
@@ -72,6 +84,6 @@ Because plates are explicit and trait-based, agents can easily understand and ex
 - **Anti-Pattern**: Forgetting to register a plate in the main `App` entry point.
   - *Fix*: Agents should check `main.rs` to ensure all newly created plates are added to the `App` builder.
 - **Anti-Pattern**: Circular dependencies between plates.
-  - *Fix*: Plates should communicate via `Loaders` and `Actions` (the API) rather than direct function calls where possible.
+  - *Fix*: Use the `dependencies()` method to declare requirements. The `montrs agent check` command will catch circularities early.
 - **Anti-Pattern**: Plates that are too large.
   - *Fix*: If a plate has more than 10-15 routes, consider breaking it into smaller, more focused sub-plates.

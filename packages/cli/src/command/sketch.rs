@@ -60,6 +60,11 @@ impl<C: AppConfig> Plate<C> for {pascal}Plate {{
         "{snake}"
     }}
 
+    // [OPTIONAL] Explicitly declare dependencies for architectural integrity
+    fn dependencies(&self) -> Vec<&'static str> {{
+        vec![]
+    }}
+
     // [OPTIONAL] Initialization logic
     async fn init(&self, _ctx: &mut PlateContext<C>) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {{
         println!("Initializing {pascal}Plate");

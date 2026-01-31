@@ -88,6 +88,12 @@ pub trait Plate<C: AppConfig>: Send + Sync + 'static {
         std::collections::HashMap::new()
     }
 
+    /// Returns the names of plates this plate depends on.
+    /// This is used to verify initialization order and provide architectural context to agents.
+    fn dependencies(&self) -> Vec<&'static str> {
+        Vec::new()
+    }
+
     /// The primary initialization point for a plate.
     ///
     /// This is called during the application bootstrap process. It should be used to:
@@ -160,6 +166,7 @@ pub struct AppSpecExport {
 pub struct PlateMetadata {
     pub name: String,
     pub description: String,
+    pub dependencies: Vec<String>,
     pub metadata: std::collections::HashMap<String, String>,
 }
 
@@ -172,6 +179,7 @@ impl<C: AppConfig> AppSpec<C> {
             plates: self.plates.iter().map(|m| PlateMetadata {
                 name: m.name().to_string(),
                 description: m.description().to_string(),
+                dependencies: m.dependencies().iter().map(|s| s.to_string()).collect(),
                 metadata: m.metadata(),
             }).collect(),
             router: self.router.spec(),

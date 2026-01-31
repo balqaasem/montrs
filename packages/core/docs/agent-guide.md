@@ -7,6 +7,7 @@ This guide is designed to help agents understand and use the core building block
 ### 1. The Plate Trait
 Every MontRS component is a `Plate`. When building an app, you should define your logic within a struct that implements `Plate`.
 - **Metadata**: Always provide a descriptive name and metadata for agent discoverability.
+- **Dependencies**: Use `dependencies()` to declare other plates this plate requires. This prevents runtime panics and allows `montrs agent check` to verify your architecture.
 - **Initialization**: Use `init` for async setup logic.
 - **Routing**: Use `register_routes` to attach loaders and actions.
 
@@ -35,6 +36,7 @@ pub struct MyPlate;
 impl Plate<AppConfig> for MyPlate {
     fn name(&self) -> &'static str { "my_plate" }
     fn description(&self) -> &'static str { "Handles user preferences." }
+    fn dependencies(&self) -> Vec<&'static str> { vec!["auth_plate"] }
     
     async fn init(&self, ctx: &mut PlateContext<AppConfig>) -> Result<(), Box<dyn StdError + Send + Sync>> {
         // Setup logic

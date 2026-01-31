@@ -25,6 +25,10 @@ impl<C: AppConfig> Plate<C> for {name_pascal}Plate {{
         "{name_snake}"
     }}
 
+    fn dependencies(&self) -> Vec<&'static str> {{
+        vec![]
+    }}
+
     async fn init(&self, _ctx: &mut PlateContext<C>) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {{
         Ok(())
     }}

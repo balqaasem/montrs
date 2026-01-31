@@ -29,6 +29,7 @@ pub struct FileEntry {
 pub struct PlateSummary {
     pub name: String,
     pub description: String,
+    pub dependencies: Vec<String>,
     pub metadata: HashMap<String, String>,
 }
 
@@ -601,6 +602,7 @@ impl AgentManager {
                                 plates.push(PlateSummary {
                                     name,
                                     description: self.get_file_description(entry.path()).unwrap_or_else(|| "Discovered plate".to_string()),
+                                    dependencies: Vec::new(),
                                     metadata: HashMap::new(),
                                 });
                             }
@@ -688,7 +690,8 @@ impl AgentManager {
                 plates.push(PlateSummary {
                     name: plate_spec.name,
                     description: plate_spec.description,
-                    metadata: HashMap::new(),
+                    dependencies: plate_spec.dependencies,
+                    metadata: plate_spec.metadata,
                 });
             }
             
@@ -720,5 +723,49 @@ impl AgentManager {
             routes,
             documentation_snippets,
         })
+    }
+
+    pub fn check_invariants(&self, snapshot: &AgentSnapshot) -> Result<Vec<String>> {
+        let mut violations = Vec::new();
+
+        // 1. Check Plate Dependencies
+        // For each plate, all its dependencies must exist in the snapshot
+        for plate in &snapshot.plates {
+            for dep in &plate.dependencies {
+                if !snapshot.plates.iter().any(|p| &p.name == dep) {
+                    violations.push(format!(
+                        "Plate '{}' depends on missing plate '{}'.",
+                        plate.name, dep
+                    ));
+                }
+            }
+        }
+
+        // 2. Check for circular dependencies (simple depth-limited check)
+        for plate in &snapshot.plates {
+            let mut visited = std::collections::HashSet::new();
+            let mut stack = vec![(&plate.name, 0)];
+            
+            while let Some((current_name, depth)) = stack.pop() {
+                if depth > 10 { // Limit depth to avoid infinite loops in complex cycles
+                    violations.push(format!("Potential deep dependency cycle involving plate '{}'.", plate.name));
+                    break;
+                }
+                
+                if visited.contains(current_name) {
+                    violations.push(format!("Circular dependency detected involving plate '{}'.", current_name));
+                    break;
+                }
+                visited.insert(current_name);
+                
+                if let Some(p) = snapshot.plates.iter().find(|p| &p.name == current_name) {
+                    for dep in &p.dependencies {
+                        stack.push((dep, depth + 1));
+                    }
+                }
+            }
+        }
+
+        Ok(violations)
     }
 }

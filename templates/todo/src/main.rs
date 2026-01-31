@@ -119,6 +119,7 @@ pub struct TodoPlate;
 #[async_trait::async_trait]
 impl Plate<MyConfig> for TodoPlate {
     fn name(&self) -> &'static str { "todo" }
+    fn dependencies(&self) -> Vec<&'static str> { vec![] }
     async fn init(&self, _ctx: &mut PlateContext<MyConfig>) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
         Ok(())
     }

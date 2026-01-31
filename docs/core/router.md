@@ -81,6 +81,12 @@ Routes are registered within a `Plate` using the `Router`.
 
 ```rust
 impl Plate<MyConfig> for UserPlate {
+    fn name(&self) -> &'static str { "user" }
+    
+    fn dependencies(&self) -> Vec<&'static str> {
+        vec!["auth"] // Depends on auth plate
+    }
+
     fn register_routes(&self, router: &mut Router<MyConfig>) {
         router.register(UserDetailRoute);
         router.register(UserListRoute);

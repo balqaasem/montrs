@@ -10,8 +10,9 @@ MontRS is a trait-driven, deterministic web framework built on Leptos 0.8.
 
 ## How to build a plate
 1. Implement the `Plate` trait.
-2. Define your `Loader` and `Action` implementations.
-3. Register them in `register_routes`.
+2. Define explicit dependencies using the `dependencies()` method if your plate requires other plates to be initialized first.
+3. Define your `Loader` and `Action` implementations.
+4. Register them in `register_routes`.
 "#;
 
 pub const DEBUGGING_GUIDE: &str = r#"
