@@ -4,12 +4,28 @@ In MontRS, a **Plate** is the primary unit of composition. Applications are buil
 
 ## 🧩 What is a Plate?
 
-A `Plate` is a struct that implements the `Plate` trait. Its main job is to register routes (Loaders and Actions) with the `Router` and declare its architectural requirements.
+A `Plate` is a struct that implements the `Plate` trait. Its main job is to register routes (Unified Routes) with the `Router` and declare its architectural requirements.
+
+### 🏗️ Creating a Plate via CLI
+
+The recommended way to create a plate is using the MontRS CLI:
+
+```bash
+montrs generate plate <name>
+```
+
+This will:
+1.  Create a new file `src/plates/<name>.rs` with the `Plate` boilerplate.
+2.  Provide instructions on how to register the plate in `main.rs`.
+
+### 🏗️ Manual Plate Definition
+
+If you prefer to define a plate manually:
 
 ```rust
 pub struct AuthPlate;
 
-impl Plate for AuthPlate {
+impl Plate<MyConfig> for AuthPlate {
     fn name(&self) -> &'static str { "auth" }
     
     // Explicitly declare dependencies for architectural integrity
@@ -17,9 +33,9 @@ impl Plate for AuthPlate {
         vec!["db_plate"]
     }
 
-    fn register_routes(&self, router: &mut Router) {
-        router.add_action("/login", LoginAction);
-        router.add_action("/register", RegisterAction);
+    fn register_routes(&self, router: &mut Router<MyConfig>) {
+        router.register(LoginRoute);
+        router.register(RegisterRoute);
     }
 }
 ```
@@ -41,7 +57,7 @@ pub struct BlogPlate {
     pub db_pool: Database,
 }
 
-impl Plate for BlogPlate {
+impl Plate<AppConfig> for BlogPlate {
     fn name(&self) -> &'static str { "BlogPlate" }
     
     fn description(&self) -> &'static str {
@@ -52,11 +68,9 @@ impl Plate for BlogPlate {
         vec!["db", "auth"] // Requires database and authentication
     }
 
-    fn register_routes(&self, router: &mut Router) {
-        router.nest("/blog", |blog| {
-            blog.add_loader("/posts", ListPostsLoader { db: self.db_pool.clone() });
-            blog.add_loader("/posts/:slug", GetPostLoader { db: self.db_pool.clone() });
-        });
+    fn register_routes(&self, router: &mut Router<AppConfig>) {
+        router.register(ListPostsRoute::new(self.db_pool.clone()));
+        router.register(GetPostRoute::new(self.db_pool.clone()));
     }
 }
 ```

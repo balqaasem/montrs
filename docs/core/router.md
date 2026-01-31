@@ -18,6 +18,35 @@ pub trait Route<C: AppConfig>: Send + Sync + 'static {
     fn action(&self) -> Self::Action;
     fn view(&self) -> Self::View;
 }
+
+### 🏗️ Creating a Route via CLI
+
+The recommended way to add a route to a plate is using the CLI:
+
+```bash
+montrs generate route <path> --plate <plate_name>
+```
+
+This generates a unified `Route` struct bundling `Params`, `Loader`, `Action`, and `View` into a single file, ensuring consistency and reducing boilerplate.
+
+### 🏗️ Manual Route Implementation
+
+If you're not using the CLI, you must implement the `Route` trait:
+
+```rust
+pub struct UserRoute;
+
+impl Route<AppConfig> for UserRoute {
+    type Params = UserParams;
+    type Loader = UserLoader;
+    type Action = UserAction;
+    type View = UserView;
+
+    fn path() -> &'static str { "/users/:id" }
+    fn loader(&self) -> Self::Loader { UserLoader }
+    fn action(&self) -> Self::Action { UserAction }
+    fn view(&self) -> Self::View { UserView }
+}
 ```
 
 ## 📥 RouteParams: Type-Safe Parameters

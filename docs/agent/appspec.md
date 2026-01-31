@@ -6,8 +6,8 @@ The `AppSpec` is the central source of truth for a MontRS project. It is a seria
 
 MontRS uses a **heuristic discovery engine** to map your source code into an `AppSpec`. This happens in several phases:
 
-1.  **Static Analysis**: The CLI scans your `src/` directory for implementations of core traits (`Plate`, `Loader`, `Action`).
-2.  **Metadata Extraction**: It invokes the `description()`, `input_schema()`, and `output_schema()` methods on these implementations.
+1.  **Static Analysis**: The CLI scans your `src/` directory for implementations of core traits (`Plate`, `Route`, `RouteLoader`, `RouteAction`).
+2.  **Metadata Extraction**: It invokes the `description()`, `path()`, and schema methods on these implementations.
 3.  **Dependency Mapping**: It identifies how plates are composed and which external plates are being used.
 4.  **Serialization**: The resulting graph is serialized into `.agent/agent.json` (for agent context) and used internally by the CLI to orchestrate the build.
 
@@ -17,7 +17,7 @@ An `AppSpec` contains:
 
 -   **Metadata**: Project name, version, and agent-specific instructions.
 -   **Plates**: A list of all registered plates and their internal configurations.
--   **Routes**: A mapping of URLs to Loaders and Actions, including their expected data shapes.
+-   **Routes**: A mapping of paths to **Unified Routes**, which bundle Params, Loaders, Actions, and Views.
 -   **Environment**: Required environment variables and their validation rules.
 
 ## 🤖 Why it matters for Agents
@@ -27,10 +27,14 @@ For an agent, the `AppSpec` is the **Project Manual**. Instead of grep-ing throu
 ```json
 {
   "path": "/api/users",
+  "name": "UserRoute",
   "loader": {
-    "name": "UserListLoader",
     "description": "Returns a paginated list of users",
     "output_schema": { ... }
+  },
+  "action": {
+    "description": "Updates a user",
+    "input_schema": { ... }
   }
 }
 ```
