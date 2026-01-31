@@ -91,6 +91,35 @@ Run custom tasks defined in `montrs.toml`.
 montrs run <task_name>
 ```
 
+### `sketch`
+Generate a single-file, explicit "sketch" of a MontRS component. This is the first step in the **Scaffolded Explicit** workflow.
+```bash
+montrs sketch <name> [--kind <plate|route|app>]
+```
+
+### `expand`
+Expand a `.sketch.rs` file into a full project structure with explicit imports and manual registration.
+```bash
+montrs expand <path_to_sketch>
+```
+
+### `generate`
+Generate boilerplate for plates and routes. This is the preferred way to add new components to your application to maintain the **Productive Explicitness** principle.
+
+**Subcommands:**
+
+- **`plate <name>`**: Generates a new `Plate` implementation in `src/plates/`.
+- **`route <path> --plate <name>`**: Generates a new unified `Route` implementation (Params, Loader, Action, View) within the specified plate's directory.
+
+**Examples:**
+```bash
+# Create a new Auth plate
+montrs generate plate Auth
+
+# Add a login route to the Auth plate
+montrs generate route /login --plate Auth
+```
+
 ## 🤖 Agent-first CLI
 
 MontRS CLI is built to be a primary communication channel between the developer and agents:

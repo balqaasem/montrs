@@ -17,7 +17,7 @@ The "Golden Path" is the recommended workflow for building robust MontRS applica
 
 1.  **Scaffold**: Start with `montrs new <app-name>` to get a pre-configured workspace.
 2.  **Define**: Use `#[derive(Schema)]` to define your data models and validation rules.
-3.  **Implement**: Build features as `Plate`s. Define `Loader`s for fetching data and `Action`s for mutations.
+3.  **Implement**: Build features as `Plate`s. Define unified `Route`s that bundle your Loader, Action, and View.
 4.  **Verify**: Use the `TestRuntime` for in-process, deterministic testing of your entire application spec.
 5.  **Ship**: Deploy to your target (Web, Server, or Desktop) using `montrs build`.
 
@@ -26,7 +26,7 @@ The "Golden Path" is the recommended workflow for building robust MontRS applica
 ## 🧠 How to Think in MontRS
 
 - **Everything is a Trait**: If you want to change behavior (ORM, Auth, Rendering), you implement a trait.
-- **Loaders are for Reading, Actions are for Writing**: This clear separation simplifies state management and debugging.
+- **Unified Routes**: A single struct defines the path, parameters, data fetching, and visual representation for a URL.
 - **The AppSpec is Truth**: Your entire application is defined by a serializable `AppSpec`, making it portable and inspectable.
 - **No Magic**: We prefer explicit registration over reflection or global state.
 
@@ -45,17 +45,24 @@ struct Greeting {
 
 struct HelloPlate;
 
-impl Plate for HelloPlate {
-    fn register_routes(&self, router: &mut Router) {
-        router.add_loader("/hello", HelloLoader);
+impl Plate<AppConfig> for HelloPlate {
+    fn register_routes(&self, router: &mut Router<AppConfig>) {
+        router.register(HelloRoute);
     }
 }
 
-#[async_trait]
-impl Loader for HelloLoader {
-    async fn call(&self, _ctx: Context) -> Result<Value> {
-        Ok(json!({ "message": "Hello from MontRS!" }))
-    }
+struct HelloRoute;
+
+impl Route<AppConfig> for HelloRoute {
+    type Params = EmptyParams;
+    type Loader = HelloLoader;
+    type Action = EmptyAction;
+    type View = HelloView;
+
+    fn path() -> &'static str { "/hello" }
+    fn loader(&self) -> Self::Loader { HelloLoader }
+    fn action(&self) -> Self::Action { EmptyAction }
+    fn view(&self) -> Self::View { HelloView }
 }
 ```
 

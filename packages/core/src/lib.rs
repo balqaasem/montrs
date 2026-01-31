@@ -15,7 +15,10 @@ pub use env::{EnvConfig, EnvConfigExt, EnvError, FromEnv, TypedEnv};
 pub use features::{FeatureFlag, FeatureManager, Rule, Segment, UserContext};
 pub use leptos::prelude::*;
 pub use limiter::{GovernorLimiter, Limiter};
-pub use router::{Action, ActionCtx, Loader, LoaderCtx, Router};
+pub use router::{
+    ActionResponse, LoaderResponse, Route, RouteAction, RouteContext, RouteError, RouteLoader,
+    RouteParams, RouteView, Router,
+};
 pub use validation::{Validate, ValidationError};
 
 use async_trait::async_trait;
@@ -83,6 +86,12 @@ pub trait Plate<C: AppConfig>: Send + Sync + 'static {
     /// Returns key-value metadata for the plate.
     fn metadata(&self) -> std::collections::HashMap<String, String> {
         std::collections::HashMap::new()
+    }
+
+    /// Returns the names of plates this plate depends on.
+    /// This is used to verify initialization order and provide architectural context to agents.
+    fn dependencies(&self) -> Vec<&'static str> {
+        Vec::new()
     }
 
     /// The primary initialization point for a plate.
@@ -157,6 +166,7 @@ pub struct AppSpecExport {
 pub struct PlateMetadata {
     pub name: String,
     pub description: String,
+    pub dependencies: Vec<String>,
     pub metadata: std::collections::HashMap<String, String>,
 }
 
@@ -169,6 +179,7 @@ impl<C: AppConfig> AppSpec<C> {
             plates: self.plates.iter().map(|m| PlateMetadata {
                 name: m.name().to_string(),
                 description: m.description().to_string(),
+                dependencies: m.dependencies().iter().map(|s| s.to_string()).collect(),
                 metadata: m.metadata(),
             }).collect(),
             router: self.router.spec(),

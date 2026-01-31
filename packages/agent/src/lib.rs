@@ -7,6 +7,7 @@ use chrono::{DateTime, Utc};
 
 pub mod guides;
 pub mod error_parser;
+pub mod framework;
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct AgentSnapshot {
@@ -16,7 +17,17 @@ pub struct AgentSnapshot {
     pub structure: Vec<FileEntry>,
     pub plates: Vec<PlateSummary>,
     pub routes: Vec<RouteSummary>,
+    pub packages: Vec<PackageSummary>,
+    pub agent_entry_point: Option<String>,
     pub documentation_snippets: HashMap<String, String>,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct PackageSummary {
+    pub name: String,
+    pub path: String,
+    pub invariants: Option<String>,
+    pub description: Option<String>,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -29,16 +40,22 @@ pub struct FileEntry {
 pub struct PlateSummary {
     pub name: String,
     pub description: String,
+    pub dependencies: Vec<String>,
     pub metadata: HashMap<String, String>,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct RouteSummary {
     pub path: String,
-    pub kind: String, // "Loader" or "Action"
+    pub kind: String,
     pub description: String,
     pub input_schema: Option<serde_json::Value>,
     pub output_schema: Option<serde_json::Value>,
+    pub params_schema: Option<serde_json::Value>,
+    pub loader_output_schema: Option<serde_json::Value>,
+    pub action_input_schema: Option<serde_json::Value>,
+    pub action_output_schema: Option<serde_json::Value>,
+    pub metadata: HashMap<String, String>,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -67,6 +84,7 @@ pub struct ErrorVersion {
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct ProjectError {
+    pub package: Option<String>,
     pub file: String,
     pub line: u32,
     pub column: u32,
@@ -74,6 +92,24 @@ pub struct ProjectError {
     pub code_context: String,
     pub level: String, // Error, Warning
     pub agent_metadata: Option<AgentErrorMetadata>,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct ErrorTracking {
+    pub errors: Vec<ConsolidatedError>,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct ConsolidatedError {
+    pub id: String,
+    pub package: Option<String>,
+    pub file: String,
+    pub line: u32,
+    pub column: u32,
+    pub level: String,
+    pub message: String,
+    pub status: String,
+    pub timestamp: DateTime<Utc>,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -99,6 +135,10 @@ impl AgentManager {
 
     pub fn errorfiles_dir(&self) -> PathBuf {
         self.agent_dir().join("errorfiles")
+    }
+
+    pub fn tracking_file(&self) -> PathBuf {
+        self.agent_dir().join("error_tracking.json")
     }
 
     pub fn ensure_dir(&self) -> Result<()> {
@@ -134,11 +174,97 @@ impl AgentManager {
         
         let content = serde_json::to_string_pretty(record)?;
         fs::write(version_dir.join(format!("{}.json", record.id)), content)?;
+        
+        // Update consolidated tracking
+        self.update_consolidated_tracking(record)?;
+        
         Ok(())
     }
 
+    pub fn load_tracking(&self) -> Result<ErrorTracking> {
+        let path = self.tracking_file();
+        if path.exists() {
+            let content = fs::read_to_string(&path)?;
+            // Try new format first
+            if let Ok(tracking) = serde_json::from_str::<ErrorTracking>(&content) {
+                return Ok(tracking);
+            }
+            // Fallback to manual parsing if needed or try to adapt legacy
+            if let Ok(value) = serde_json::from_str::<serde_json::Value>(&content) {
+                if let Some(active_issues) = value.get("active_issues").and_then(|v| v.as_array()) {
+                    let mut errors = Vec::new();
+                    for issue in active_issues {
+                        if let (Some(id), Some(msg)) = (issue.get("id").and_then(|v| v.as_str()), issue.get("message").and_then(|v| v.as_str())) {
+                            let status = issue.get("status").and_then(|v| v.as_str()).unwrap_or("Pending").to_string();
+                            errors.push(ConsolidatedError {
+                                id: id.to_string(),
+                                package: issue.get("package").and_then(|v| v.as_str()).map(|s| s.to_string()),
+                                file: issue.get("file").and_then(|v| v.as_str()).unwrap_or("unknown").to_string(),
+                                line: issue.get("line").and_then(|v| v.as_u64()).unwrap_or(0) as u32,
+                                column: issue.get("column").and_then(|v| v.as_u64()).unwrap_or(0) as u32,
+                                level: issue.get("type").and_then(|v| v.as_str()).unwrap_or("Error").to_string(),
+                                message: msg.to_string(),
+                                status,
+                                timestamp: issue.get("timestamp")
+                                    .and_then(|v| v.as_str())
+                                    .and_then(|s| s.parse().ok())
+                                    .unwrap_or_else(Utc::now),
+                            });
+                        }
+                    }
+                    if !errors.is_empty() {
+                        return Ok(ErrorTracking { errors });
+                    }
+                }
+            }
+        }
+        Ok(ErrorTracking { errors: Vec::new() })
+    }
+
+    pub fn save_tracking(&self, tracking: &ErrorTracking) -> Result<()> {
+        self.ensure_dir()?;
+        let content = serde_json::to_string_pretty(tracking)?;
+        fs::write(self.tracking_file(), content)?;
+        Ok(())
+    }
+
+    fn update_consolidated_tracking(&self, record: &ErrorRecord) -> Result<()> {
+        let mut tracking = self.load_tracking().unwrap_or(ErrorTracking { errors: Vec::new() });
+        let status = match record.status {
+            ErrorStatus::Active => "Pending",
+            ErrorStatus::Resolved => "Fixed",
+        }.to_string();
+
+        let consolidated = ConsolidatedError {
+            id: record.id.clone(),
+            package: record.detail.package.clone(),
+            file: record.detail.file.clone(),
+            line: record.detail.line,
+            column: record.detail.column,
+            level: record.detail.level.clone(),
+            message: record.detail.message.clone(),
+            status,
+            timestamp: record.timestamp,
+        };
+
+        if let Some(pos) = tracking.errors.iter().position(|e| e.id == record.id) {
+            tracking.errors[pos] = consolidated;
+        } else {
+            tracking.errors.push(consolidated);
+        }
+
+        self.save_tracking(&tracking)
+    }
+
     /// Reports a new error to the agent, creating or updating errorfile.json.
-    pub fn report_project_error(&self, error: ProjectError) -> Result<String> {
+    pub fn report_project_error(&self, mut error: ProjectError) -> Result<String> {
+        // Try to determine package from file path if not provided
+        if error.package.is_none() && error.file != "unknown" {
+            if let Some(pkg) = self.determine_package(&error.file) {
+                error.package = Some(pkg);
+            }
+        }
+
         // Check if a similar active error already exists
         if let Ok(active_errors) = self.list_active_errors() {
             for existing in active_errors {
@@ -190,6 +316,7 @@ impl AgentManager {
 
     pub fn report_error(&self, message: String) -> Result<()> {
         self.report_project_error(ProjectError {
+            package: None,
             file: "unknown".to_string(),
             line: 0,
             column: 0,
@@ -199,6 +326,20 @@ impl AgentManager {
             agent_metadata: None,
         })?;
         Ok(())
+    }
+
+    fn determine_package(&self, file_path: &str) -> Option<String> {
+        let path = std::path::Path::new(file_path);
+        // Look for "packages/NAME" or "apps/NAME"
+        let components: Vec<_> = path.components().collect();
+        for i in 0..components.len() {
+            if let Some(c) = components[i].as_os_str().to_str() {
+                if (c == "packages" || c == "apps") && i + 1 < components.len() {
+                    return components[i+1].as_os_str().to_str().map(|s| s.to_string());
+                }
+            }
+        }
+        None
     }
 
     pub fn generate_diff(&self) -> Option<String> {
@@ -296,6 +437,29 @@ impl AgentManager {
                         "path": { "type": "string", "description": "Path to format (default: .)" }
                     }
                 }
+            }),
+            serde_json::json!({
+                "name": "montrs_sketch",
+                "description": "Generates a single-file 'sketch' of a MontRS component.",
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "name": { "type": "string", "description": "Name of the sketch file" },
+                        "kind": { "type": "string", "enum": ["plate", "route", "app"], "description": "Component type" }
+                    },
+                    "required": ["name"]
+                }
+            }),
+            serde_json::json!({
+                "name": "montrs_expand",
+                "description": "Expands a sketch file into a full MontRS workspace structure.",
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "path": { "type": "string", "description": "Path to the sketch file" }
+                    },
+                    "required": ["path"]
+                }
             })
         ];
 
@@ -306,21 +470,28 @@ impl AgentManager {
                 for entry in entries.flatten() {
                     let path = entry.path();
                     if path.is_dir() {
-                        let pkg_name = path.file_name().unwrap().to_string_lossy();
+                        let pkg_name = path.file_name().map(|f| f.to_string_lossy()).unwrap_or_default();
                         
-                        // 1. Scan README for high-level capabilities
+                        // 1. Scan README and docs/invariants.md for high-level capabilities
                         let readme_path = path.join("README.md");
-                        if readme_path.exists() {
+                        let invariants_path = path.join("docs").join("invariants.md");
+                        let mut description = format!("Capability provided by package {}. Refer to its README for details.", pkg_name);
+                        
+                        if invariants_path.exists() {
+                            description = format!("Capability provided by package {}. MUST follow invariants defined in agent.json under packages['{}'].invariants", pkg_name, pkg_name);
+                        } else if readme_path.exists() {
                             if let Ok(content) = fs::read_to_string(&readme_path) {
                                 if content.contains("Agent Usage Guide") || content.contains("Key Features") || content.contains("Key Components") || content.contains("Agent") {
-                                    tools.push(serde_json::json!({
-                                        "name": format!("montrs_pkg_{}", pkg_name),
-                                        "description": format!("Capability provided by package {}. Refer to its README for details.", pkg_name),
-                                        "parameters": { "type": "object", "properties": {} }
-                                    }));
+                                    // Keep default description or refine if needed
                                 }
                             }
                         }
+
+                        tools.push(serde_json::json!({
+                            "name": format!("montrs_pkg_{}", pkg_name),
+                            "description": description,
+                            "parameters": { "type": "object", "properties": {} }
+                        }));
 
                         // 2. Scan source for explicit @agent-tool markers
                         let src_dir = path.join("src");
@@ -432,8 +603,7 @@ impl AgentManager {
         }
 
         let plate_re = regex::Regex::new(r"impl\s+Plate(?:<[^>]+>)?\s+for\s+(\w+)").unwrap();
-        let loader_re = regex::Regex::new(r"impl\s+Loader(?:<[^>]+>)?\s+for\s+(\w+)").unwrap();
-        let action_re = regex::Regex::new(r"impl\s+Action(?:<[^>]+>)?\s+for\s+(\w+)").unwrap();
+        let route_re = regex::Regex::new(r"impl\s+Route(?:<[^>]+>)?\s+for\s+(\w+)").unwrap();
 
         for src_dir in scan_dirs {
             if !src_dir.exists() { continue; }
@@ -450,34 +620,27 @@ impl AgentManager {
                                 plates.push(PlateSummary {
                                     name,
                                     description: self.get_file_description(entry.path()).unwrap_or_else(|| "Discovered plate".to_string()),
+                                    dependencies: Vec::new(),
                                     metadata: HashMap::new(),
                                 });
                             }
                         }
 
-                        // Discover Loaders
-                        for caps in loader_re.captures_iter(&content) {
+                        // Discover Routes
+                        for caps in route_re.captures_iter(&content) {
                             let name = caps[1].to_string();
-                            println!("Agent: Found loader implementation: {}", name);
+                            println!("Agent: Found route implementation: {}", name);
                             routes.push(RouteSummary {
                                 path: format!("(impl) {}", name),
-                                kind: "Loader".to_string(),
-                                description: format!("Heuristically discovered Loader: {}", name),
+                                kind: "Route".to_string(),
+                                description: format!("Heuristically discovered Route: {}", name),
                                 input_schema: None,
                                 output_schema: None,
-                            });
-                        }
-
-                        // Discover Actions
-                        for caps in action_re.captures_iter(&content) {
-                            let name = caps[1].to_string();
-                            println!("Agent: Found action implementation: {}", name);
-                            routes.push(RouteSummary {
-                                path: format!("(impl) {}", name),
-                                kind: "Action".to_string(),
-                                description: format!("Heuristically discovered Action: {}", name),
-                                input_schema: None,
-                                output_schema: None,
+                                params_schema: None,
+                                loader_output_schema: None,
+                                action_input_schema: None,
+                                action_output_schema: None,
+                                metadata: HashMap::new(),
                             });
                         }
                     }
@@ -497,11 +660,45 @@ impl AgentManager {
     }
 
     /// Generates a comprehensive snapshot of the codebase.
-    pub fn generate_snapshot(&self, project_name: String) -> Result<AgentSnapshot> {
+    pub fn generate_snapshot(&self, project_name: &str) -> Result<AgentSnapshot> {
         self.generate_snapshot_with_spec(project_name, None)
     }
 
-    pub fn generate_snapshot_with_spec(&self, project_name: String, spec: Option<montrs_core::AppSpecExport>) -> Result<AgentSnapshot> {
+    /// Generates a snapshot of the framework itself using embedded data.
+    /// Useful for global reference or when not in a MontRS project.
+    pub fn generate_framework_snapshot(&self) -> AgentSnapshot {
+        let mut documentation_snippets = HashMap::new();
+        documentation_snippets.insert("architecture".to_string(), guides::ARCHITECTURE_GUIDE.to_string());
+        documentation_snippets.insert("debugging".to_string(), guides::DEBUGGING_GUIDE.to_string());
+        documentation_snippets.insert("agent/index".to_string(), framework::AGENT_INDEX.to_string());
+        documentation_snippets.insert("workflows/fixing-errors".to_string(), framework::FIXING_ERRORS_WORKFLOW.to_string());
+        documentation_snippets.insert("workflows/adding-features".to_string(), framework::ADDING_FEATURES_WORKFLOW.to_string());
+
+        let framework_invariants = framework::get_framework_invariants();
+        let mut packages = Vec::new();
+        for (name, invariants) in framework_invariants {
+            packages.push(PackageSummary {
+                name: name.to_string(),
+                path: format!("packages/{}", name),
+                invariants: Some(invariants.to_string()),
+                description: Some(format!("MontRS {} package (embedded reference)", name)),
+            });
+        }
+
+        AgentSnapshot {
+            project_name: "MontRS Framework".to_string(),
+            timestamp: Utc::now(),
+            framework_version: "0.1.0".to_string(),
+            structure: Vec::new(),
+            plates: Vec::new(),
+            routes: Vec::new(),
+            packages,
+            agent_entry_point: Some(framework::AGENT_INDEX.to_string()),
+            documentation_snippets,
+        }
+    }
+
+    pub fn generate_snapshot_with_spec(&self, project_name: &str, spec: Option<montrs_core::AppSpecExport>) -> Result<AgentSnapshot> {
         let mut structure = Vec::new();
         let walker = ignore::WalkBuilder::new(&self.root_path)
             .hidden(false)
@@ -536,6 +733,87 @@ impl AgentManager {
         let mut documentation_snippets = HashMap::new();
         documentation_snippets.insert("architecture".to_string(), guides::ARCHITECTURE_GUIDE.to_string());
         documentation_snippets.insert("debugging".to_string(), guides::DEBUGGING_GUIDE.to_string());
+        
+        // Add embedded workflows and prompts
+        documentation_snippets.insert("workflows/fixing-errors".to_string(), framework::FIXING_ERRORS_WORKFLOW.to_string());
+        documentation_snippets.insert("workflows/adding-features".to_string(), framework::ADDING_FEATURES_WORKFLOW.to_string());
+        documentation_snippets.insert("agent/index".to_string(), framework::AGENT_INDEX.to_string());
+        documentation_snippets.insert("agent/app-developer-prompt".to_string(), framework::APP_DEVELOPER_PROMPT.to_string());
+        documentation_snippets.insert("agent/framework-contributor-prompt".to_string(), framework::FRAMEWORK_CONTRIBUTOR_PROMPT.to_string());
+
+        // Scan global docs directory
+        let docs_dir = self.root_path.join("docs");
+        if docs_dir.exists() {
+            let walker = walkdir::WalkDir::new(&docs_dir).into_iter();
+            for entry in walker.filter_map(|e| e.ok()) {
+                if entry.path().is_file() && entry.path().extension().and_then(|s| s.to_str()) == Some("md") {
+                    if let Ok(relative_path) = entry.path().strip_prefix(&docs_dir) {
+                        let key = relative_path.to_string_lossy().to_string();
+                        if let Ok(content) = fs::read_to_string(entry.path()) {
+                            documentation_snippets.insert(format!("docs/{}", key), content);
+                        }
+                    }
+                }
+            }
+        }
+
+        // Discover packages and their invariants/internal docs
+        let mut packages = Vec::new();
+        let packages_dir = self.root_path.join("packages");
+        
+        // Use embedded framework invariants as a base/fallback
+        let framework_invariants = framework::get_framework_invariants();
+
+        if packages_dir.exists() {
+            if let Ok(entries) = fs::read_dir(&packages_dir) {
+                for entry in entries.flatten() {
+                    if entry.path().is_dir() {
+                        let name = entry.file_name().to_string_lossy().to_string();
+                        let relative_path = entry.path().strip_prefix(&self.root_path)?.to_string_lossy().to_string();
+                        
+                        let pkg_docs_dir = entry.path().join("docs");
+                        let invariants_path = pkg_docs_dir.join("invariants.md");
+                        let invariants = if invariants_path.exists() {
+                            fs::read_to_string(invariants_path).ok()
+                        } else {
+                            // Fallback to embedded framework invariant if it matches a core package
+                            framework_invariants.get(name.as_str()).map(|s| s.to_string())
+                        };
+
+                        // Also scan for other package-specific docs
+                        if pkg_docs_dir.exists() {
+                            let walker = walkdir::WalkDir::new(&pkg_docs_dir).into_iter();
+                            for doc_entry in walker.filter_map(|e| e.ok()) {
+                                if doc_entry.path().is_file() && doc_entry.path().extension().and_then(|s| s.to_str()) == Some("md") {
+                                    if let Ok(rel_doc_path) = doc_entry.path().strip_prefix(&pkg_docs_dir) {
+                                        let key = rel_doc_path.to_string_lossy().to_string();
+                                        if let Ok(content) = fs::read_to_string(doc_entry.path()) {
+                                            documentation_snippets.insert(format!("packages/{}/docs/{}", name, key), content);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        packages.push(PackageSummary {
+                            name,
+                            path: relative_path,
+                            invariants,
+                            description: None,
+                        });
+                    }
+                }
+            }
+        }
+
+        // Check for Agent Entry Point
+        let entry_point_path = self.root_path.join("docs").join("agent").join("index.md");
+        let agent_entry_point = if entry_point_path.exists() {
+            Some(fs::read_to_string(entry_point_path)?)
+        } else {
+            // Fallback to embedded framework entry point
+            Some(framework::AGENT_INDEX.to_string())
+        };
 
         let (plates, routes) = if let Some(s) = spec {
             let mut plates = Vec::new();
@@ -545,26 +823,23 @@ impl AgentManager {
                 plates.push(PlateSummary {
                     name: plate_spec.name,
                     description: plate_spec.description,
-                    metadata: HashMap::new(),
+                    dependencies: plate_spec.dependencies,
+                    metadata: plate_spec.metadata,
                 });
             }
             
-            for (path, loader) in s.router.loaders {
+            for (path, meta) in s.router.routes {
                 routes.push(RouteSummary {
-                    path,
-                    kind: "Loader".to_string(),
-                    description: loader.description,
-                    input_schema: loader.input_schema,
-                    output_schema: loader.output_schema,
-                });
-            }
-            for (path, action) in s.router.actions {
-                routes.push(RouteSummary {
-                    path,
-                    kind: "Action".to_string(),
-                    description: action.description,
-                    input_schema: action.input_schema,
-                    output_schema: action.output_schema,
+                    path: path.clone(),
+                    kind: "Route".to_string(),
+                    description: meta.loader_description.clone(),
+                    input_schema: None,
+                    output_schema: None,
+                    params_schema: None,
+                    loader_output_schema: None,
+                    action_input_schema: None,
+                    action_output_schema: None,
+                    metadata: HashMap::new(),
                 });
             }
             (plates, routes)
@@ -573,13 +848,71 @@ impl AgentManager {
         };
 
         Ok(AgentSnapshot {
-            project_name,
+            project_name: project_name.to_string(),
             timestamp: Utc::now(),
             framework_version: "0.1.0".to_string(),
             structure,
             plates,
             routes,
+            packages,
+            agent_entry_point,
             documentation_snippets,
         })
+    }
+
+    pub fn check_invariants(&self, snapshot: &AgentSnapshot) -> Result<Vec<String>> {
+        let mut violations = Vec::new();
+
+        // 1. Check Plate Dependencies
+        // For each plate, all its dependencies must exist in the snapshot
+        for plate in &snapshot.plates {
+            for dep in &plate.dependencies {
+                if !snapshot.plates.iter().any(|p| &p.name == dep) {
+                    violations.push(format!(
+                        "Plate '{}' depends on missing plate '{}'.",
+                        plate.name, dep
+                    ));
+                }
+            }
+        }
+
+        // 2. Check for circular dependencies (simple depth-limited check)
+        for plate in &snapshot.plates {
+            let mut visited = std::collections::HashSet::new();
+            let mut stack = vec![(&plate.name, 0)];
+            
+            while let Some((current_name, depth)) = stack.pop() {
+                if depth > 10 { // Limit depth to avoid infinite loops in complex cycles
+                    violations.push(format!("Potential deep dependency cycle involving plate '{}'.", plate.name));
+                    break;
+                }
+                
+                if visited.contains(current_name) {
+                    violations.push(format!("Circular dependency detected involving plate '{}'.", current_name));
+                    break;
+                }
+                visited.insert(current_name);
+                
+                if let Some(p) = snapshot.plates.iter().find(|p| &p.name == current_name) {
+                    for dep in &p.dependencies {
+                        stack.push((dep, depth + 1));
+                    }
+                }
+            }
+        }
+
+        // 3. Check for package invariants and documentation
+        for pkg in &snapshot.packages {
+            if pkg.invariants.is_none() {
+                violations.push(format!("Package '{}' is missing invariants. All framework packages must define architectural rules.", pkg.name));
+            }
+        }
+
+        // 4. Check for unified entry point
+        if snapshot.agent_entry_point.is_none() {
+            violations.push("Project is missing a unified agent entry point (docs/agent/index.md).".to_string());
+        }
+
+        Ok(violations)
     }
 }

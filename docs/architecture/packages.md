@@ -44,9 +44,22 @@ MontRS is organized as a modular workspace. Each package has a specific responsi
 
 ## How Packages Interact
 
+Every package in the workspace maintains its own **[Local Invariants](file:///packages/*/docs/invariants.md)**. These documents define the specific "rules of engagement" and architectural boundaries for that package, providing immediate context for both human contributors and AI agents.
+
 MontRS follows a **Dependency Inversion** pattern. `montrs-core` defines the traits, and other packages (like `orm` or `schema`) provide implementations or tools that work with those traits.
 
 1.  **CLI** reads **Config** and **Core** to understand the app.
 2.  **Core** uses **Schema** to validate data at the boundaries.
 3.  **Plates** use **ORM** to persist data.
 4.  **Agent** scans everything to produce the **Spec Snapshot**.
+
+---
+
+## 🛠️ Adding New Packages
+
+If you are a contributor looking to add a new package to the MontRS workspace, you **must** follow the guidelines in the **[Packages Contribution Guide](../community/packages-contribution.md)**. 
+
+Key requirements include:
+- Defining clear boundaries.
+- Ensuring Agent-first compatibility.
+- Updating this document with the new package's responsibility.

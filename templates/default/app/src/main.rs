@@ -1,22 +1,38 @@
 use leptos::prelude::*;
 use montrs_core::{AppSpec, Target, AppConfig, EnvConfig, EnvError, FromEnv};
 use tailwind_fuse::*;
+use serde::{Deserialize, Serialize};
+use thiserror::Error;
 
-#[derive(Clone)]
-struct MyAppConfig;
-impl AppConfig for MyAppConfig {
-    type Error = Box<dyn std::error::Error + Send + Sync>;
-    type Env = MyEnv;
+// [REQUIRED] 1. Define Application Error
+#[derive(Debug, Error, Serialize, Deserialize)]
+pub enum MyAppError {
+    #[error("Internal Error: {0}")]
+    Internal(String),
 }
 
+// [REQUIRED] 2. Define Application Environment
 #[derive(Clone)]
 struct MyEnv;
 impl EnvConfig for MyEnv {
-    fn get<T: FromEnv>(&self, _key: &str) -> Result<T, EnvError> {
-        Err(EnvError::MissingKey(_key.to_string()))
+    fn get_var(&self, key: &str) -> Result<String, EnvError> {
+        // [EXPLICIT] Explicitly handle environment variables
+        match key {
+            "APP_NAME" => Ok("MontRS Default App".to_string()),
+            _ => Err(EnvError::MissingKey(key.to_string())),
+        }
     }
 }
 
+// [REQUIRED] 3. Define Application Configuration
+#[derive(Clone)]
+struct MyAppConfig;
+impl AppConfig for MyAppConfig {
+    type Error = MyAppError;
+    type Env = MyEnv;
+}
+
+// [OPTIONAL] 4. Styling with tailwind-fuse
 #[derive(TwClass)]
 #[tw(class = "px-6 py-2 rounded-lg transition-colors")]
 struct CounterBtn {
@@ -31,6 +47,7 @@ enum BtnVariant {
     Secondary,
 }
 
+// [REQUIRED] 5. Root View
 #[component]
 fn App() -> impl IntoView {
     let (count, set_count) = signal(0);
@@ -52,9 +69,14 @@ fn App() -> impl IntoView {
     }
 }
 
+// [REQUIRED] 6. Main Entry Point
 fn main() {
+    // [EXPLICIT] Manual bootstrapping of AppSpec
     let spec = AppSpec::new(MyAppConfig, MyEnv)
         .with_target(Target::Wasm);
     
-    spec.mount(|| view! { <App /> });
+    // [EXPLICIT] Explicit mounting to the DOM
+    // In a real MontRS app, we'd use spec.boot() which handles SSR/Hydration
+    // but for a simple Wasm mount, we can use this:
+    mount_to_body(|| view! { <App /> });
 }

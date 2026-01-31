@@ -3,6 +3,7 @@ pub mod config;
 pub mod utils;
 pub mod ext;
 pub mod error;
+pub mod mcp;
 
 use clap::{Parser, Subcommand};
 
@@ -27,30 +28,6 @@ pub struct MontrsCli {
     /// Turn on partial hot-reloading.
     #[arg(long)]
     pub hot_reload: bool,
-
-    /// Precompress static assets with gzip and brotli.
-    #[arg(short = 'P', long)]
-    pub precompress: bool,
-
-    /// Include debug information in Wasm output.
-    #[arg(long)]
-    pub wasm_debug: bool,
-
-    /// Minify javascript assets.
-    #[arg(long, default_value = "true")]
-    pub js_minify: bool,
-
-    /// Split WASM binary based on #[lazy] macros.
-    #[arg(long)]
-    pub split: bool,
-
-    /// Only build the frontend.
-    #[arg(long)]
-    pub frontend_only: bool,
-
-    /// Only build the server.
-    #[arg(long, conflicts_with = "frontend_only")]
-    pub server_only: bool,
 
     /// The features to use when compiling all targets.
     #[arg(long)]
@@ -190,6 +167,84 @@ pub enum Commands {
         #[arg(long, default_value = "json")]
         format: String,
     },
+    /// Generate a single-file "sketch" of a MontRS component.
+    Sketch {
+        /// Name of the sketch file.
+        name: String,
+        /// Component type (plate, route, or app).
+        #[arg(short, long, default_value = "plate")]
+        kind: String,
+    },
+    /// Expand a sketch file into a full MontRS workspace structure.
+    Expand {
+        /// Path to the sketch file.
+        path: String,
+    },
+    /// Generate boilerplate for plates and routes.
+    Generate {
+        #[command(subcommand)]
+        subcommand: GenerateSubcommand,
+    },
+    /// Agent-facing tools for validation, diagnostics, and atomic changes.
+    Agent {
+        #[command(subcommand)]
+        subcommand: AgentSubcommand,
+    },
+    /// Model Context Protocol (MCP) server mode.
+    Mcp {
+        #[command(subcommand)]
+        subcommand: McpSubcommand,
+    },
+}
+
+#[derive(Subcommand, Debug)]
+pub enum AgentSubcommand {
+    /// Validate structural correctness and project invariants.
+    Check {
+        /// Path to check.
+        #[arg(default_value = ".")]
+        path: String,
+    },
+    /// Assess project health and agent-readability.
+    Doctor {
+        /// Optional package to focus on.
+        #[arg(short, long)]
+        package: Option<String>,
+    },
+    /// Show a diagnostic diff for an error file, including the offending code and the suggested fix.
+    Diff {
+        /// Path to the error file or diagnostic report.
+        path: String,
+    },
+    /// List all active and resolved errors tracked by the agent.
+    ListErrors {
+        /// Filter by status (active or resolved).
+        #[arg(short, long)]
+        status: Option<String>,
+    },
+}
+
+#[derive(Subcommand, Debug)]
+pub enum McpSubcommand {
+    /// Start the MCP server over stdio.
+    Serve,
+}
+
+#[derive(Subcommand, Debug)]
+pub enum GenerateSubcommand {
+    /// Generate a new plate.
+    Plate {
+        /// Name of the plate.
+        name: String,
+    },
+    /// Generate a new route.
+    Route {
+        /// Path pattern for the route (e.g., "/users/:id").
+        path: String,
+        /// The plate to add this route to.
+        #[arg(short, long)]
+        plate: String,
+    },
 }
 
 pub async fn run(cli: MontrsCli) -> anyhow::Result<()> {
@@ -210,12 +265,6 @@ pub async fn run(cli: MontrsCli) -> anyhow::Result<()> {
     config.project.log = cli.log.clone();
     config.project.release = cli.release;
     config.project.hot_reload = cli.hot_reload;
-    config.project.precompress = cli.precompress;
-    config.project.wasm_debug = cli.wasm_debug;
-    config.project.js_minify = cli.js_minify;
-    config.project.split = cli.split;
-    config.project.frontend_only = cli.frontend_only;
-    config.project.server_only = cli.server_only;
     config.project.features = cli.features.clone();
 
     if cli.tailwind_toml {
@@ -259,7 +308,34 @@ pub async fn run(cli: MontrsCli) -> anyhow::Result<()> {
         Commands::Spec { include_docs, format } => {
             command::spec::run(include_docs, format).await
         }
+        Commands::Sketch { name, kind } => {
+            command::sketch::run(name, kind).await
+        }
+        Commands::Expand { path } => {
+            command::expand::run(path).await
+        }
         Commands::Upgrade => command::upgrade::run().await,
+        Commands::Generate { subcommand } => match subcommand {
+            GenerateSubcommand::Plate { name } => command::generate::plate(name).await,
+            GenerateSubcommand::Route { path, plate } => {
+                command::generate::route(path, plate).await
+            }
+        },
+        Commands::Agent { subcommand } => {
+            match command::agent::run(subcommand).await {
+                Ok(output) => {
+                    println!("{}", output);
+                    Ok(())
+                }
+                Err(e) => {
+                    eprintln!("Error running agent command: {}", e);
+                    Err(e)
+                }
+            }
+        }
+        Commands::Mcp { subcommand } => {
+            command::mcp::run(subcommand).await
+        }
     }
 }
 
@@ -285,20 +361,25 @@ pub fn main_entry() {
 
         // Agent: Update tools and snapshot if we are in an existing project
         if args.len() > 1 && args[1] != "new" {
-            if let Err(e) = agent_manager.write_tools_spec() {
-                eprintln!("Warning: Failed to update tools spec: {}", e);
-            }
-            
-            match agent_manager.generate_snapshot(app_name) {
-                Ok(snapshot) => {
-                    if let Err(e) = agent_manager.write_snapshot(&snapshot, "json") {
-                        eprintln!("Agent: Failed to write JSON snapshot: {}", e);
+            // Check if we're in a MontRS project before doing agent work
+            if cwd.join("montrs.toml").exists() || cwd.join("Cargo.toml").exists() {
+                if let Err(e) = agent_manager.write_tools_spec() {
+                    eprintln!("Warning: Failed to update tools spec: {}", e);
+                }
+                
+                match agent_manager.generate_snapshot(&app_name) {
+                    Ok(snapshot) => {
+                        if let Err(e) = agent_manager.write_snapshot(&snapshot, "json") {
+                            eprintln!("Agent: Failed to write JSON snapshot: {}", e);
+                        }
+                        if let Err(e) = agent_manager.write_snapshot(&snapshot, "txt") {
+                            eprintln!("Agent: Failed to write TXT snapshot: {}", e);
+                        }
                     }
-                    if let Err(e) = agent_manager.write_snapshot(&snapshot, "txt") {
-                        eprintln!("Agent: Failed to write TXT snapshot: {}", e);
+                    Err(_) => {
+                        // Silent failure for snapshot generation in non-project dirs
                     }
                 }
-                Err(e) => eprintln!("Agent: Failed to generate agent snapshot: {}", e),
             }
         }
     }

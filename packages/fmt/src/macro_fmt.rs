@@ -1,5 +1,6 @@
 use crate::{FormatError, FormatterSettings};
 use crop::Rope;
+use montrs_utils::to_kebab_case;
 use rstml::node::{Node, NodeAttribute, NodeElement};
 use syn::visit::{self, Visit};
 use syn::{File, Macro};
@@ -133,7 +134,14 @@ impl RstmlPrinter<'_> {
         C: rstml::node::CustomNode + ToTokens + std::fmt::Debug 
     {
         self.add_indent();
-        let name = el.name().to_string();
+        let original_name = el.name().to_string();
+        let name = if original_name.chars().next().map(|c| c.is_uppercase()).unwrap_or(false) {
+            // Component: Force PascalCase
+            montrs_utils::to_pascal_case(&original_name)
+        } else {
+            // HTML Tag: Force lowercase
+            original_name.to_lowercase()
+        };
         self.result.push('<');
         self.result.push_str(&name);
 
@@ -162,7 +170,7 @@ impl RstmlPrinter<'_> {
                 self.result.push_str(&block.to_token_stream().to_string());
             }
             NodeAttribute::Attribute(a) => {
-                self.result.push_str(&a.key.to_string());
+                self.result.push_str(&to_kebab_case(&a.key.to_string()));
                 if let Some(value) = a.value() {
                     self.result.push('=');
                     self.result.push_str(&value.to_token_stream().to_string());

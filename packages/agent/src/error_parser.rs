@@ -18,6 +18,7 @@ pub fn parse_rustc_errors(output: &str) -> Vec<ProjectError> {
         let column = cap.name("col").and_then(|m| m.as_str().parse().ok()).unwrap_or(0);
 
         errors.push(ProjectError {
+            package: None, // Will be filled by AgentManager if possible
             file,
             line,
             column,

@@ -8,6 +8,7 @@ pub struct Comment {
     pub start: LineColumn,
     pub end: LineColumn,
     pub is_doc: bool,
+    pub is_agent_tool: bool,
 }
 
 pub type CommentMap = BTreeMap<usize, Vec<Comment>>;
@@ -50,6 +51,7 @@ pub fn extract_comments(source: &str) -> (Rope, Vec<Comment>) {
                     let end = LineColumn { line, column: col };
                     comments.push(Comment {
                         is_doc: text.starts_with("///") || text.starts_with("//!"),
+                        is_agent_tool: text.contains("@agent-tool"),
                         text,
                         start,
                         end,
@@ -83,6 +85,7 @@ pub fn extract_comments(source: &str) -> (Rope, Vec<Comment>) {
                     let end = LineColumn { line, column: col };
                     comments.push(Comment {
                         is_doc: text.starts_with("/**") || text.starts_with("/*!"),
+                        is_agent_tool: text.contains("@agent-tool"),
                         text,
                         start,
                         end,
@@ -102,14 +105,26 @@ pub fn reinsert_comments(formatted: &str, comments: Vec<Comment>) -> String {
     }
 
     let mut result = String::new();
+    
+    // 1. Separate agent tools to ensure they are at the very top if they were at the start
+    let (agent_tools, other_comments): (Vec<Comment>, Vec<Comment>) = 
+        comments.into_iter().partition(|c| c.is_agent_tool);
+
+    // 2. Add agent tools that were at the beginning of the file
+    for tool in agent_tools.iter() {
+        if tool.start.line <= 2 && !formatted.contains(&tool.text) {
+            result.push_str(&tool.text);
+            if !tool.text.ends_with('\n') {
+                result.push('\n');
+            }
+        }
+    }
+
     let formatted_lines: Vec<&str> = formatted.lines().collect();
     let mut current_comment_idx = 0;
-
-    // This is a simplified re-insertion. 
-    // In the full Span-Gap algorithm, we would match comments to the tokens they were next to.
-    // For now, we'll try to keep them on their relative lines if possible, 
-    // or at least ensure they aren't lost.
+    let comments = other_comments;
     
+    // 3. Re-insert remaining comments based on relative line numbers
     for (i, line) in formatted_lines.iter().enumerate() {
         let line_num = i + 1;
         
@@ -118,7 +133,9 @@ pub fn reinsert_comments(formatted: &str, comments: Vec<Comment>) -> String {
             let comment = &comments[current_comment_idx];
             if !formatted.contains(&comment.text) {
                 result.push_str(&comment.text);
-                result.push('\n');
+                if !comment.text.ends_with('\n') {
+                    result.push('\n');
+                }
             }
             current_comment_idx += 1;
         }
@@ -127,14 +144,26 @@ pub fn reinsert_comments(formatted: &str, comments: Vec<Comment>) -> String {
         result.push('\n');
     }
 
-    // Add any remaining comments
+    // 4. Add any remaining comments that weren't placed
     while current_comment_idx < comments.len() {
         let comment = &comments[current_comment_idx];
         if !formatted.contains(&comment.text) {
             result.push_str(&comment.text);
-            result.push('\n');
+            if !comment.text.ends_with('\n') {
+                result.push('\n');
+            }
         }
         current_comment_idx += 1;
+    }
+
+    // 5. Add any agent tools that weren't at the beginning
+    for tool in agent_tools {
+        if tool.start.line > 2 && !formatted.contains(&tool.text) {
+            result.push_str(&tool.text);
+            if !tool.text.ends_with('\n') {
+                result.push('\n');
+            }
+        }
     }
 
     result
@@ -169,6 +198,7 @@ mod tests {
             start: LineColumn { line: 1, column: 0 },
             end: LineColumn { line: 1, column: 10 },
             is_doc: false,
+            is_agent_tool: false,
         }];
         let result = reinsert_comments(formatted, comments);
         assert!(result.contains("// comment"));

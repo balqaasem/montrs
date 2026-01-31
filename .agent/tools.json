@@ -48,56 +48,49 @@
       }
     },
     {
-      "description": "Capability provided by package bench. Refer to its README for details.",
-      "name": "montrs_pkg_bench",
+      "description": "Generates a single-file 'sketch' of a MontRS component.",
+      "name": "montrs_sketch",
       "parameters": {
-        "properties": {},
+        "properties": {
+          "kind": {
+            "description": "Component type",
+            "enum": [
+              "plate",
+              "route",
+              "app"
+            ],
+            "type": "string"
+          },
+          "name": {
+            "description": "Name of the sketch file",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ],
         "type": "object"
       }
     },
     {
-      "description": "Runs performance benchmarks for the project or specific targets.",
-      "name": "bench_run",
+      "description": "Expands a sketch file into a full MontRS workspace structure.",
+      "name": "montrs_expand",
       "parameters": {
-        "properties": {},
+        "properties": {
+          "path": {
+            "description": "Path to the sketch file",
+            "type": "string"
+          }
+        },
+        "required": [
+          "path"
+        ],
         "type": "object"
       }
     },
     {
-      "description": "Capability provided by package cli. Refer to its README for details.",
-      "name": "montrs_pkg_cli",
-      "parameters": {
-        "properties": {},
-        "type": "object"
-      }
-    },
-    {
-      "description": "Capability provided by package core. Refer to its README for details.",
-      "name": "montrs_pkg_core",
-      "parameters": {
-        "properties": {},
-        "type": "object"
-      }
-    },
-    {
-      "description": "Capability provided by package fmt. Refer to its README for details.",
-      "name": "montrs_pkg_fmt",
-      "parameters": {
-        "properties": {},
-        "type": "object"
-      }
-    },
-    {
-      "description": "Formats Rust and view! code according to MontRS standards.",
-      "name": "code_format",
-      "parameters": {
-        "properties": {},
-        "type": "object"
-      }
-    },
-    {
-      "description": "Capability provided by package llm. Refer to its README for details.",
-      "name": "montrs_pkg_llm",
+      "description": "Capability provided by package agent. MUST follow invariants defined in agent.json under packages['agent'].invariants",
+      "name": "montrs_pkg_agent",
       "parameters": {
         "properties": {},
         "type": "object"
@@ -120,7 +113,63 @@
       }
     },
     {
-      "description": "Capability provided by package orm. Refer to its README for details.",
+      "description": "Capability provided by package bench. MUST follow invariants defined in agent.json under packages['bench'].invariants",
+      "name": "montrs_pkg_bench",
+      "parameters": {
+        "properties": {},
+        "type": "object"
+      }
+    },
+    {
+      "description": "Runs performance benchmarks for the project or specific targets.",
+      "name": "bench_run",
+      "parameters": {
+        "properties": {},
+        "type": "object"
+      }
+    },
+    {
+      "description": "Capability provided by package cli. MUST follow invariants defined in agent.json under packages['cli'].invariants",
+      "name": "montrs_pkg_cli",
+      "parameters": {
+        "properties": {},
+        "type": "object"
+      }
+    },
+    {
+      "description": "Capability provided by package core. MUST follow invariants defined in agent.json under packages['core'].invariants",
+      "name": "montrs_pkg_core",
+      "parameters": {
+        "properties": {},
+        "type": "object"
+      }
+    },
+    {
+      "description": "Capability provided by package fmt. MUST follow invariants defined in agent.json under packages['fmt'].invariants",
+      "name": "montrs_pkg_fmt",
+      "parameters": {
+        "properties": {},
+        "type": "object"
+      }
+    },
+    {
+      "description": "Formats Rust and view! code according to MontRS standards.",
+      "name": "code_format",
+      "parameters": {
+        "properties": {},
+        "type": "object"
+      }
+    },
+    {
+      "description": "Capability provided by package montrs. MUST follow invariants defined in agent.json under packages['montrs'].invariants",
+      "name": "montrs_pkg_montrs",
+      "parameters": {
+        "properties": {},
+        "type": "object"
+      }
+    },
+    {
+      "description": "Capability provided by package orm. MUST follow invariants defined in agent.json under packages['orm'].invariants",
       "name": "montrs_pkg_orm",
       "parameters": {
         "properties": {},
@@ -136,7 +185,7 @@
       }
     },
     {
-      "description": "Capability provided by package schema. Refer to its README for details.",
+      "description": "Capability provided by package schema. MUST follow invariants defined in agent.json under packages['schema'].invariants",
       "name": "montrs_pkg_schema",
       "parameters": {
         "properties": {},
@@ -144,7 +193,7 @@
       }
     },
     {
-      "description": "Capability provided by package test. Refer to its README for details.",
+      "description": "Capability provided by package test. MUST follow invariants defined in agent.json under packages['test'].invariants",
       "name": "montrs_pkg_test",
       "parameters": {
         "properties": {},
@@ -154,6 +203,14 @@
     {
       "description": "Runs unit, integration, and end-to-end tests for the MontRS project.",
       "name": "test_run",
+      "parameters": {
+        "properties": {},
+        "type": "object"
+      }
+    },
+    {
+      "description": "Capability provided by package utils. MUST follow invariants defined in agent.json under packages['utils'].invariants",
+      "name": "montrs_pkg_utils",
       "parameters": {
         "properties": {},
         "type": "object"

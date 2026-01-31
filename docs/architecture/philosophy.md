@@ -26,6 +26,12 @@ Data entering or leaving the application must be validated. The `montrs-schema` 
 
 We design our tools and documentation not just for humans, but for agents. Structured metadata, versioned error files, and machine-readable snapshots are core features, not afterthoughts.
 
-## 7. Minimal Magic
+## 7. Productive Explicitness (Scaffolded Explicit)
 
-We avoid "magic" behaviors that are hard to trace. We prefer explicit registration and configuration over implicit discovery, ensuring that the developer (and the agent) always knows how the system is wired together.
+We avoid "magic" behaviors that are hard to trace. We prefer explicit registration and configuration over implicit discovery. However, explicitness should not mean "tedious." 
+
+MontRS follows the **Scaffolded Explicit** architecture:
+1. **Sketch**: Start with a single-file, explicit, and deterministic blueprint (`montrs sketch`).
+2. **Expand**: Grow into a full, structured workspace with explicit imports and manual registration (`montrs expand`).
+
+This ensures that the developer (and the AI agent) always has a clear, readable source of truth while maintaining high iteration speed. All scaffolded code is production-ready and deterministic by construction.

@@ -45,4 +45,5 @@ montrs-core = { path = "../core" }
 montrs-agent = { path = "../agent" }
 montrs-bench = { path = "../bench" }
 montrs-fmt = { path = "../fmt" }
+montrs-utils = { path = "../utils" }
 colored = "2.1"

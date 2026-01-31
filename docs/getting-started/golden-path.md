@@ -14,22 +14,24 @@ pub struct CreateTodoInput {
 }
 ```
 
-## 2. Define Explicit Loaders and Actions
+## 2. Define a Unified Route
 
-Avoid mixing data fetching and mutations. Use `Loader` for read operations and `Action` for write operations.
+Instead of mixing data fetching and mutations randomly, use the `Route` trait to unify everything related to a URL path.
 
-- **Loaders**: Should be side-effect free and return the state needed for a view.
-- **Actions**: Should handle validation, persistence, and return the result of the mutation.
+- **Params**: Define what inputs the URL accepts.
+- **Loader**: Fetch side-effect free state for the view.
+- **Action**: Handle validation, persistence, and mutation results.
+- **View**: Define the visual representation.
 
 ## 3. Modularize with Plates
 
-Group related functionality into a `Plate`. If the functionality is reusable across projects, package it as a standalone crate.
+Group related routes into a `Plate`. If the functionality is reusable across projects, package it as a standalone crate.
 
 ```rust
-impl Plate for TodoPlate {
-    fn register_routes(&self, router: &mut Router) {
-        router.add_loader("/todos", ListTodosLoader);
-        router.add_action("/todos", CreateTodoAction);
+impl Plate<AppConfig> for TodoPlate {
+    fn register_routes(&self, router: &mut Router<AppConfig>) {
+        router.register(TodoListRoute);
+        router.register(TodoCreateRoute);
     }
 }
 ```

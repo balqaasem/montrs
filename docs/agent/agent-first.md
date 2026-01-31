@@ -11,6 +11,14 @@ To effectively work with a MontRS project, an agent should:
 3.  **Handle Errors Structurely**: When a task fails, check `.agent/errorfiles/` for the latest `errorfile.json`. It contains the exact error, explanation, and suggested fixes.
 4.  **Learn from History**: Look at resolved error files to see diffs of how similar problems were fixed in the past.
 
+## 🛡️ Architectural Guardrails: Framework Invariants
+
+A key feature of MontRS's agent-native architecture is **Framework Invariants** (`docs/invariants.md`). 
+
+- **Localized Context**: Unlike global documentation, invariants provide high-density rules for a specific framework package or feature.
+- **Contract Verification**: Agents use these files as a "contract" to verify that their use of the framework aligns with its intended design.
+- **Automated Checking**: The `montrs agent check` command uses these invariants to statically verify that the project's use of the framework remains healthy.
+
 ## 🛠️ Metadata & Annotations
 
 Agents should look for the following markers in the codebase:
