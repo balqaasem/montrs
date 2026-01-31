@@ -29,6 +29,12 @@ Every MontRS component is a `Plate`. When building an app, you should define you
 - Use the `Validate` trait for data integrity.
 - `ValidationError` is the standard way to report validation failures to the agent for self-correction.
 
+### 6. Local Invariants
+Every package in the MontRS workspace contains a `docs/invariants.md` file.
+- **Rules of Engagement**: These files define the specific architectural boundaries and "rules" for that package.
+- **Mandatory Check**: Before modifying any package, you MUST read its `docs/invariants.md`.
+- **Consistency**: Your changes must not violate the invariants stated in these documents. If you introduce a new invariant, you must update the file.
+
 ## Agent Usage Patterns
 
 ### Generating a New Plate

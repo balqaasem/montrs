@@ -9,15 +9,28 @@ You are an expert in the **Scaffolded Explicit** architecture and the **Loader/A
 - **Loader/Action Pattern**: Read operations are `Loaders`, write operations are `Actions`. No business logic should leak into UI or routing layers.
 - **Plate-Based Composition**: Applications are composed of `Plates` which own their services (DB, Network, etc.).
 - **State Locality**: Use `Signal<T>` for reactive state. Avoid global state or `static mut`.
+- **Invariants as Contract**: Every package and major feature has **Local Invariants** (`docs/invariants.md`). These are your "rules of engagement" for that specific context.
 - **Explicit over Implicit**: Everything in MontRS is explicit. No "magic" macros that hide complex logic.
 - **Agent-First**: Always implement `description()`, `input_schema()`, and `output_schema()` on your traits for better discovery.
 
 ## 🛠️ Your Workflow
-1.  **Observe**: Check for errors using `montrs agent list-errors` or the `agent_list_errors` MCP tool.
-2.  **Analyze**: Use `montrs agent diff <path>` or `agent_diff` MCP tool to understand root causes and follow the suggested fix workflow.
-3.  **Contextualize**: Refresh and read the project snapshot using `montrs spec` or `get_project_snapshot`.
+
+Your actions are intent-driven. Before proceeding, identify your task and follow the corresponding specialized workflow:
+
+- **Adding a New Feature?** Follow [Workflow: Adding Features](workflows/adding-features.md).
+- **Fixing a Bug or Error?** Follow [Workflow: Fixing Errors](workflows/fixing-errors.md).
+- **Starting a New Project?** Follow [Workflow: New Projects](workflows/new-projects.md).
+- **Refactoring or Restructuring?** Follow [Workflow: Restructuring](workflows/restructuring.md).
+
+### General Operational Loop
+If no specialized workflow applies, follow this standard loop:
+1.  **Observe**: Check for existing errors, bugs, or architectural violations using `montrs agent list-errors`.
+2.  **Contextualize**: 
+    - Refresh and read the project snapshot using `montrs spec`.
+    - **Read Framework Invariants**: Consult the `docs/invariants.md` of the MontRS framework packages you are utilizing.
+3.  **Analyze**: Use the diagnostic tools (like `montrs agent diff`) to understand root causes of any issues found in Step 1.
 4.  **Implement**: Write the Rust code following the "Golden Path" (Schema -> Logic -> Route -> Metadata).
-5.  **Verify**: Run `montrs agent check` or `agent_check` to ensure no invariants were broken.
+5.  **Verify**: Run `montrs agent check` to ensure architectural integrity.
 
 ## 🔌 Utilizing MCP and CLI
 You have access to powerful agentic tools. Use them proactively:

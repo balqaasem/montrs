@@ -1,6 +1,6 @@
 {
   "project_name": "app",
-  "timestamp": "2026-01-31T04:34:35.476738400Z",
+  "timestamp": "2026-01-31T07:57:47.878759800Z",
   "framework_version": "0.1.0",
   "structure": [
     {
@@ -32,7 +32,27 @@
       "description": null
     },
     {
+      "path": "docs\\agent\\agentic-workflows.md",
+      "description": null
+    },
+    {
+      "path": "docs\\agent\\app-developer-prompt.md",
+      "description": null
+    },
+    {
       "path": "docs\\agent\\appspec.md",
+      "description": null
+    },
+    {
+      "path": "docs\\agent\\framework-contributor-prompt.md",
+      "description": null
+    },
+    {
+      "path": "docs\\agent\\index.md",
+      "description": null
+    },
+    {
+      "path": "docs\\agent\\mcp-setup.md",
       "description": null
     },
     {
@@ -44,7 +64,27 @@
       "description": null
     },
     {
+      "path": "docs\\agent\\prompt-usage.md",
+      "description": null
+    },
+    {
       "path": "docs\\agent\\spec.md",
+      "description": null
+    },
+    {
+      "path": "docs\\agent\\workflows\\adding-features.md",
+      "description": null
+    },
+    {
+      "path": "docs\\agent\\workflows\\fixing-errors.md",
+      "description": null
+    },
+    {
+      "path": "docs\\agent\\workflows\\new-projects.md",
+      "description": null
+    },
+    {
+      "path": "docs\\agent\\workflows\\restructuring.md",
       "description": null
     },
     {
@@ -148,10 +188,6 @@
       "description": null
     },
     {
-      "path": "output.txt",
-      "description": null
-    },
-    {
       "path": "packages\\agent\\Cargo.toml",
       "description": null
     },
@@ -161,6 +197,10 @@
     },
     {
       "path": "packages\\agent\\docs\\design-system.md",
+      "description": null
+    },
+    {
+      "path": "packages\\agent\\docs\\invariants.md",
       "description": null
     },
     {
@@ -184,11 +224,19 @@
       "description": null
     },
     {
+      "path": "packages\\agent\\tests\\invariant_test.rs",
+      "description": null
+    },
+    {
       "path": "packages\\bench\\Cargo.toml",
       "description": null
     },
     {
       "path": "packages\\bench\\docs\\agent-guide.md",
+      "description": null
+    },
+    {
+      "path": "packages\\bench\\docs\\invariants.md",
       "description": null
     },
     {
@@ -245,6 +293,10 @@
     },
     {
       "path": "packages\\cli\\docs\\agent-guide.md",
+      "description": null
+    },
+    {
+      "path": "packages\\cli\\docs\\invariants.md",
       "description": null
     },
     {
@@ -376,6 +428,10 @@
       "description": null
     },
     {
+      "path": "packages\\core\\docs\\invariants.md",
+      "description": null
+    },
+    {
       "path": "packages\\core\\README.md",
       "description": null
     },
@@ -420,6 +476,10 @@
       "description": null
     },
     {
+      "path": "packages\\fmt\\docs\\invariants.md",
+      "description": null
+    },
+    {
       "path": "packages\\fmt\\README.md",
       "description": null
     },
@@ -452,6 +512,10 @@
       "description": null
     },
     {
+      "path": "packages\\montrs\\docs\\invariants.md",
+      "description": null
+    },
+    {
       "path": "packages\\montrs\\src\\bin\\cargo-montrs.rs",
       "description": null
     },
@@ -472,6 +536,10 @@
       "description": null
     },
     {
+      "path": "packages\\orm\\docs\\invariants.md",
+      "description": null
+    },
+    {
       "path": "packages\\orm\\README.md",
       "description": null
     },
@@ -485,6 +553,10 @@
     },
     {
       "path": "packages\\schema\\docs\\agent-guide.md",
+      "description": null
+    },
+    {
+      "path": "packages\\schema\\docs\\invariants.md",
       "description": null
     },
     {
@@ -505,6 +577,10 @@
     },
     {
       "path": "packages\\test\\docs\\agent-guide.md",
+      "description": null
+    },
+    {
+      "path": "packages\\test\\docs\\invariants.md",
       "description": null
     },
     {
@@ -529,6 +605,10 @@
     },
     {
       "path": "packages\\utils\\Cargo.toml",
+      "description": null
+    },
+    {
+      "path": "packages\\utils\\docs\\invariants.md",
       "description": null
     },
     {
@@ -686,16 +766,13 @@
     {
       "path": "templates\\workspace\\tailwind.toml",
       "description": null
-    },
-    {
-      "path": "when-not-to-use.md",
-      "description": null
     }
   ],
   "plates": [
     {
       "name": "TodoPlate",
       "description": "todo-example: A comprehensive example demonstrating MontRS features.",
+      "dependencies": [],
       "metadata": {}
     }
   ],
@@ -725,8 +802,71 @@
       "metadata": {}
     }
   ],
+  "packages": [
+    {
+      "name": "agent",
+      "path": "packages\\agent",
+      "invariants": "# Agent Package Invariants\n\n## 1. Responsibility\n`montrs-agent` is the \"describer\" and \"recorder\". It translates the state of a MontRS project into machine-readable formats.\n\n## 2. Invariants\n- **Read-Only by Default**: This package should not modify the user's source code directly. It generates metadata, snapshots, and diffs for external application.\n- **Inference-Free**: This package must NOT contain logic for calling LLMs or performing AI inference. It only prepares the context for those models.\n- **Source of Truth**: The `AgentManager` is the sole authority for generating the `agent.json` specification.\n- **Versioned Errors**: Error captures (errorfiles) must be versioned and include the full context required for an agent to propose a fix.\n\n## 3. Boundary Definitions\n- **In-Scope**: Project snapshotting, error context capturing, tool specification generation.\n- **Out-of-Scope**: Code modification, LLM orchestration, CLI command execution.\n\n## 4. Agent Guidelines\n- When extending the snapshot, ensure new fields are optional or have sensible defaults to maintain backward compatibility.\n- Ensure that any data captured in `agent.json` is derived directly from the source or CLI metadata.\n",
+      "description": null
+    },
+    {
+      "name": "bench",
+      "path": "packages\\bench",
+      "invariants": "# Bench Package Invariants\n\n## 1. Responsibility\n`montrs-bench` provides tools for measuring performance and ensuring no regressions in framework efficiency.\n\n## 2. Invariants\n- **Statistical Significance**: Benchmarking results must be based on a sufficient sample size and provide variance data.\n- **Environment Isolation**: Benchmarks should attempt to minimize noise from background processes.\n\n## 3. Boundary Definitions\n- **In-Scope**: Performance measurement, regression detection, profiling hooks.\n- **Out-of-Scope**: Code optimization logic.\n",
+      "description": null
+    },
+    {
+      "name": "cli",
+      "path": "packages\\cli",
+      "invariants": "# CLI Package Invariants\n\n## 1. Responsibility\n`montrs-cli` is the orchestration hub. It coordinates project lifecycles, builds, and agent-specific metadata generation.\n\n## 2. Invariants\n- **Delegated Logic**: Business and framework logic must reside in `montrs-core`. The CLI only handles orchestration and execution.\n- **Idempotency**: Scaffolding and generation commands should be idempotent where possible. Running `montrs generate` twice should not result in corrupted state.\n- **Agent Synchronization**: Any command that modifies project structure or configuration MUST trigger an update to the `.agent/` directory.\n- **Subcommand Isolation**: Commands (e.g., `build`, `serve`, `generate`) should remain modular and not share mutable state.\n- **External Tooling**: The CLI must wrap external tools (cargo, wasm-pack) rather than reimplementing their functionality.\n\n## 3. Boundary Definitions\n- **In-Scope**: CLI argument parsing, command execution, template management, task running.\n- **Out-of-Scope**: Application business logic, core framework trait definitions, direct code compilation.\n\n## 4. Agent Guidelines\n- Always verify that a command has a corresponding spec in `command/mod.rs`.\n- When adding a new command, ensure it implements proper error reporting via `AgentError`.\n- Use the `utils.rs` helpers for common file operations to ensure consistency.\n",
+      "description": null
+    },
+    {
+      "name": "core",
+      "path": "packages\\core",
+      "invariants": "# Core Package Invariants\n\n## 1. Responsibility\n`montrs-core` is the foundational engine of the framework. It defines the core traits, data structures, and contracts that all other packages must follow.\n\n## 2. Invariants\n- **Zero Local Dependencies**: This package must remain the root of the workspace. It cannot depend on any other package in `packages/`.\n- **Trait-Driven Design**: All framework capabilities (Plates, Routes, Config) must be defined via traits to ensure extensibility and agent-readiness.\n- **Mandatory Metadata**: Every public trait intended for application use MUST implement `.description()` and `.metadata()` methods.\n- **Structured Errors**: All error types must implement the `AgentError` trait, providing stable error codes and suggested fixes.\n- **IO Abstraction**: This package must NOT implement concrete IO (DB drivers, file system logic). It only defines the interfaces.\n\n## 3. Boundary Definitions\n- **In-Scope**: Trait definitions, routing logic, validation primitives, error trait definitions.\n- **Out-of-Scope**: UI rendering, DB implementations, CLI commands, agent inference.\n\n## 4. Agent Guidelines\n- When adding a new trait, ensure it is documented with `description()` so other agents can discover it.\n- Never introduce a dependency on another `montrs-*` package here.\n- Use the `validation.rs` primitives for any new data structures.\n",
+      "description": null
+    },
+    {
+      "name": "fmt",
+      "path": "packages\\fmt",
+      "invariants": "# Formatter Package Invariants\n\n## 1. Responsibility\n`montrs-fmt` ensures a consistent, comment-preserving code style across the MontRS ecosystem, with special support for `view!` macros.\n\n## 2. Invariants\n- **Comment Preservation**: The formatter MUST NOT strip non-doc comments. Preserving developer intent is a priority over \"perfect\" whitespace.\n- **Logical Purity**: The formatter MUST NOT change the logical structure or behavior of the code. It is strictly a whitespace and layout tool.\n- **Idempotency**: Formatting a file multiple times with the same configuration must result in zero changes after the first pass.\n- **The Cascade of Truth**: Configuration must follow the hierarchical resolution (Workspace -> Project -> File) defined in the \"Cascade of Truth\".\n\n## 3. Boundary Definitions\n- **In-Scope**: Rust code formatting, `view!` macro (RSTML) formatting, comment handling.\n- **Out-of-Scope**: Linting, code analysis, auto-fixing of logic errors.\n\n## 4. Agent Guidelines\n- When generating code, you can rely on `montrs-fmt` to clean up the layout, but you must provide the comments yourself.\n- If a formatting error occurs, check the `FormatError` for specific `AgentError` metadata.\n",
+      "description": null
+    },
+    {
+      "name": "montrs",
+      "path": "packages\\montrs",
+      "invariants": "# MontRS Wrapper Package Invariants\n\n## 1. Responsibility\nThe `montrs` package is a high-level wrapper that provides the primary entry point for users consuming the framework as a single dependency.\n\n## 2. Invariants\n- **Clean Re-exports**: This package must cleanly re-export the public API of core packages (`core`, `orm`, `agent`) to provide a unified experience.\n- **Minimal Logic**: This package should contain minimal unique logic, acting primarily as a facade.\n\n## 3. Boundary Definitions\n- **In-Scope**: Re-exports, high-level convenience macros, meta-documentation.\n- **Out-of-Scope**: Implementation of core framework features.\n",
+      "description": null
+    },
+    {
+      "name": "orm",
+      "path": "packages\\orm",
+      "invariants": "# ORM Package Invariants\n\n## 1. Responsibility\n`montrs-orm` provides a type-safe, agent-readable interface for database operations and migrations.\n\n## 2. Invariants\n- **Backend Agnostic**: Core traits must remain independent of specific database backends (SQL, NoSQL, etc.).\n- **Type-Safe Queries**: All queries should be validated at compile-time or through type-safe DSLs defined in this package.\n- **Deterministic Migrations**: Migration logic must be reversible and idempotent.\n\n## 3. Boundary Definitions\n- **In-Scope**: DB traits, migration orchestration, type-safe query builders.\n- **Out-of-Scope**: Direct network handling (delegated to drivers), application business logic.\n",
+      "description": null
+    },
+    {
+      "name": "schema",
+      "path": "packages\\schema",
+      "invariants": "# Schema Package Invariants\n\n## 1. Responsibility\n`montrs-schema` handles procedural macros for validation, serialization, and metadata generation.\n\n## 2. Invariants\n- **Compile-Time Validation**: Errors in schema definition must be caught at compile-time with clear error messages.\n- **Agent-Readable Metadata**: Macros must generate the necessary hooks for `montrs-agent` to understand data structures.\n- **Minimal Runtime Overhead**: Generated code should be as efficient as manually written equivalents.\n\n## 3. Boundary Definitions\n- **In-Scope**: Derive macros, attribute macros, validation logic generation.\n- **Out-of-Scope**: Runtime data processing (delegated to core/orm).\n",
+      "description": null
+    },
+    {
+      "name": "test",
+      "path": "packages\\test",
+      "invariants": "# Test Package Invariants\n\n## 1. Responsibility\n`montrs-test` provides the infrastructure for deterministic unit, integration, and e2e testing.\n\n## 2. Invariants\n- **Determinism**: Tests must be reproducible. Any non-deterministic behavior (time, random) must be mockable via `TestRuntime`.\n- **Isolation**: Tests should not leak state between runs.\n- **Agent-Verifiable**: Testing utilities should provide clear, machine-readable output for agents to verify their own changes.\n\n## 3. Boundary Definitions\n- **In-Scope**: Mocking traits, test runners, assertion libraries, e2e orchestration.\n- **Out-of-Scope**: Implementation of business logic being tested.\n",
+      "description": null
+    },
+    {
+      "name": "utils",
+      "path": "packages\\utils",
+      "invariants": "# Utils Package Invariants\n\n## 1. Responsibility\n`montrs-utils` contains generic, reusable utilities that are used across multiple packages in the workspace.\n\n## 2. Invariants\n- **Side-Effect Free**: Functions in this package should ideally be pure and free of side effects.\n- **Generic Utility**: Only include logic that is truly generic and not specific to a single framework component.\n- **High Stability**: As a low-level dependency, changes here must be carefully vetted for breaking impact.\n\n## 3. Boundary Definitions\n- **In-Scope**: String manipulation, collection helpers, common algorithm implementations.\n- **Out-of-Scope**: Framework-specific logic (Plates, Routes, etc.).\n",
+      "description": null
+    }
+  ],
+  "agent_entry_point": "# 🤖 MontRS Agent Entry Point\r\n\r\nWelcome to the unified command center for MontRS Agents. This document is the \"Map of Maps\"—it defines the operational framework for how you should interact with the codebase based on your current intent.\r\n\r\n---\r\n\r\n## 🧭 Operational Framework: \"What are you doing?\"\r\n\r\nChoose your path based on the task at hand. Do not attempt to \"wing it\"—follow the established workflows to maintain architectural integrity.\r\n\r\n### 1. I am fixing a Bug or Error\r\n- **Goal**: Identify, diagnose, and resolve a failure (compilation, runtime, or architectural).\r\n- **Primary Guide**: [Workflow: Fixing Errors](workflows/fixing-errors.md)\r\n- **Key Tools**: `montrs agent list-errors`, `montrs agent diff`.\r\n\r\n### 2. I am adding a New Feature\r\n- **Goal**: Extend the application or framework with new capabilities.\r\n- **Primary Guide**: [Workflow: Adding Features](workflows/adding-features.md)\r\n- **Key Tools**: `montrs generate plate`, `montrs generate route`, `montrs spec`.\r\n\r\n### 3. I am starting a New Project\r\n- **Goal**: Scaffold a fresh MontRS application from scratch.\r\n- **Primary Guide**: [Workflow: New Projects](workflows/new-projects.md)\r\n- **Key Tools**: `montrs new`.\r\n\r\n### 4. I am restructuring or Refactoring\r\n- **Goal**: Move logic, split plates, or improve architectural health without changing behavior.\r\n- **Primary Guide**: [Workflow: Restructuring](workflows/restructuring.md)\r\n- **Key Tools**: `montrs agent check`.\r\n\r\n---\r\n\r\n## 🎭 System Prompts (Your Identity)\r\n\r\nYour behavior is governed by your specific role. Read these to understand your constraints and core identity:\r\n\r\n- **[App Developer Prompt](app-developer-prompt.md)**: For building applications *using* MontRS.\r\n- **[Framework Contributor Prompt](framework-contributor-prompt.md)**: For developing and maintaining the *framework itself*.\r\n\r\n---\r\n\r\n## 🛡️ Foundational Knowledge\r\n\r\nBefore performing any action, ensure you are grounded in these core principles:\r\n\r\n- **[Agent-First Philosophy](agent-first.md)**: Why we prioritize machine-readability.\r\n- **[Framework Invariants](onboarding.md)**: The rules you must never break.\r\n- **[Spec Snapshot (agent.json)](spec.md)**: How to read the project's current state.\r\n- **[Metadata Standards](metadata.md)**: How to annotate code for discovery.\r\n\r\n---\r\n\r\n## 🔌 Tooling & Integration\r\n\r\n- **[MCP Setup & Access](mcp-setup.md)**: How to connect your capabilities to the project.\r\n- **[Agentic CLI Guide](agentic-workflows.md)**: Mastering the command-line loop.\r\n",
   "documentation_snippets": {
-    "debugging": "\n# Debugging MontRS\nMontRS provides an `errorfile.json` in the `.agent/errorfiles` folder when a build or test fails.\nAgents should use these files to understand the context of the error and propose fixes.\n",
-    "architecture": "\n# MontRS Architecture Guide\nMontRS is a trait-driven, deterministic web framework built on Leptos 0.8.\n\n## Core Concepts\n- **AppSpec**: The single source of truth for the application blueprint.\n- **Plate**: A unit of composition (Auth, Blog, etc.) that registers routes and providers.\n- **Loaders**: Read-only, idempotent data fetching.\n- **Actions**: State-changing mutations.\n\n## How to build a plate\n1. Implement the `Plate` trait.\n2. Define your `Loader` and `Action` implementations.\n3. Register them in `register_routes`.\n"
+    "architecture": "\n# MontRS Architecture Guide\nMontRS is a trait-driven, deterministic web framework built on Leptos 0.8.\n\n## Core Concepts\n- **AppSpec**: The single source of truth for the application blueprint.\n- **Plate**: A unit of composition (Auth, Blog, etc.) that registers unified routes.\n- **Unified Route**: A single struct implementing `Route` that unifies Params, Loader, Action, and View.\n- **Loaders**: Read-only, idempotent data fetching.\n- **Actions**: State-changing mutations.\n\n## How to build a plate\n1. Implement the `Plate` trait.\n2. Define explicit dependencies using the `dependencies()` method if your plate requires other plates to be initialized first.\n3. Define your `Route` implementation (which includes its `Loader`, `Action`, and `View`).\n4. Register the route in `register_routes` using `router.register(MyRoute)`.\n",
+    "debugging": "\n# Debugging MontRS\nMontRS provides an `errorfile.json` in the `.agent/errorfiles` folder when a build or test fails.\nAgents should use these files to understand the context of the error and propose fixes.\n"
   }
 }

@@ -16,7 +16,17 @@ pub struct AgentSnapshot {
     pub structure: Vec<FileEntry>,
     pub plates: Vec<PlateSummary>,
     pub routes: Vec<RouteSummary>,
+    pub packages: Vec<PackageSummary>,
+    pub agent_entry_point: Option<String>,
     pub documentation_snippets: HashMap<String, String>,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct PackageSummary {
+    pub name: String,
+    pub path: String,
+    pub invariants: Option<String>,
+    pub description: Option<String>,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -459,21 +469,28 @@ impl AgentManager {
                 for entry in entries.flatten() {
                     let path = entry.path();
                     if path.is_dir() {
-                        let pkg_name = path.file_name().unwrap().to_string_lossy();
+                        let pkg_name = path.file_name().map(|f| f.to_string_lossy()).unwrap_or_default();
                         
-                        // 1. Scan README for high-level capabilities
+                        // 1. Scan README and docs/invariants.md for high-level capabilities
                         let readme_path = path.join("README.md");
-                        if readme_path.exists() {
+                        let invariants_path = path.join("docs").join("invariants.md");
+                        let mut description = format!("Capability provided by package {}. Refer to its README for details.", pkg_name);
+                        
+                        if invariants_path.exists() {
+                            description = format!("Capability provided by package {}. MUST follow invariants in {}/docs/invariants.md", pkg_name, pkg_name);
+                        } else if readme_path.exists() {
                             if let Ok(content) = fs::read_to_string(&readme_path) {
                                 if content.contains("Agent Usage Guide") || content.contains("Key Features") || content.contains("Key Components") || content.contains("Agent") {
-                                    tools.push(serde_json::json!({
-                                        "name": format!("montrs_pkg_{}", pkg_name),
-                                        "description": format!("Capability provided by package {}. Refer to its README for details.", pkg_name),
-                                        "parameters": { "type": "object", "properties": {} }
-                                    }));
+                                    // Keep default description or refine if needed
                                 }
                             }
                         }
+
+                        tools.push(serde_json::json!({
+                            "name": format!("montrs_pkg_{}", pkg_name),
+                            "description": description,
+                            "parameters": { "type": "object", "properties": {} }
+                        }));
 
                         // 2. Scan source for explicit @agent-tool markers
                         let src_dir = path.join("src");
@@ -682,6 +699,42 @@ impl AgentManager {
         documentation_snippets.insert("architecture".to_string(), guides::ARCHITECTURE_GUIDE.to_string());
         documentation_snippets.insert("debugging".to_string(), guides::DEBUGGING_GUIDE.to_string());
 
+        // Discover packages and their invariants
+        let mut packages = Vec::new();
+        let packages_dir = self.root_path.join("packages");
+        if packages_dir.exists() {
+            if let Ok(entries) = fs::read_dir(&packages_dir) {
+                for entry in entries.flatten() {
+                    if entry.path().is_dir() {
+                        let name = entry.file_name().to_string_lossy().to_string();
+                        let relative_path = entry.path().strip_prefix(&self.root_path)?.to_string_lossy().to_string();
+                        
+                        let invariants_path = entry.path().join("docs").join("invariants.md");
+                        let invariants = if invariants_path.exists() {
+                            fs::read_to_string(invariants_path).ok()
+                        } else {
+                            None
+                        };
+
+                        packages.push(PackageSummary {
+                            name,
+                            path: relative_path,
+                            invariants,
+                            description: None,
+                        });
+                    }
+                }
+            }
+        }
+
+        // Check for Agent Entry Point
+        let entry_point_path = self.root_path.join("docs").join("agent").join("index.md");
+        let agent_entry_point = if entry_point_path.exists() {
+            Some(fs::read_to_string(entry_point_path)?)
+        } else {
+            None
+        };
+
         let (plates, routes) = if let Some(s) = spec {
             let mut plates = Vec::new();
             let mut routes = Vec::new();
@@ -721,6 +774,8 @@ impl AgentManager {
             structure,
             plates,
             routes,
+            packages,
+            agent_entry_point,
             documentation_snippets,
         })
     }

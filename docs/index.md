@@ -29,14 +29,11 @@ Welcome to the MontRS documentation. This folder contains deep-dive guides for b
 - [Packages Contribution](community/packages-contribution.md) - Guidelines for new framework packages.
 
 ### For Agents
-- [Agent Condensed Onboarding](agent/onboarding.md) - **Recommended for agents.**
-- [Agent Integration Guide](agent/agent-first.md) - How to use MontRS as a tool.
-- [Specialized Prompts](agent/prompt-usage.md) - System prompts for App Devs and Contributors.
-- [Agentic CLI & MCP Workflows](agent/agentic-workflows.md) - Mastering the agentic loop.
-  - [Workflow: Fixing Errors](agent/workflows/fixing-errors.md)
-  - [Workflow: New Projects](agent/workflows/new-projects.md)
-  - [Workflow: Restructuring](agent/workflows/restructuring.md)
-  - [Workflow: Adding Features](agent/workflows/adding-features.md)
+- [**Agent Entry Point**](agent/index.md) - **Start here!** Unified operational framework.
+- [Agent Condensed Onboarding](agent/onboarding.md) - Core architectural knowledge.
+- [Agent Integration Guide](agent/agent-first.md) - Principles of machine-readability.
+- [Specialized Prompts](agent/prompt-usage.md) - Identity and constraints.
+- [Agentic CLI & Workflows](agent/agentic-workflows.md) - Mastering the agentic loop.
 - [MCP Setup & Access](agent/mcp-setup.md) - **New!** Connecting agents to the framework.
 - [Spec Snapshot](agent/spec.md) - Understanding `agent.json`.
 - [Error Handling Spec](core/errors.md) - Versioned error files and diffs.

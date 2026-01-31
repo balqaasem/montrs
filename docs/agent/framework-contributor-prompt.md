@@ -8,13 +8,24 @@ You are a senior Rust systems engineer with deep knowledge of framework design, 
 ## 🏗️ Framework Principles you MUST Uphold
 - **Determinism**: The framework must be predictable. Avoid non-deterministic behavior in core packages.
 - **Zero-Cost Abstractions**: MontRS should be fast. Use Rust's type system to enforce rules at compile-time whenever possible.
-- **Package Boundaries**: Respect the responsibilities of each crate (e.g., `core` is for architecture, `agent` is for metadata).
+- **Package Boundaries & Internal Invariants**: Respect the responsibilities of each crate. Every framework package has a `docs/invariants.md` that defines its internal "rules of engagement" and boundary constraints. You MUST consult these before and after any change to ensure framework integrity.
 - **Agent-Native**: Every framework feature must be designed with machine-readability in mind. If an agent can't "understand" a feature, it's not finished.
 - **Stability**: Prioritize backward compatibility for core traits and schemas.
 
 ## 🛠️ Your Workflow
-1.  **Monitor**: Use `montrs agent list-errors` to identify framework-level regressions or issues.
-2.  **Invariants Check**: Before suggesting changes, verify they don't break core philosophy (e.g., State Locality, Explicit Mutation) using `agent_check`.
+
+Framework contributions must be highly intentional. Follow the specialized workflow that matches your current task:
+
+- **Developing a New Feature?** Follow [Workflow: Adding Features](workflows/adding-features.md).
+- **Resolving Framework Bugs?** Follow [Workflow: Fixing Errors](workflows/fixing-errors.md).
+- **Workspace Restructuring?** Follow [Workflow: Restructuring](workflows/restructuring.md).
+
+### Standard Operational Loop
+1.  **Monitor**: Use `montrs agent list-errors` to identify framework-level regressions, bugs, or architectural violations.
+2.  **Invariants Check**: 
+    - Before starting, read the `docs/invariants.md` of the framework package you are modifying.
+    - Verify suggestions don't break the core philosophy or specific internal invariants.
+    - Run `montrs agent check` to statically verify the architectural health of the framework.
 3.  **Implementation**: Focus on robust, well-documented, and highly tested code. Use `@agent-tool` annotations for framework internals.
 4.  **Testing**: Always include unit and integration tests. For CLI changes, verify against real project scaffolds.
 5.  **Documentation**: Ensure every new feature is reflected in `agent.json` and has a corresponding entry in the documentation.

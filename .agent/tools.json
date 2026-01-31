@@ -89,7 +89,7 @@
       }
     },
     {
-      "description": "Capability provided by package agent. Refer to its README for details.",
+      "description": "Capability provided by package agent. MUST follow invariants in agent/docs/invariants.md",
       "name": "montrs_pkg_agent",
       "parameters": {
         "properties": {},
@@ -113,7 +113,7 @@
       }
     },
     {
-      "description": "Capability provided by package bench. Refer to its README for details.",
+      "description": "Capability provided by package bench. MUST follow invariants in bench/docs/invariants.md",
       "name": "montrs_pkg_bench",
       "parameters": {
         "properties": {},
@@ -129,7 +129,7 @@
       }
     },
     {
-      "description": "Capability provided by package cli. Refer to its README for details.",
+      "description": "Capability provided by package cli. MUST follow invariants in cli/docs/invariants.md",
       "name": "montrs_pkg_cli",
       "parameters": {
         "properties": {},
@@ -137,7 +137,7 @@
       }
     },
     {
-      "description": "Capability provided by package core. Refer to its README for details.",
+      "description": "Capability provided by package core. MUST follow invariants in core/docs/invariants.md",
       "name": "montrs_pkg_core",
       "parameters": {
         "properties": {},
@@ -145,7 +145,7 @@
       }
     },
     {
-      "description": "Capability provided by package fmt. Refer to its README for details.",
+      "description": "Capability provided by package fmt. MUST follow invariants in fmt/docs/invariants.md",
       "name": "montrs_pkg_fmt",
       "parameters": {
         "properties": {},
@@ -161,7 +161,15 @@
       }
     },
     {
-      "description": "Capability provided by package orm. Refer to its README for details.",
+      "description": "Capability provided by package montrs. MUST follow invariants in montrs/docs/invariants.md",
+      "name": "montrs_pkg_montrs",
+      "parameters": {
+        "properties": {},
+        "type": "object"
+      }
+    },
+    {
+      "description": "Capability provided by package orm. MUST follow invariants in orm/docs/invariants.md",
       "name": "montrs_pkg_orm",
       "parameters": {
         "properties": {},
@@ -177,7 +185,7 @@
       }
     },
     {
-      "description": "Capability provided by package schema. Refer to its README for details.",
+      "description": "Capability provided by package schema. MUST follow invariants in schema/docs/invariants.md",
       "name": "montrs_pkg_schema",
       "parameters": {
         "properties": {},
@@ -185,7 +193,7 @@
       }
     },
     {
-      "description": "Capability provided by package test. Refer to its README for details.",
+      "description": "Capability provided by package test. MUST follow invariants in test/docs/invariants.md",
       "name": "montrs_pkg_test",
       "parameters": {
         "properties": {},
@@ -195,6 +203,14 @@
     {
       "description": "Runs unit, integration, and end-to-end tests for the MontRS project.",
       "name": "test_run",
+      "parameters": {
+        "properties": {},
+        "type": "object"
+      }
+    },
+    {
+      "description": "Capability provided by package utils. MUST follow invariants in utils/docs/invariants.md",
+      "name": "montrs_pkg_utils",
       "parameters": {
         "properties": {},
         "type": "object"

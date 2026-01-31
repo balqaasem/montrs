@@ -6,7 +6,8 @@ This guide defines the "Golden Path" for adding functionality to an app or exten
 
 ## 📱 For Application Developers
 
-1.  **Define Schema**: Create input/output structs with `#[derive(Schema)]`.
+1.  **Contextualize**: Read the `docs/invariants.md` of the MontRS framework packages you are utilizing. These define the "rules of engagement" for using the framework's features correctly.
+2.  **Define Schema**: Create input/output structs with `#[derive(Schema)]`.
 2.  **Generate Boilerplate**:
     -   Run `montrs generate plate <name>` for new features.
     -   Run `montrs generate route <path> --plate <name>` for new endpoints.
@@ -23,7 +24,8 @@ This guide defines the "Golden Path" for adding functionality to an app or exten
 
 ## 🏗️ For Framework Contributors
 
-1.  **Trait Definition**: Define new core traits in `packages/core`.
+1.  **Invariants Check**: Read `packages/<target>/docs/invariants.md` to understand the internal architectural rules and boundary constraints of the framework package you are modifying.
+2.  **Trait Definition**: Define new core traits in `packages/core`.
 2.  **Implementation**: Provide default or specialized implementations in relevant packages.
 3.  **Macro Support**: If the feature requires automation, update `packages/schema` (procedural macros).
 4.  **CLI Integration**: Update `montrs generate` commands in `packages/cli` if the feature requires boilerplate.
@@ -36,7 +38,8 @@ This guide defines the "Golden Path" for adding functionality to an app or exten
 ---
 
 ## 🤖 Agent Instructions (MCP)
--   **Step 1**: Use `montrs generate` tools whenever possible to ensure architectural consistency.
--   **Step 2**: Follow the **Golden Path** (Schema -> Generation -> Implementation -> Registration).
--   **Step 3**: Always add `description()` to Loaders and Actions.
--   **Step 4**: `agent_check({})` to verify compliance.
+-   **Step 1**: Read the relevant framework `docs/invariants.md` before proposing changes to ensure you are using the framework's features as intended.
+-   **Step 2**: Use `montrs generate` tools whenever possible to ensure architectural consistency.
+-   **Step 3**: Follow the **Golden Path** (Schema -> Generation -> Implementation -> Registration).
+-   **Step 4**: Always add `description()` to Loaders and Actions.
+-   **Step 5**: `agent_check({})` to verify compliance.
